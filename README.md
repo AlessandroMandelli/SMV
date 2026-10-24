@@ -1,4 +1,4 @@
-# Schede Restauro 2.4
+# Schede Restauro 2.5
 
 PWA per la schedatura del Sacro Monte di Varese. Versione aggiornata del 24 ottobre 2026.
 
@@ -12,6 +12,17 @@ PWA per la schedatura del Sacro Monte di Varese. Versione aggiornata del 24 otto
 Il sito è già compilato: per pubblicarlo non servono Node, npm, un server applicativo o chiavi API. Le cartelle `assets`, `js` e `vendor`, insieme al file `app.bundle.js`, devono essere caricate integralmente. La grafica del PDF e i suoi font sono inclusi nel pacchetto.
 
 ## Modifiche di questa versione
+
+- **Pagina 1 del PDF:** sempre presente e completa di tutte le etichette del modello, anche con campi vuoti.
+- **Pagina 2:** titoli delle sezioni 3, 4 e 5 sempre presenti; le etichette dei campi non compilati vengono nascoste. I gruppi e le tabelle vuoti non aggiungono pagine.
+- **Atlante fotografico vuoto:** rimane soltanto il titolo, aggiunto alla pagina precedente se c'è spazio prima del piè di pagina; altrimenti viene creata una pagina di continuazione. Rimane prima dell'Atlante anche il titolo dell'Indice di priorità. Le foto presenti restano quattro per pagina.
+- **Manutenzione immediata:** rimangono intestazione, dati fissi e titolo Interventi eseguiti. Macro-Area e Azioni condotte in loco vengono mostrate soltanto se compilate. Interventi completamente vuoti esclusi dalla stampa.
+- **Azioni preventive:** rimangono intestazione, dati fissi e titolo Azioni preventive. Grado d'urgenza, finestra d'intervento, descrizione, azione, obiettivo e operatore compaiono soltanto con un valore. I gruppi Qualifica e Stato compaiono soltanto se esiste una selezione, conservando le opzioni e i checkbox del modello.
+- Note aggiuntive e relativi riquadri nascosti quando vuoti, eccetto gli elementi che appartengono alla struttura obbligatoria della prima pagina. Le intestazioni delle continuazioni mantengono anche ID, data e oggetto della scheda.
+
+Le posizioni degli altri campi rimangono quelle del modello. Il titolo dell'Atlante viene collocato dopo tutti i dati e le eventuali continuazioni precedenti, senza sovrapporsi al contenuto o al piè di pagina. Spazi e righe completamente vuote non sono considerati dati compilati.
+
+Sono comprese anche le modifiche della versione 2.4:
 
 - Titolo della home aggiornato in **Schede di Restauro**, largo quanto **Sacro Monte di Varese**. Conservati il grassetto del titolo, il peso regolare del sottotitolo e i colori. La dimensione del titolo si adatta al font effettivo del dispositivo e viene riallineata al ridimensionamento della finestra o al caricamento dei font.
 
@@ -63,7 +74,7 @@ Tutte le risorse di esecuzione sono locali. Al primo accesso con connessione il 
 
 Sono selezionabili 14 cappelle e tre archi. Il punto della mappa viene selezionato e bloccato automaticamente. Le posizioni delle 14 cappelle sono quelle della repository originale.
 
-L'interfaccia è organizzata in sei sezioni. Il PDF ha una struttura indipendente: usa le cinque pagine del nuovo riferimento, aggiungendo continuazioni per i dati eccedenti. Non esiste un limite di sette pagine.
+L'interfaccia è organizzata in sei sezioni. Il PDF ha una struttura indipendente e usa le cinque pagine del riferimento come modello. Può omettere la pagina dedicata all'Atlante vuoto, portandone il titolo nella precedente quando c'è spazio, e aggiunge continuazioni per i dati eccedenti. Non esiste un limite di sette pagine.
 
 ID e Oggetto sono condivisi fra le sezioni. Le date sono inizializzate alla creazione e modificabili separatamente; riaprire la bozza non le aggiorna. Lo storico usa mese e anno. I numeri usano virgola decimale e punto delle migliaia. Le misure aggiungono l'unità m.
 
@@ -89,7 +100,7 @@ I file pronti rimangono disponibili finché non modifichi la scheda. Dopo una mo
 
 I dati compilati vengono sovrapposti ai campi, a 9,5 pt e con minimo 8 pt. Si usano i sottoinsiemi Arial incorporati nel PDF originale. Poiché il riferimento contiene solo alcuni caratteri di Arial, i caratteri mancanti nei testi aggiunti usano Liberation Sans, compatibile con le metriche di Arial. **I font delle parti originali restano integralmente quelli del PDF fornito.** I simboli non disponibili vengono segnalati, senza eliminarli silenziosamente.
 
-Le pagine di continuazione riutilizzano porzioni vettoriali del modello, preservando lo stile dei rispettivi blocchi. Le tabelle aggiungono soltanto righe compilate e nuove pagine quando necessario, con intestazioni ripetute. I livelli e i rientri degli elenchi puntati delle azioni preventive vengono dal PDF originale. Un testo eccedente viene segnalato con “segue” nel campo e riportato nella continuazione, senza perdere contenuto. Le fotografie sono disposte quattro per pagina su fondo bianco.
+Le pagine di continuazione riutilizzano porzioni vettoriali del modello, preservando lo stile dei rispettivi blocchi. Le tabelle aggiungono soltanto righe compilate e nuove pagine quando necessario, con intestazioni ripetute. I livelli e i rientri degli elenchi puntati delle azioni preventive vengono dal PDF originale; i singoli punti vuoti vengono nascosti. Un testo eccedente viene segnalato con “segue” nel campo e riportato nella continuazione, senza perdere contenuto. Le fotografie sono disposte quattro per pagina su fondo bianco.
 
 ## File del progetto
 
