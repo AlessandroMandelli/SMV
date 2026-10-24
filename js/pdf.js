@@ -12,6 +12,10 @@ import {
 const WIDTH = 792,
   HEIGHT = 612,
   BOTTOM = 550;
+const PRIORITY_TITLE = [32, 28, 725, 20];
+const ATLAS_TITLE = [32, 227.8, 727.5, 20.5];
+const IMMEDIATE_NOTES = [27, 456, 727, 100];
+const PREVENTIVE_NOTES = [31, 466, 727, 87];
 const files = new Map();
 const normalize = (value) =>
   String(value ?? "")
@@ -87,6 +91,7 @@ class TemplateReport {
     this.fonts = fonts;
     this.api = api;
     this.overflow = [];
+    this.used = new Map();
     this.coverage = new Map(
       Object.values(fonts).map((font) => [
         font,
@@ -97,6 +102,7 @@ class TemplateReport {
   page(index) {
     const page = this.pdf.addPage([WIDTH, HEIGHT]);
     page.drawPage(this.templates[index]);
+    this.used.set(page, [540, 365.5, 0, 218, 216][index]);
     return page;
   }
   slice(page, index, x, top, width, height, destX = x, destTop = top) {
@@ -110,14 +116,55 @@ class TemplateReport {
     );
     page.drawPage(this.templates[index], { x: destX - x, y: top - destTop });
     page.pushOperators(popGraphicsState());
+    if (destTop < BOTTOM) this.mark(page, destTop + height);
   }
   clear(page, x, top, width, height, color = this.api.rgb(1, 1, 1)) {
     page.drawRectangle({ x, y: HEIGHT - top - height, width, height, color });
   }
+  mark(page, bottom) {
+    this.used.set(page, Math.max(this.used.get(page) || 0, bottom));
+  }
+  hideUnless(page, visible, rect, color) {
+    if (!visible) this.clear(page, ...rect, color);
+  }
+  appendHeading(index, rect) {
+    let page = this.pdf.getPages().at(-1);
+    let top = (this.used.get(page) ?? BOTTOM) + 14;
+    if (top + rect[3] > BOTTOM) {
+      page = this.continuation(index);
+      top = 30;
+    }
+    this.slice(page, index, ...rect, rect[0], top);
+    return page;
+  }
   continuation(index, heading) {
     const page = this.pdf.addPage([WIDTH, HEIGHT]);
+    this.used.set(page, 0);
     this.slice(page, index, 0, 560, WIDTH, 52);
-    if (index === 3 || index === 4) this.slice(page, index, 0, 0, WIDTH, 215);
+    if (index === 3 || index === 4) {
+      this.slice(page, index, 0, 0, WIDTH, index === 3 ? 218 : 215);
+      if (this.state) {
+        const date =
+          index === 3 ? this.state.immediate.date : this.state.preventive.date;
+        sharedFields(this, page, this.state, date, false);
+        if (index === 3) {
+          this.hideUnless(
+            page,
+            hasText(this.state.immediate.executedDate),
+            [121, 164.9, 620, 12.5],
+          );
+          this.fit(
+            page,
+            "Eseguiti in data",
+            displayDate(this.state.immediate.executedDate),
+            201,
+            165.4,
+            520,
+            13,
+          );
+        }
+      }
+    }
     if (heading)
       this.slice(
         page,
@@ -173,6 +220,7 @@ class TemplateReport {
       run += char;
     }
     flush();
+    if (hasText(text)) this.mark(page, baseline + size * 0.3);
   }
   lines(text, width, size = 9.5) {
     const lines = [];
@@ -209,7 +257,7 @@ class TemplateReport {
     height,
     { color, bold = false, queue = true } = {},
   ) {
-    if (!normalize(value)) return;
+    if (!hasText(value)) return;
     let size = 9.5,
       lines;
     for (; size >= 8; size -= 0.25) {
@@ -240,6 +288,7 @@ class TemplateReport {
       );
   }
   check(page, x, top, size = 8) {
+    this.mark(page, top + size);
     const c = this.api.rgb(0, 0.22, 0.42);
     page.drawLine({
       start: { x: x + 1, y: HEIGHT - top - size * 0.5 },
@@ -298,8 +347,8 @@ function diagnostics(report, page, rows) {
   const headers = [32.58, 380.86, 714.84, 20.7];
   const entries = rows.filter(diagnosisHasContent);
   // Il modello contiene righe vuote prestampate: coprile anche senza dati.
-  const tableTop = entries.length ? 401.8 : 380.6;
-  report.clear(page, 32.3, tableTop, 715.4, 558.8 - tableTop);
+  const tableTop = entries.length ? 401.8 : 380;
+  report.clear(page, 31, tableTop, 718, 560 - tableTop);
   if (!entries.length) return;
   let current = page,
     y = 401.8,
@@ -367,6 +416,7 @@ function diagnostics(report, page, rows) {
         });
       }
       y += height;
+      report.mark(current, y);
       offset += count;
       if (offset < total) next();
     }
@@ -378,55 +428,60 @@ function history(report, page, state) {
     ["restorations", 63.3],
     ["maintenance", 147.9],
   ]) {
-    const rows = state.history[key];
+    const rows = state.history[key].filter((row) =>
+      [row.date, row.action].some(hasText),
+    );
     const first = rows[0];
     const dateTop = key === "restorations" ? 80.2 : 162.5,
       actionTop = key === "restorations" ? 97.2 : 177.1;
-    if (first) {
+    function fields(target, row, offset = 0, height = 38) {
+      report.hideUnless(target, hasText(row.date), [
+        35,
+        dateTop + offset - 0.5,
+        30,
+        12,
+      ]);
+      report.hideUnless(target, hasText(row.action), [
+        35,
+        actionTop + offset - 0.5,
+        39,
+        12,
+      ]);
       report.fit(
-        page,
+        target,
         "Data intervento precedente",
-        displayMonth(first.date),
+        displayMonth(row.date),
         66,
-        dateTop,
+        dateTop + offset,
         650,
         14,
       );
       report.fit(
-        page,
+        target,
         "Azione precedente",
-        first.action,
+        row.action,
         74,
-        actionTop,
+        actionTop + offset,
         665,
-        38,
+        height,
       );
     }
+    if (first) fields(page, first);
+    else report.clear(page, 35, top - 1, 710, key === "restorations" ? 74 : 68);
     for (const row of rows.slice(1)) {
       const continuation = report.continuation(1);
       report.slice(continuation, 1, 28, 28.5, 724, 18, 28, 29);
       report.slice(continuation, 1, 35, top - 3, 705, 69, 35, 65);
-      report.fit(
-        continuation,
-        "Data intervento precedente",
-        displayMonth(row.date),
-        66,
-        65 + dateTop - top + 3,
-        650,
-        14,
-      );
-      report.fit(
-        continuation,
-        "Azione precedente",
-        row.action,
-        74,
-        65 + actionTop - top + 3,
-        665,
-        400,
-      );
+      fields(continuation, row, 68 - top, 400);
     }
   }
-  state.conditions.forEach((condition, i) => {
+  const conditions = state.conditions.filter(
+    (condition) =>
+      [condition.exposure, condition.assessment].some(hasText) ||
+      condition.methods.length,
+  );
+  if (!conditions.length) report.clear(page, 35, 260.8, 710, 73);
+  conditions.forEach((condition, i) => {
     let target = page,
       offset = 0;
     if (i) {
@@ -435,6 +490,24 @@ function history(report, page, state) {
       report.slice(target, 1, 28, 223, 724, 110, 28, 30);
       offset = 193;
     }
+    report.hideUnless(target, hasText(condition.exposure), [
+      35,
+      260.8 - offset,
+      66,
+      12,
+    ]);
+    report.hideUnless(target, condition.methods.length > 0, [
+      35,
+      277.5 - offset,
+      710,
+      14,
+    ]);
+    report.hideUnless(target, hasText(condition.assessment), [
+      35,
+      296.3 - offset,
+      107,
+      12,
+    ]);
     report.fit(
       target,
       "Esposizione",
@@ -458,9 +531,95 @@ function history(report, page, state) {
     );
   });
 }
+
+function priority(report, page, row, dy = 0) {
+  const filled = row && [row.risk, row.window, row.anomalies].some(hasText);
+  if (!filled) {
+    report.clear(page, 31, 28 - dy, 727, 115);
+    report.slice(
+      page,
+      2,
+      ...PRIORITY_TITLE,
+      PRIORITY_TITLE[0],
+      PRIORITY_TITLE[1] - dy,
+    );
+    return;
+  }
+  const background = report.api.rgb(0.91, 0.945, 0.949);
+  report.mark(page, 141.5 - dy);
+  report.hideUnless(
+    page,
+    hasText(row.risk),
+    [36.5, 58 - dy, 91, 13.5],
+    background,
+  );
+  report.hideUnless(
+    page,
+    hasText(row.risk) && hasText(row.window),
+    [178.5, 58 - dy, 22, 13.5],
+    background,
+  );
+  report.hideUnless(
+    page,
+    hasText(row.window),
+    [206.8, 58 - dy, 500, 26.5],
+    background,
+  );
+  report.hideUnless(
+    page,
+    hasText(row.anomalies),
+    [206.8, 85.8 - dy, 78, 12],
+    background,
+  );
+  report.risk(page, row.risk, 129, 58.7 - dy, 48);
+  for (const [i, x] of [207.6, 392.2, 477.5, 576.8].entries())
+    if (row.window === WINDOWS[i]) report.check(page, x, 74 - dy);
+  report.fit(page, "Anomalie attese", row.anomalies, 285, 86.4 - dy, 452, 56);
+}
+
+async function inspectionEnd(report, state) {
+  const priorities = state.priorities.filter((row) =>
+    [row.risk, row.window, row.anomalies].some(hasText),
+  );
+  if (
+    !priorities.length &&
+    !hasText(state.inspectionNotes) &&
+    !state.photos.length
+  ) {
+    // Conserva il titolo delle priorità; l'atlante non richiede una pagina vuota.
+    report.appendHeading(2, PRIORITY_TITLE);
+    report.appendHeading(2, ATLAS_TITLE);
+    return;
+  }
+  const page = report.page(2);
+  priority(report, page, priorities[0]);
+  report.hideUnless(page, hasText(state.inspectionNotes), [31, 155, 727, 60]);
+  if (hasText(state.inspectionNotes)) report.mark(page, 214.5);
+  report.fit(
+    page,
+    "Note aggiuntive",
+    state.inspectionNotes,
+    118,
+    160.1,
+    620,
+    55,
+  );
+  if (!state.photos.length) report.clear(page, 31, 227, 729, 324);
+  for (const row of priorities.slice(1)) {
+    const continuation = report.continuation(2);
+    report.slice(continuation, 2, 32.7, 28.4, 724.5, 114);
+    priority(report, continuation, row);
+  }
+  if (state.photos.length) {
+    report.mark(page, 248.3);
+    await photographs(report, page, state.photos);
+  }
+  report.flushOverflow(2);
+  if (!state.photos.length) report.appendHeading(2, ATLAS_TITLE);
+}
 async function photographs(report, page, photos) {
   // Rimuovi sfondo, bordi e segnaposto del modello, anche con l'atlante vuoto.
-  report.clear(page, 32.3, 262, 727.2, 288);
+  report.clear(page, 31, 261.5, 729, 289.5);
   if (!photos.length) return;
   const gap = 12,
     width = (712 - gap) / 2;
@@ -494,14 +653,23 @@ async function photographs(report, page, photos) {
     });
   }
 }
-function sharedFields(report, page, state, date) {
-  report.fit(page, "ID Scheda", state.general.id, 178, 60.9, 300, 12);
-  report.fit(page, "Data", displayDate(date), 152, 75.5, 320, 12);
-  report.fit(page, "Oggetto", state.general.object, 165, 102.6, 568, 12);
+function sharedFields(report, page, state, date, queue = true) {
+  report.fit(page, "ID Scheda", state.general.id, 178, 60.9, 300, 12, {
+    queue,
+  });
+  report.fit(page, "Data", displayDate(date), 152, 75.5, 320, 12, { queue });
+  report.fit(page, "Oggetto", state.general.object, 165, 102.6, 568, 12, {
+    queue,
+  });
 }
 function immediate(report, state) {
   let page = report.page(3);
   sharedFields(report, page, state, state.immediate.date);
+  report.hideUnless(
+    page,
+    hasText(state.immediate.executedDate),
+    [121, 164.9, 620, 12.5],
+  );
   report.fit(
     page,
     "Eseguiti in data",
@@ -511,17 +679,16 @@ function immediate(report, state) {
     520,
     13,
   );
-  const rows = state.immediate.records;
-  rows.forEach((row, i) => {
-    if (i) {
-      page = report.continuation(3);
-      sharedFields(report, page, state, state.immediate.date);
-      report.slice(page, 3, 28, 200, 736, 18);
-      report.slice(page, 3, 28, 232, 736, 36);
-    }
-    report.fit(page, "Macro-Area", row.area, 91, 237.4, 646, 13);
+  const rows = state.immediate.records.filter((row) =>
+    [row.area, row.action].some(hasText),
+  );
+  report.clear(page, ...IMMEDIATE_NOTES);
+  function fields(target, row) {
+    report.hideUnless(target, hasText(row.area), [28, 236.8, 64, 12]);
+    report.hideUnless(target, hasText(row.action), [28, 253.7, 115, 12]);
+    report.fit(target, "Macro-Area", row.area, 91, 237.4, 646, 13);
     report.fit(
-      page,
+      target,
       "Azioni condotte in loco",
       row.action,
       143,
@@ -529,8 +696,21 @@ function immediate(report, state) {
       594,
       192,
     );
+  }
+  if (!rows.length) fields(page, { area: "", action: "" });
+  rows.forEach((row, i) => {
+    if (i) {
+      page = report.continuation(3);
+      report.slice(page, 3, 28, 232, 736, 36);
+      report.hideUnless(
+        page,
+        hasText(state.immediate.executedDate),
+        [121, 164.9, 620, 12.5],
+      );
+    }
+    fields(page, row);
   });
-  if (rows.length > 1) report.slice(page, 3, 28, 454, 736, 96);
+  if (hasText(state.immediate.notes)) report.slice(page, 3, ...IMMEDIATE_NOTES);
   report.fit(
     page,
     "Note aggiuntive",
@@ -541,29 +721,95 @@ function immediate(report, state) {
     77,
   );
 }
+
+function preventiveFields(report, page, action) {
+  report.clear(page, 28, 294.8, 721, 164);
+  if (!action) return;
+  if (hasText(action.risk)) {
+    report.slice(page, 4, 35, 295.5, 84, 11.8);
+    report.risk(page, action.risk, 122, 296, 57);
+  }
+  if (hasText(action.window)) {
+    report.slice(page, 4, 213, 295.5, 101.5, 11.8);
+    report.fit(page, "Finestra d’intervento", action.window, 318, 296, 420, 14);
+  }
+  if (hasText(action.risk) && hasText(action.window))
+    report.slice(page, 4, 184.5, 295.5, 20, 11.8);
+  // Ogni etichetta e ogni pallino rimangono quelli vettoriali del modello.
+  const fields = [
+    ["Descrizione", action.description, 317, 335.45, 128, 324.5],
+    ["Azione", action.action, 335.45, 346.95, 141, 336.02],
+    ["Obiettivo", action.objective, 346.95, 358.45, 151, 347.54],
+    ["Operatore", action.operator, 358.45, 369.7, 156, 359],
+  ];
+  const heights = fields.map(([, value, top, bottom, x]) => {
+    const lines = hasText(value) ? report.lines(value, 740 - x).length : 0;
+    return Math.max(bottom - top, lines > 1 ? lines * 11.3 : 0);
+  });
+  const extra = heights.reduce(
+    (sum, height, i) => sum + height - (fields[i][3] - fields[i][2]),
+    0,
+  );
+  let shift = 0;
+  fields.forEach(([label, value, top, bottom, x, fieldTop], i) => {
+    if (hasText(value)) {
+      report.slice(page, 4, 28, top, 720, bottom - top, 28, top + shift);
+      report.fit(
+        page,
+        label,
+        value,
+        x,
+        fieldTop + shift,
+        740 - x,
+        extra < 38 ? heights[i] : bottom - top,
+      );
+    }
+    if (extra < 38) shift += heights[i] - (bottom - top);
+  });
+  if (ROLES.includes(action.role)) {
+    report.slice(page, 4, 82, 369.7, 211.5, 48, 82, 369.7 + shift);
+    report.check(
+      page,
+      101,
+      [376, 392, 408][ROLES.indexOf(action.role)] + shift,
+      9,
+    );
+  }
+  if (STATUSES.includes(action.status)) {
+    report.slice(page, 4, 340.5, 369.7, 284.5, 16.1, 340.5, 369.7 + shift);
+    report.check(
+      page,
+      [383.8, 469.1, 568.4][STATUSES.indexOf(action.status)],
+      376 + shift,
+      9,
+    );
+  }
+}
 function preventive(report, state) {
+  const actionHasContent = (action) =>
+    Object.entries(action).some(
+      ([key, value]) => key !== "id" && hasText(value),
+    );
   const records = state.diagnosis.filter(
     (row) =>
-      diagnosisHasContent(row) ||
-      row.actions.some((action) =>
-        Object.entries(action).some(
-          ([key, value]) => key !== "id" && hasText(value),
-        ),
-      ),
+      [row.area, row.element, row.pathology].some(hasText) ||
+      row.actions.some(actionHasContent),
   );
   if (!records.length)
     records.push({ area: "", element: "", pathology: "", actions: [] });
   let last;
   for (const row of records) {
-    const actions = row.actions.length ? row.actions : [null];
+    const compiledActions = row.actions.filter(actionHasContent);
+    const actions = compiledActions.length ? compiledActions : [null];
     for (const action of actions) {
       const page = report.page(4);
       last = page;
       sharedFields(report, page, state, state.preventive.date);
+      report.clear(page, ...PREVENTIVE_NOTES);
       // Senza dati nascondi anche l'intestazione della tabella del modello.
       const hasContext = [row.area, row.element, row.pathology].some(hasText);
-      const tableTop = hasContext ? 242.96 : 223.8;
-      report.clear(page, 32.3, tableTop, 724.1, 279.66 - tableTop);
+      const tableTop = hasContext ? 242.96 : 223;
+      report.clear(page, 31, tableTop, 727, 281 - tableTop);
       if (hasContext) report.slice(page, 4, 32.58, 242.96, 723.54, 18.3);
       report.fit(page, "Macro-Area", row.area, 38.2, 245.5, 211, 14);
       report.fit(page, "Elemento", row.element, 260, 245.5, 211, 14);
@@ -576,84 +822,12 @@ function preventive(report, state) {
         258,
         14,
       );
-      if (!action) continue;
-      report.risk(page, action.risk, 122, 296, 57);
-      report.fit(
-        page,
-        "Finestra d’intervento",
-        action.window,
-        318,
-        296,
-        420,
-        14,
-      );
-      // Solo la zona compilabile del pacchetto viene riposizionata se aumenta il testo.
-      // Ogni etichetta, grassetto e pallino proviene dal PDF originale.
-      const fields = [
-        ["Descrizione", action.description, 317, 335.8, 128, 324.5],
-        ["Azione", action.action, 335.8, 347, 141, 336.02],
-        ["Obiettivo", action.objective, 347, 358.5, 151, 347.54],
-        ["Operatore", action.operator, 358.5, 370, 156, 359],
-      ];
-      const heights = fields.map(([label, value, top, bottom, x]) =>
-        Math.max(
-          bottom - top,
-          report.lines(value, 740 - x).length > 1
-            ? report.lines(value, 740 - x).length * 11.3
-            : bottom - top,
-        ),
-      );
-      const extra = heights.reduce(
-        (sum, h, i) => sum + h - (fields[i][3] - fields[i][2]),
-        0,
-      );
-      if (extra < 38) {
-        if (extra > 0.1) {
-          report.clear(page, 28, 317, 720, 142);
-          let y = 317;
-          fields.forEach(([label, value, top, bottom, x, fieldTop], i) => {
-            report.slice(page, 4, 28, top, 720, bottom - top, 28, y);
-            report.fit(
-              page,
-              label,
-              value,
-              x,
-              y + fieldTop - top,
-              740 - x,
-              heights[i],
-            );
-            y += heights[i];
-          });
-          report.slice(page, 4, 28, 370, 720, 49, 28, y);
-          const shift = y - 370;
-          for (const [j, cy] of [376, 392, 408].entries())
-            if (action.role === ROLES[j])
-              report.check(page, 101, cy + shift, 9);
-          for (const [j, cx] of [383.8, 469.1, 568.4].entries())
-            if (action.status === STATUSES[j])
-              report.check(page, cx, 376 + shift, 9);
-        } else {
-          fields.forEach(([label, value, top, bottom, x, fieldTop]) =>
-            report.fit(page, label, value, x, fieldTop, 740 - x, bottom - top),
-          );
-          for (const [j, cy] of [376, 392, 408].entries())
-            if (action.role === ROLES[j]) report.check(page, 101, cy, 9);
-          for (const [j, cx] of [383.8, 469.1, 568.4].entries())
-            if (action.status === STATUSES[j]) report.check(page, cx, 376, 9);
-        }
-      } else {
-        // Le quattro righe del modello rimangono intatte; eventuali eccedenze sono esplicitamente collegate.
-        fields.forEach(([label, value, top, bottom, x, fieldTop]) =>
-          report.fit(page, label, value, x, fieldTop, 740 - x, bottom - top),
-        );
-        for (const [j, cy] of [376, 392, 408].entries())
-          if (action.role === ROLES[j]) report.check(page, 101, cy, 9);
-        for (const [j, cx] of [383.8, 469.1, 568.4].entries())
-          if (action.status === STATUSES[j]) report.check(page, cx, 376, 9);
-      }
+      preventiveFields(report, page, action);
       report.flushOverflow(4);
     }
   }
+  if (hasText(state.preventive.notes))
+    report.slice(last, 4, ...PREVENTIVE_NOTES);
   report.fit(
     last,
     "Note aggiuntive",
@@ -689,6 +863,7 @@ export async function makePdf(state, assets) {
   };
   const report = new TemplateReport(pdf, templates, fonts, api),
     g = state.general;
+  report.state = state;
   const page1 = report.page(0);
   for (const [label, value, x, top, w, h] of [
     ["ID Scheda", g.id, 178, 86.6, 215, 12],
@@ -727,38 +902,13 @@ export async function makePdf(state, assets) {
   diagnostics(report, page2, state.diagnosis);
   history(report, page2, state);
   report.flushOverflow(1);
-  const page3 = report.page(2),
-    first = state.priorities[0];
-  function priority(page, row, dy = 0) {
-    if (!row) return;
-    report.risk(page, row.risk, 129, 58.7 - dy, 48);
-    for (const [i, x] of [207.6, 392.2, 477.5, 576.8].entries())
-      if (row.window === WINDOWS[i]) report.check(page, x, 74 - dy);
-    report.fit(page, "Anomalie attese", row.anomalies, 285, 86.4 - dy, 452, 56);
-  }
-  priority(page3, first);
-  report.fit(
-    page3,
-    "Note aggiuntive",
-    state.inspectionNotes,
-    118,
-    160.1,
-    620,
-    55,
-  );
-  for (const row of state.priorities.slice(1)) {
-    const continuation = report.continuation(2);
-    report.slice(continuation, 2, 32, 30, 720, 115, 32, 30);
-    priority(continuation, row);
-  }
-  await photographs(report, page3, state.photos);
-  report.flushOverflow(2);
+  await inspectionEnd(report, state);
   immediate(report, state);
   report.flushOverflow(3);
   preventive(report, state);
   report.flushOverflow(4);
   pdf.setTitle(baseName(state, assets));
   pdf.setAuthor("Cròmo s.c.ar.l.");
-  pdf.setCreator("Schede Restauro 2.3");
+  pdf.setCreator("Schede Restauro 2.5");
   return new Blob([await pdf.save()], { type: "application/pdf" });
 }
