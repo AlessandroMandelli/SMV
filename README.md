@@ -1,4 +1,4 @@
-# Schede Restauro 2.6
+# Schede Restauro 2.7
 
 PWA per la schedatura del Sacro Monte di Varese. Versione aggiornata del 24 ottobre 2026.
 
@@ -12,6 +12,11 @@ PWA per la schedatura del Sacro Monte di Varese. Versione aggiornata del 24 otto
 Il sito è già compilato: per pubblicarlo non servono Node, npm, un server applicativo o chiavi API. Le cartelle `assets`, `js` e `vendor`, insieme al file `app.bundle.js`, devono essere caricate integralmente. La grafica del PDF e i suoi font sono inclusi nel pacchetto.
 
 ## Modifiche di questa versione
+
+- Barre verdi dei titoli delle sezioni 3, 4, 5 e 6 uniformate: stessi bordi sinistro e destro, larghezza, altezza e rientro del testo. L'allineamento è applicato anche alle continuazioni e alle pagine fotografiche.
+- Conservati il colore originale e il testo vettoriale con i font e i grassetti del modello, senza ridimensionare i caratteri.
+
+Sono comprese le modifiche della versione 2.6:
 
 - Nella seconda pagina del PDF, le sezioni 3, 4 e 5 vengono avvicinate automaticamente quando mancano i contenuti. Le righe diagnostiche sfruttano lo spazio recuperato e continuano su un'altra pagina soltanto quando serve.
 - Se non ci sono priorità compilate, viene omesso anche il titolo **Indice di priorità e tempistiche di intervento**. I titoli delle sezioni 3, 4 e 5 restano sempre visibili.

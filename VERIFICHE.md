@@ -1,5 +1,6 @@
-# Verifiche della versione 2.6
+# Verifiche della versione 2.7
 
+- Misurati sui PDF renderizzati i bordi delle barre delle sezioni 3, 4, 5 e 6: larghezza e altezza uniformi, bordi allineati e testo con lo stesso rientro. Verificate anche le continuazioni e le pagine con fotografie.
 - Generati 43 scenari PDF: scheda vuota, righe vuote aggiunte, campi isolati, sezioni parzialmente o interamente compilate, gruppi ripetuti, testi lunghi e fotografie.
 - Seconda pagina: titoli obbligatori 3, 4 e 5 mantenuti e avvicinati; assenza di spazi riservati ai gruppi vuoti. Titolo delle priorità omesso senza dati e mantenuto quando una priorità è compilata.
 - Diagnostica con 1, 8, 10, 21, 22, 23, 24 e 40 righe: uso dello spazio recuperato, continuazioni e nessuna riga vuota di riempimento. Verificati anche lo storico e lo stato conservativo compilati e ripetuti.
