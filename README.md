@@ -1,4 +1,4 @@
-# Schede Restauro 2.5
+# Schede Restauro 2.6
 
 PWA per la schedatura del Sacro Monte di Varese. Versione aggiornata del 24 ottobre 2026.
 
@@ -13,14 +13,20 @@ Il sito è già compilato: per pubblicarlo non servono Node, npm, un server appl
 
 ## Modifiche di questa versione
 
+- Nella seconda pagina del PDF, le sezioni 3, 4 e 5 vengono avvicinate automaticamente quando mancano i contenuti. Le righe diagnostiche sfruttano lo spazio recuperato e continuano su un'altra pagina soltanto quando serve.
+- Se non ci sono priorità compilate, viene omesso anche il titolo **Indice di priorità e tempistiche di intervento**. I titoli delle sezioni 3, 4 e 5 restano sempre visibili.
+- Il titolo dell'Atlante vuoto segue i contenuti effettivamente presenti e rimane sulla pagina precedente quando c'è spazio. Prima pagina, font, grassetti, loghi, dati fissi e impaginazione di quattro foto per pagina conservati.
+
+Sono comprese le altre regole introdotte nella versione 2.5:
+
 - **Pagina 1 del PDF:** sempre presente e completa di tutte le etichette del modello, anche con campi vuoti.
 - **Pagina 2:** titoli delle sezioni 3, 4 e 5 sempre presenti; le etichette dei campi non compilati vengono nascoste. I gruppi e le tabelle vuoti non aggiungono pagine.
-- **Atlante fotografico vuoto:** rimane soltanto il titolo, aggiunto alla pagina precedente se c'è spazio prima del piè di pagina; altrimenti viene creata una pagina di continuazione. Rimane prima dell'Atlante anche il titolo dell'Indice di priorità. Le foto presenti restano quattro per pagina.
+- **Atlante fotografico vuoto:** rimane soltanto il titolo, aggiunto alla pagina precedente se c'è spazio prima del piè di pagina; altrimenti viene creata una pagina di continuazione. Le foto presenti restano quattro per pagina.
 - **Manutenzione immediata:** rimangono intestazione, dati fissi e titolo Interventi eseguiti. Macro-Area e Azioni condotte in loco vengono mostrate soltanto se compilate. Interventi completamente vuoti esclusi dalla stampa.
 - **Azioni preventive:** rimangono intestazione, dati fissi e titolo Azioni preventive. Grado d'urgenza, finestra d'intervento, descrizione, azione, obiettivo e operatore compaiono soltanto con un valore. I gruppi Qualifica e Stato compaiono soltanto se esiste una selezione, conservando le opzioni e i checkbox del modello.
 - Note aggiuntive e relativi riquadri nascosti quando vuoti, eccetto gli elementi che appartengono alla struttura obbligatoria della prima pagina. Le intestazioni delle continuazioni mantengono anche ID, data e oggetto della scheda.
 
-Le posizioni degli altri campi rimangono quelle del modello. Il titolo dell'Atlante viene collocato dopo tutti i dati e le eventuali continuazioni precedenti, senza sovrapporsi al contenuto o al piè di pagina. Spazi e righe completamente vuote non sono considerati dati compilati.
+Le sezioni della seconda pagina si riposizionano conservando la grafica vettoriale del modello. Le altre pagine mantengono le posizioni del riferimento. Il titolo dell'Atlante viene collocato dopo tutti i dati e le eventuali continuazioni precedenti, senza sovrapporsi al contenuto o al piè di pagina. Spazi e righe completamente vuote non sono considerati dati compilati.
 
 Sono comprese anche le modifiche della versione 2.4:
 
