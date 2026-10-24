@@ -12,7 +12,14 @@ import {
 const WIDTH = 792,
   HEIGHT = 612,
   BOTTOM = 550;
-const ATLAS_TITLE = [32, 227.8, 727.5, 20.5];
+const SECTION_BAR = { x: 32.82, width: 723, height: 18, textX: 36.78 };
+const SECTION_TITLES = {
+  3: { index: 1, textX: 32.82, baseline: 40.14 },
+  4: { index: 1, textX: 36.78, baseline: 236.48 },
+  5: { index: 1, textX: 36.78, baseline: 358.72 },
+  6: { index: 2, textX: 36.78, baseline: 240.02 },
+};
+const ATLAS_TOP = 227.8;
 const IMMEDIATE_NOTES = [27, 456, 727, 100];
 const PREVENTIVE_NOTES = [31, 466, 727, 87];
 const files = new Map();
@@ -126,14 +133,31 @@ class TemplateReport {
   hideUnless(page, visible, rect, color) {
     if (!visible) this.clear(page, ...rect, color);
   }
-  appendHeading(index, rect) {
+  sectionHeading(page, section, top) {
+    const source = SECTION_TITLES[section];
+    const { x, width, height, textX } = SECTION_BAR;
+    // Barre identiche; il testo resta un ritaglio vettoriale, senza scalare i font.
+    this.clear(page, x, top, width, height, this.api.rgb(0, 0.357, 0.376));
+    this.slice(
+      page,
+      source.index,
+      source.textX - 0.5,
+      source.baseline - 10,
+      width - 8,
+      13,
+      textX - 0.5,
+      top + 1.34,
+    );
+    this.mark(page, top + height);
+  }
+  appendHeading(section) {
     let page = this.pdf.getPages().at(-1);
     let top = (this.used.get(page) ?? BOTTOM) + 14;
-    if (top + rect[3] > BOTTOM) {
-      page = this.continuation(index);
+    if (top + SECTION_BAR.height > BOTTOM) {
+      page = this.continuation(SECTION_TITLES[section].index);
       top = 30;
     }
-    this.slice(page, index, ...rect, rect[0], top);
+    this.sectionHeading(page, section, top);
     return page;
   }
   continuation(index, heading) {
@@ -346,7 +370,7 @@ function diagnostics(report, page, rows, titleTop) {
   const headers = [32.58, 380.86, 714.84, 20.7];
   const entries = rows.filter(diagnosisHasContent);
   // La seconda pagina nasce vuota: copia soltanto il titolo e i dati presenti.
-  report.slice(page, 1, 28, 347.3, 724, 18, 28, titleTop);
+  report.sectionHeading(page, 5, titleTop);
   if (!entries.length) return;
   const headerTop = titleTop + 32;
   report.slice(page, 1, ...headers, headers[0], headerTop);
@@ -356,7 +380,7 @@ function diagnostics(report, page, rows, titleTop) {
     parity = 0;
   function next() {
     current = report.continuation(1);
-    report.slice(current, 1, 32.58, 347.3, 714.84, 18, 32.58, 31);
+    report.sectionHeading(current, 5, 31);
     report.slice(current, 1, ...headers, 32.58, 62);
     y = 82.7;
     bottom = 550;
@@ -425,8 +449,8 @@ function diagnostics(report, page, rows, titleTop) {
 }
 function history(report, page, state) {
   // Mantieni le fasce e i caratteri originali, ma fai scorrere i gruppi vuoti.
-  let cursor = 46.5;
-  report.slice(page, 1, 28, 28.5, 724, 18);
+  let cursor = 28.5 + SECTION_BAR.height;
+  report.sectionHeading(page, 3, 28.5);
   for (const [key, top] of [
     ["restorations", 63.3],
     ["maintenance", 147.9],
@@ -478,7 +502,7 @@ function history(report, page, state) {
     }
     for (const row of rows.slice(1)) {
       const continuation = report.continuation(1);
-      report.slice(continuation, 1, 28, 28.5, 724, 18, 28, 29);
+      report.sectionHeading(continuation, 3, 29);
       report.slice(continuation, 1, 35, top - 3, 705, 69, 35, 65);
       fields(continuation, row, 68 - top, 400);
     }
@@ -489,14 +513,15 @@ function history(report, page, state) {
       condition.methods.length,
   );
   const conditionTitleTop = cursor + 14;
-  report.slice(page, 1, 28, 223, 724, 18, 28, conditionTitleTop);
-  cursor = conditionTitleTop + 18;
+  report.sectionHeading(page, 4, conditionTitleTop);
+  cursor = conditionTitleTop + SECTION_BAR.height;
   conditions.forEach((condition, i) => {
     let target = page,
       offset = 0;
     if (i) {
       target = report.continuation(1);
-      report.slice(target, 1, 28, 223, 724, 110, 28, 30);
+      report.sectionHeading(target, 4, 30);
+      report.slice(target, 1, 28, 245, 724, 88, 28, 52);
       offset = 193;
     } else {
       const start = cursor + 14;
@@ -600,7 +625,7 @@ async function inspectionEnd(report, state) {
     !state.photos.length
   ) {
     // Senza priorità compilate ometti anche il relativo titolo.
-    report.appendHeading(2, ATLAS_TITLE);
+    report.appendHeading(6);
     return;
   }
   const page = report.page(2);
@@ -623,11 +648,12 @@ async function inspectionEnd(report, state) {
     priority(report, continuation, row);
   }
   if (state.photos.length) {
-    report.mark(page, 248.3);
+    report.clear(page, 31, 227, 729, 23);
+    report.sectionHeading(page, 6, ATLAS_TOP);
     await photographs(report, page, state.photos);
   }
   report.flushOverflow(2);
-  if (!state.photos.length) report.appendHeading(2, ATLAS_TITLE);
+  if (!state.photos.length) report.appendHeading(6);
 }
 async function photographs(report, page, photos) {
   // Rimuovi sfondo, bordi e segnaposto del modello, anche con l'atlante vuoto.
@@ -640,7 +666,7 @@ async function photographs(report, page, photos) {
     const slot = i % 4;
     if (i > 0 && slot === 0) {
       target = report.continuation(2);
-      report.slice(target, 2, 32, 227, 725, 20, 32, 30);
+      report.sectionHeading(target, 6, 30);
     }
     const startTop = i < 4 ? 263 : 65,
       height = (540 - startTop - gap) / 2,
@@ -920,6 +946,6 @@ export async function makePdf(state, assets) {
   report.flushOverflow(4);
   pdf.setTitle(baseName(state, assets));
   pdf.setAuthor("Cròmo s.c.ar.l.");
-  pdf.setCreator("Schede Restauro 2.6");
+  pdf.setCreator("Schede Restauro 2.7");
   return new Blob([await pdf.save()], { type: "application/pdf" });
 }
