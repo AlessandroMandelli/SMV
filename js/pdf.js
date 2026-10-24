@@ -12,7 +12,6 @@ import {
 const WIDTH = 792,
   HEIGHT = 612,
   BOTTOM = 550;
-const PRIORITY_TITLE = [32, 28, 725, 20];
 const ATLAS_TITLE = [32, 227.8, 727.5, 20.5];
 const IMMEDIATE_NOTES = [27, 456, 727, 100];
 const PREVENTIVE_NOTES = [31, 466, 727, 87];
@@ -342,17 +341,18 @@ class TemplateReport {
   }
 }
 
-function diagnostics(report, page, rows) {
+function diagnostics(report, page, rows, titleTop) {
   const xs = [32.82, 151.88, 270.92, 418.72, 574.6, 666.76, 747.18];
   const headers = [32.58, 380.86, 714.84, 20.7];
   const entries = rows.filter(diagnosisHasContent);
-  // Il modello contiene righe vuote prestampate: coprile anche senza dati.
-  const tableTop = entries.length ? 401.8 : 380;
-  report.clear(page, 31, tableTop, 718, 560 - tableTop);
+  // La seconda pagina nasce vuota: copia soltanto il titolo e i dati presenti.
+  report.slice(page, 1, 28, 347.3, 724, 18, 28, titleTop);
   if (!entries.length) return;
+  const headerTop = titleTop + 32;
+  report.slice(page, 1, ...headers, headers[0], headerTop);
   let current = page,
-    y = 401.8,
-    bottom = 558.1,
+    y = headerTop + 20.94,
+    bottom = BOTTOM,
     parity = 0;
   function next() {
     current = report.continuation(1);
@@ -424,6 +424,9 @@ function diagnostics(report, page, rows) {
   }
 }
 function history(report, page, state) {
+  // Mantieni le fasce e i caratteri originali, ma fai scorrere i gruppi vuoti.
+  let cursor = 46.5;
+  report.slice(page, 1, 28, 28.5, 724, 18);
   for (const [key, top] of [
     ["restorations", 63.3],
     ["maintenance", 147.9],
@@ -466,8 +469,13 @@ function history(report, page, state) {
         height,
       );
     }
-    if (first) fields(page, first);
-    else report.clear(page, 35, top - 1, 710, key === "restorations" ? 74 : 68);
+    if (first) {
+      const start = cursor + 14;
+      const end = hasText(first.action) ? actionTop + 38 : dateTop + 14;
+      report.slice(page, 1, 35, top - 1, 710, end - top + 1, 35, start);
+      fields(page, first, start - top + 1);
+      cursor = start + end - top + 1;
+    }
     for (const row of rows.slice(1)) {
       const continuation = report.continuation(1);
       report.slice(continuation, 1, 28, 28.5, 724, 18, 28, 29);
@@ -480,15 +488,26 @@ function history(report, page, state) {
       [condition.exposure, condition.assessment].some(hasText) ||
       condition.methods.length,
   );
-  if (!conditions.length) report.clear(page, 35, 260.8, 710, 73);
+  const conditionTitleTop = cursor + 14;
+  report.slice(page, 1, 28, 223, 724, 18, 28, conditionTitleTop);
+  cursor = conditionTitleTop + 18;
   conditions.forEach((condition, i) => {
     let target = page,
       offset = 0;
     if (i) {
       target = report.continuation(1);
-      offset = 227.4 - 30;
       report.slice(target, 1, 28, 223, 724, 110, 28, 30);
       offset = 193;
+    } else {
+      const start = cursor + 14;
+      const end = hasText(condition.assessment)
+        ? 332
+        : condition.methods.length
+          ? 292
+          : 276;
+      report.slice(page, 1, 35, 260.8, 710, end - 260.8, 35, start);
+      offset = 260.8 - start;
+      cursor = start + end - 260.8;
     }
     report.hideUnless(target, hasText(condition.exposure), [
       35,
@@ -530,19 +549,13 @@ function history(report, page, state) {
       i ? 350 : 35,
     );
   });
+  return cursor + 14;
 }
 
 function priority(report, page, row, dy = 0) {
   const filled = row && [row.risk, row.window, row.anomalies].some(hasText);
   if (!filled) {
     report.clear(page, 31, 28 - dy, 727, 115);
-    report.slice(
-      page,
-      2,
-      ...PRIORITY_TITLE,
-      PRIORITY_TITLE[0],
-      PRIORITY_TITLE[1] - dy,
-    );
     return;
   }
   const background = report.api.rgb(0.91, 0.945, 0.949);
@@ -586,8 +599,7 @@ async function inspectionEnd(report, state) {
     !hasText(state.inspectionNotes) &&
     !state.photos.length
   ) {
-    // Conserva il titolo delle priorità; l'atlante non richiede una pagina vuota.
-    report.appendHeading(2, PRIORITY_TITLE);
+    // Senza priorità compilate ometti anche il relativo titolo.
     report.appendHeading(2, ATLAS_TITLE);
     return;
   }
@@ -897,10 +909,9 @@ export async function makePdf(state, assets) {
     if (asset.id === state.assetId) report.check(page1, x, y, 8);
   }
   report.flushOverflow(0);
-  const page2 = report.page(1);
-  // Le eccedenze dello storico sono aggiunte dopo la tabella, senza perdere l'ordine delle pagine originali.
-  diagnostics(report, page2, state.diagnosis);
-  history(report, page2, state);
+  const page2 = report.continuation(1);
+  const diagnosisTop = history(report, page2, state);
+  diagnostics(report, page2, state.diagnosis, diagnosisTop);
   report.flushOverflow(1);
   await inspectionEnd(report, state);
   immediate(report, state);
@@ -909,6 +920,6 @@ export async function makePdf(state, assets) {
   report.flushOverflow(4);
   pdf.setTitle(baseName(state, assets));
   pdf.setAuthor("Cròmo s.c.ar.l.");
-  pdf.setCreator("Schede Restauro 2.5");
+  pdf.setCreator("Schede Restauro 2.6");
   return new Blob([await pdf.save()], { type: "application/pdf" });
 }
