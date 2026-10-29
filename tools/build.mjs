@@ -1,7 +1,7 @@
 // Solo per chi modifica i sorgenti. Il sito distribuito funziona senza Node o npm.
 import { createRequire } from "node:module";
 const { build } = createRequire(import.meta.url)("esbuild");
-import { readFile, writeFile, readdir } from "node:fs/promises";
+import { readFile, writeFile, access } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname, relative } from "node:path";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -29,23 +29,31 @@ await build({
     js: `/* Schede Restauro ${displayVersion} — generato dai sorgenti modulari in js/. */`,
   },
 });
-const files = [];
-async function walk(dir) {
-  for (const entry of await readdir(dir, { withFileTypes: true })) {
-    if (["tools", "node_modules", ".git"].includes(entry.name)) continue;
-    const path = resolve(dir, entry.name);
-    if (entry.isDirectory()) await walk(path);
-    else if (
-      !["sw.js", ".nojekyll", "package.json", "package-lock.json"].includes(
-        entry.name,
-      ) &&
-      !entry.name.endsWith(".md") &&
-      !entry.name.endsWith(".txt")
-    )
-      files.push("./" + relative(root, path).replaceAll("\\", "/"));
-  }
-}
-await walk(root);
+// Solo risorse necessarie all'app installata. I sorgenti restano nello ZIP
+// per la manutenzione, ma sono già inclusi in app.bundle.js e non vanno in cache.
+const files = [
+  "./index.html",
+  "./styles.css",
+  "./app.bundle.js",
+  "./pwa-install.js",
+  "./manifest.webmanifest",
+  "./assets/icon-180.png",
+  "./assets/icon-192.png",
+  "./assets/icon-512.png",
+  "./assets/home-landscape.png",
+  "./assets/map.jpg",
+  "./assets/branding/anniversary.png",
+  "./assets/branding/logo.jpg",
+  "./assets/branding/footer.jpg",
+  "./assets/source-arial.ttf",
+  "./assets/source-arial-bold.ttf",
+  "./assets/sans-regular.ttf",
+  "./assets/sans-bold.ttf",
+  "./vendor/pdf-lib.min.js",
+  "./vendor/fontkit.umd.min.js",
+  "./vendor/jszip.min.js",
+];
+for (const path of files) await access(resolve(root, path));
 files.sort();
 const sw = `/* Cache isolata per il percorso della PWA. */
 const VERSION='${version}';
