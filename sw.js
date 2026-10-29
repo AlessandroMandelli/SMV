@@ -1,11 +1,10 @@
 /* Cache isolata per il percorso della PWA. */
-const VERSION='3.4.0';
+const VERSION='3.4.1';
 const PREFIX='schede-restauro:'+self.registration.scope+':';
 const CACHE=PREFIX+VERSION;
 const FILES=[
   "./",
   "./app.bundle.js",
-  "./assets/beni.json",
   "./assets/branding/anniversary.png",
   "./assets/branding/footer.jpg",
   "./assets/branding/logo.jpg",
@@ -14,25 +13,11 @@ const FILES=[
   "./assets/icon-192.png",
   "./assets/icon-512.png",
   "./assets/map.jpg",
-  "./assets/pdf-template.pdf",
   "./assets/sans-bold.ttf",
   "./assets/sans-regular.ttf",
   "./assets/source-arial-bold.ttf",
   "./assets/source-arial.ttf",
   "./index.html",
-  "./js/app.js",
-  "./js/catalog.js",
-  "./js/config.js",
-  "./js/docx.js",
-  "./js/export.js",
-  "./js/home-title.js",
-  "./js/legacy.js",
-  "./js/model.js",
-  "./js/pdf-layout.js",
-  "./js/pdf.js",
-  "./js/road.js",
-  "./js/storage.js",
-  "./js/zip.js",
   "./manifest.webmanifest",
   "./pwa-install.js",
   "./styles.css",

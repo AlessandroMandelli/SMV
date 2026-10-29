@@ -1,12 +1,13 @@
-# Schede Restauro 3.4
+# Schede Restauro 3.4.1
 
-PWA per la schedatura del Sacro Monte di Varese. Versione del 28 ottobre 2026, basata sulle funzionalità della 2.9 con un motore PDF interamente riscritto secondo il Word commentato.
+PWA per la schedatura del Sacro Monte di Varese. Versione del 29 ottobre 2026.
 
 ## Pubblicazione su GitHub Pages
 
 1. Estrai lo ZIP e copia tutto il contenuto nella radice della repository, sostituendo i file della versione precedente.
+   Se aggiorni la repository già pubblicata, elimina anche i due file rimossi dal pacchetto: `assets/pdf-template.pdf` e `vendor/README-fontkit.md`. La semplice sovrascrittura dei file nuovi non elimina quelli vecchi.
 2. Pubblica il branch utilizzato con GitHub Pages, cartella `/ (root)`.
-3. Attendi il completamento della pubblicazione e riapri la PWA. La cache viene aggiornata alla versione 3.4.
+3. Attendi il completamento della pubblicazione e riapri la PWA. La cache viene aggiornata alla versione 3.4.1.
 
 Il pacchetto funziona già compilato. Per pubblicarlo non servono Node, npm, server applicativi o chiavi API. Mantieni integralmente le cartelle `assets`, `js` e `vendor` e il file `app.bundle.js`. Non cancellare i dati del browser per aggiornare: contengono la bozza.
 
@@ -34,11 +35,11 @@ Il pacchetto di distribuzione non contiene il JSON di prova. I file JSON necessa
 
 ## Compilazione, bozza e file
 
-Le funzionalità della versione 2.9 sono conservate: 14 cappelle, tre archi e Strada; Soggetto multilinea, date storiche libere, tabelle e gruppi ripetibili, fotografie da fotocamera o caricamento, importazione/esportazione JSON e bozza locale.
+La PWA comprende: 14 cappelle, tre archi e Strada; Soggetto multilinea, date storiche libere, tabelle e gruppi ripetibili, fotografie da fotocamera o caricamento, importazione/esportazione JSON e bozza locale.
 
 Selezionando Strada, il tracciato rosso viene sovrapposto alla planimetria sotto i 17 checkbox, anche nel PDF. I nomi dei file distinguono Strada, cappelle e archi.
 
-I JSON precedenti e la bozza conservano lo schema dati della 2.9. Le date vengono inizializzate alla creazione della scheda e non aggiornate riprendendo la bozza. I numeri usano virgola decimale e punto delle migliaia; le misure aggiungono m.
+I JSON precedenti e la bozza conservano lo stesso schema dati. Le date vengono inizializzate alla creazione della scheda e non aggiornate riprendendo la bozza. I numeri usano virgola decimale e punto delle migliaia; le misure aggiungono m.
 
 Gli operatori e i dati societari rimangono nel PDF e nei dati comuni, senza essere mostrati nei blocchi fissi della compilazione. L'anagrafica dei singoli beni rimane modificabile salvo i campi dichiarati in `fixed` nel catalogo.
 
@@ -56,7 +57,7 @@ Word e LibreOffice impaginano autonomamente il DOCX: la disposizione e il numero
 
 Il menu contiene **Reset scheda**, **Info**, un separatore grigio rientrato e **Installa app**. Il reset conferma la cancellazione della bozza e riporta alla home.
 
-**Info** mostra `https://alessandromandelli.github.io/SMV/` su una sola riga e, sotto, la versione nel formato **V.3.4**. La versione è ricavata da `package.json` durante la build.
+**Info** mostra `https://alessandromandelli.github.io/SMV/` su una sola riga e, sotto, la versione nel formato **V.3.4.1**. La versione è ricavata da `package.json` durante la build.
 
 La voce di installazione e il suo separatore sono nascosti quando l'app è aperta come PWA, dopo l'evento di installazione e quando il browser riconosce l'installazione tramite la propria API. Su Safari/iOS una pagina aperta nel browser non può sempre rilevare una PWA già presente sulla Home; nell'app aperta dalla Home la voce è nascosta.
 
@@ -64,7 +65,7 @@ La voce di installazione e il suo separatore sono nascosti quando l'app è apert
 
 La PWA deve essere pubblicata via HTTPS, come su GitHub Pages. Installa app utilizza il prompt nativo quando il browser lo mette a disposizione; negli altri casi mostra le istruzioni appropriate. Su iPhone/iPad l'installazione avviene dal menu Condividi con Aggiungi alla schermata Home.
 
-Tutte le risorse sono locali. Al primo accesso con connessione il service worker prepara la cache. La bozza resta sul dispositivo e nel profilo browser utilizzato: esporta il JSON per conservarla o trasferirla.
+Tutte le risorse sono locali. Al primo accesso con connessione il service worker prepara la cache delle sole risorse necessarie all'app. I sorgenti di sviluppo e la documentazione non vengono duplicati nella cache. L'attivazione della nuova versione elimina le cache precedenti della sola PWA, compreso il vecchio template, senza cancellare le bozze. La bozza resta sul dispositivo e nel profilo browser utilizzato: esporta il JSON per conservarla o trasferirla.
 
 ## Modifica del codice
 
@@ -78,6 +79,6 @@ Tutte le risorse sono locali. Al primo accesso con connessione il service worker
 - `js/road.js`: tracciato condiviso fra la mappa web e il PDF.
 - `assets/beni.json`: catalogo dei beni e futura anagrafica fissa.
 
-Il Word è il riferimento grafico. Il file `assets/pdf-template.pdf` viene conservato come riferimento storico, ma non viene incorporato dal nuovo motore: sostituirlo da solo non cambia l'impaginazione. Le modifiche strutturali si effettuano nei due moduli PDF.
+Il modello Word concordato è il riferimento grafico. PDF e DOCX vengono generati direttamente dai rispettivi moduli JavaScript, senza template PDF esterni. Le modifiche all'impaginazione si effettuano nei generatori.
 
-Dopo una modifica ai sorgenti, esegui `npm install` e `npm run build`. Pubblica anche il bundle e il service worker rigenerati. L'utente che compila le schede non deve installare questi strumenti.
+Dopo una modifica ai sorgenti, esegui `npm install` e `npm run build`. Se aggiungi una risorsa necessaria offline, inseriscila nell'elenco esplicito di `tools/build.mjs`. Pubblica anche il bundle e il service worker rigenerati. L'utente che compila le schede non deve installare questi strumenti.
