@@ -1,4 +1,10 @@
-# Verifiche della versione 3.4.2
+# Verifiche della versione 3.4.3
+
+## Aggiornamento 3.4.3
+
+- Il riconoscimento della finestra installata viene conservato durante il passaggio a tutto schermo, il ritorno alla finestra normale e la ricarica nella stessa sessione. La modalità window-controls-overlay è riconosciuta come finestra dell'app.
+- Il solo tutto schermo di una scheda browser non è considerato prova di installazione. Nessun flag permanente di installazione viene aggiunto.
+- Superati dieci scenari simulati di installazione, comprese transizioni finestra/tutto schermo, focus, pageshow, ricarica a tutto schermo, API non disponibili, sessionStorage bloccato e listener precedenti. Verificato che una nuova sessione browser non erediti un flag permanente. Ripetuta la verifica della cache offline aggiornando dalla 3.4.2 alla 3.4.3; controlli di sintassi superati.
 
 ## Aggiornamento 3.4.2
 

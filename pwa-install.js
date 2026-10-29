@@ -3,12 +3,24 @@
   let promptEvent = null,
     installedThisSession = false,
     prompting = false,
-    relatedInstalled = false;
-  const standalone = () =>
-    installedThisSession ||
-    relatedInstalled ||
-    matchMedia("(display-mode: standalone)").matches ||
-    navigator.standalone === true;
+    relatedInstalled = false,
+    appWindowDetected = false;
+  const appWindowKey = "schede-restauro:app-window:" + new URL("./", location.href).href;
+  try {
+    appWindowDetected = sessionStorage.getItem(appWindowKey) === "true";
+  } catch { /* L'app funziona anche se lo storage della sessione non è disponibile. */ }
+  function standalone() {
+    // Il tutto schermo può sostituire display-mode: standalone. Conserva il
+    // riconoscimento della finestra, anche dopo una ricarica nella stessa sessione.
+    // Il solo fullscreen non dimostra l'installazione: vale anche per le schede web.
+    if (navigator.standalone === true ||
+      matchMedia("(display-mode: standalone)").matches ||
+      matchMedia("(display-mode: window-controls-overlay)").matches) {
+      appWindowDetected = true;
+      try { sessionStorage.setItem(appWindowKey, "true"); } catch { /* Solo memoria. */ }
+    }
+    return appWindowDetected || installedThisSession || relatedInstalled;
+  }
   function refresh() {
     const installed = standalone();
     for (const id of ["installHeader", "installMenu"]) {
@@ -96,9 +108,11 @@
     checkInstalled();
     window.addEventListener("focus", checkInstalled);
     window.addEventListener("pageshow", checkInstalled);
-    const mode = matchMedia("(display-mode: standalone)");
-    if (mode.addEventListener) mode.addEventListener("change", refresh);
-    else if (mode.addListener) mode.addListener(refresh);
+    for (const value of ["standalone", "window-controls-overlay", "fullscreen"]) {
+      const mode = matchMedia(`(display-mode: ${value})`);
+      if (mode.addEventListener) mode.addEventListener("change", refresh);
+      else if (mode.addListener) mode.addListener(refresh);
+    }
     if ("serviceWorker" in navigator && isSecureContext)
       navigator.serviceWorker
         .register("./sw.js", { scope: "./", updateViaCache: "none" })

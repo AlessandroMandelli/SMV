@@ -1,4 +1,4 @@
-# Schede Restauro 3.4.2
+# Schede Restauro 3.4.3
 
 PWA per la schedatura del Sacro Monte di Varese. Versione del 29 ottobre 2026.
 
@@ -7,7 +7,7 @@ PWA per la schedatura del Sacro Monte di Varese. Versione del 29 ottobre 2026.
 1. Estrai lo ZIP e copia tutto il contenuto nella radice della repository, sostituendo i file della versione precedente.
    Se aggiorni la repository già pubblicata, elimina anche i due file rimossi dal pacchetto: `assets/pdf-template.pdf` e `vendor/README-fontkit.md`. La semplice sovrascrittura dei file nuovi non elimina quelli vecchi.
 2. Pubblica il branch utilizzato con GitHub Pages, cartella `/ (root)`.
-3. Attendi il completamento della pubblicazione e riapri la PWA. La cache viene aggiornata alla versione 3.4.2.
+3. Attendi il completamento della pubblicazione e riapri la PWA. La cache viene aggiornata alla versione 3.4.3.
 
 Il pacchetto funziona già compilato. Per pubblicarlo non servono Node, npm, server applicativi o chiavi API. Mantieni integralmente le cartelle `assets`, `js` e `vendor` e il file `app.bundle.js`. Non cancellare i dati del browser per aggiornare: contengono la bozza.
 
@@ -57,9 +57,11 @@ Word e LibreOffice impaginano autonomamente il DOCX: la disposizione e il numero
 
 Il menu contiene **Reset scheda**, **Info**, un separatore grigio rientrato e **Installa app**. Il reset conferma la cancellazione della bozza e riporta alla home.
 
-**Info** mostra `https://alessandromandelli.github.io/SMV/` su una sola riga e, sotto, la versione nel formato **V.3.4.2**. La versione è ricavata da `package.json` durante la build.
+**Info** mostra `https://alessandromandelli.github.io/SMV/` su una sola riga e, sotto, la versione nel formato **V.3.4.3**. La versione è ricavata da `package.json` durante la build.
 
 La voce di installazione e il suo separatore sono nascosti quando l'app è aperta come PWA, dopo l'evento di installazione e quando il browser riconosce l'installazione tramite la propria API. Su Safari/iOS una pagina aperta nel browser non può sempre rilevare una PWA già presente sulla Home; nell'app aperta dalla Home la voce è nascosta.
+
+Una volta riconosciuta la finestra della PWA, la voce rimane nascosta passando a tutto schermo e tornando alla finestra normale. Il riconoscimento è conservato per la sessione della finestra, anche ricaricandola; non viene salvato come stato permanente del dispositivo. Il semplice tutto schermo di una normale scheda del browser non nasconde la voce.
 
 ## Installazione e uso offline
 

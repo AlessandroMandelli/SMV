@@ -1,4 +1,4 @@
-/* Schede Restauro 3.4.2 — generato dai sorgenti modulari in js/. */
+/* Schede Restauro 3.4.3 — generato dai sorgenti modulari in js/. */
 (() => {
   // recovered-smv/js/road.js
   var ROAD_SIZE = { width: 654, height: 1190 };
@@ -785,7 +785,7 @@
   }
 
   // recovered-smv/js/config.js
-  var VERSION = "3.4.2";
+  var VERSION = "3.4.3";
   var PWA_URL = "https://alessandromandelli.github.io/SMV/";
 
   // recovered-smv/js/pdf-layout.js
