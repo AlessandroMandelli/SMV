@@ -246,7 +246,7 @@ function render() {
     `Sezione ${state.section + 1} di ${SECTIONS.length}`;
   $("previous").textContent = state.section
     ? "← " + SECTIONS[state.section - 1]
-    : "⌂ Home";
+    : "Home";
   $("next").textContent =
     state.section === SECTIONS.length - 1
       ? "Salva scheda"
