@@ -1,4 +1,4 @@
-/* Schede Restauro 3.4.1 — generato dai sorgenti modulari in js/. */
+/* Schede Restauro 3.4.2 — generato dai sorgenti modulari in js/. */
 (() => {
   // recovered-smv/js/road.js
   var ROAD_SIZE = { width: 654, height: 1190 };
@@ -785,7 +785,7 @@
   }
 
   // recovered-smv/js/config.js
-  var VERSION = "3.4.1";
+  var VERSION = "3.4.2";
   var PWA_URL = "https://alessandromandelli.github.io/SMV/";
 
   // recovered-smv/js/pdf-layout.js
@@ -2415,7 +2415,7 @@
     $("sectionContent").innerHTML = renderer();
     syncFilename();
     $("sectionCounter").textContent = `Sezione ${state.section + 1} di ${SECTIONS.length}`;
-    $("previous").textContent = state.section ? "\u2190 " + SECTIONS[state.section - 1] : "\u2302 Home";
+    $("previous").textContent = state.section ? "\u2190 " + SECTIONS[state.section - 1] : "Home";
     $("next").textContent = state.section === SECTIONS.length - 1 ? "Salva scheda" : SECTIONS[state.section + 1] + " \u2192";
     $("next").disabled = busy;
   }

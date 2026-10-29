@@ -1,4 +1,12 @@
-# Verifiche della versione 3.4.1
+# Verifiche della versione 3.4.2
+
+## Aggiornamento 3.4.2
+
+- Il pulsante per tornare alla schermata iniziale mostra soltanto Home, senza icona. Conserva il comportamento precedente.
+- Rigenerati bundle, versione Info e cache per distribuire l'aggiornamento anche alla PWA installata.
+- Verificata la scritta Home nel bundle distribuito e ripetute con esito positivo le verifiche dell'interfaccia e della cache offline in ambiente simulato. Controlli di sintassi del bundle e del service worker superati.
+
+## Verifiche della base 3.4.1
 
 - Test dal bundle distribuito: sette combinazioni di formati (tre singoli, tre coppie e tutti e tre), ripetute per desktop e iPhone simulato. Contenuti e nomi controllati: nessun formato aggiunto o perso. Su iPhone un singolo file è diretto e ogni selezione multipla produce un solo ZIP. JSON singolo verificato senza caricare il generatore PDF o DOCX.
 - Box Salva scheda: tutti i formati inizialmente selezionati, pulsante Salva disabilitato senza selezioni, chiusura senza download. Errori mostrati nel box e comandi disabilitati durante la generazione. I file derivano da un'unica copia dei dati; una modifica durante la generazione invalida il risultato.
