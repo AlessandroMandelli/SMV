@@ -1,4 +1,4 @@
-/* Schede Restauro 3.6.11 — generato dai sorgenti modulari in js/. */
+/* Schede Restauro 3.6.13 — generato dai sorgenti modulari in js/. */
 (() => {
   // recovered-smv/js/road.js
   var ROAD_SIZE = { width: 553, height: 949 };
@@ -7,7 +7,7 @@
   function mapAssets(assets2, assetId) {
     var _a;
     const kind = (_a = assets2.find((asset2) => asset2.id === assetId)) == null ? void 0 : _a.kind;
-    return kind && kind !== "road" ? assets2.filter((asset2) => asset2.kind === kind) : [];
+    return kind && kind !== "road" ? assets2.filter((asset2) => asset2.kind === kind && Number.isFinite(asset2.x) && Number.isFinite(asset2.y)) : [];
   }
 
   // recovered-smv/js/sections.js
@@ -196,7 +196,7 @@
       customFilename: false,
       section: 0,
       editorVersion: EDITOR_LAYOUT_VERSION,
-      filenameDate: "",
+      filenameDate: date,
       general: {
         id: "",
         date,
@@ -232,17 +232,23 @@
       preventive: { date, notes: "" }
     };
   }
+  function filenameDay(state2) {
+    const value = state2.filenameDate || state2.createdAt;
+    return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : localDate(new Date(value));
+  }
   function baseName(state2, assets2) {
     if (state2.customFilename && state2.filename.trim())
       return safeFilename(state2.filename);
-    const asset2 = assets2.find((a) => a.id === state2.assetId);
-    const name = (asset2 == null ? void 0 : asset2.kind) === "road" ? "Viale" : (asset2 == null ? void 0 : asset2.kind) === "arch" ? `Arco_${String(asset2.number).padStart(2, "0")}` : (asset2 == null ? void 0 : asset2.kind) === "fountain" ? asset2.id === "fm" ? "Fontana_Mose" : `Fontana_${String(asset2.number).padStart(2, "0")}` : (asset2 == null ? void 0 : asset2.id) === "grotte" ? "Grotte_delle_Romite" : `Cappella_${String((asset2 == null ? void 0 : asset2.number) || "").padStart(2, "0")}`;
-    const stamp = new Date(state2.filenameDate || state2.createdAt);
-    const date = state2.filenameDate ? localDate(stamp) : state2.general.date || localDate(stamp);
-    return `Sacro_Monte_Varese_${name}_${date.replaceAll("-", "_")}_${localTime(stamp).replace(":", "_")}`;
+    const asset2 = assets2.find((item) => item.id === state2.assetId);
+    const date = filenameDay(state2);
+    const prefix = `scheda_ispezione_periodica_${(asset2 == null ? void 0 : asset2.fileLabel) || "Bene"}_ID_`;
+    const suffix = "_" + date;
+    const identifier = (String(state2.general.id || "").trim() || `XX.XX_${date.slice(0, 4)}`).normalize("NFC").replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_").replace(/\s+/g, "_");
+    const id = identifier.slice(0, Math.max(1, 160 - prefix.length - suffix.length));
+    return safeFilename(prefix + id + suffix);
   }
   function safeFilename(name) {
-    return name.trim().replace(/\.(docx|pdf|json|zip)$/i, "").replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_").replace(/[. ]+$/, "").slice(0, 160) || "Scheda_Restauro";
+    return name.normalize("NFC").trim().replace(/\.(docx|pdf|json|zip)$/i, "").replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_").replace(/[. ]+$/, "").slice(0, 160) || "Scheda_Restauro";
   }
   function formatMeasure(value) {
     const raw = String(value ?? "").trim();
@@ -559,7 +565,7 @@
       actions: state2.diagnosis.flatMap((r) => r.actions.map((a) => a.id))
     };
     state2.survey = { id: uid(), date, notes };
-    state2.filenameDate = (/* @__PURE__ */ new Date()).toISOString();
+    state2.filenameDate = localDate();
     state2.customFilename = false;
     state2.filename = "";
     state2.immediate.date = date;
@@ -785,7 +791,8 @@
       "fixed": {},
       "number": 1,
       "x": 48.82459,
-      "y": 88.72497
+      "y": 88.72497,
+      "fileLabel": "I_Cappella"
     },
     {
       "id": "c02",
@@ -794,7 +801,8 @@
       "fixed": {},
       "number": 2,
       "x": 51.7179,
-      "y": 81.34879
+      "y": 81.34879,
+      "fileLabel": "II_Cappella"
     },
     {
       "id": "c03",
@@ -803,7 +811,8 @@
       "fixed": {},
       "number": 3,
       "x": 53.88788,
-      "y": 70.70601
+      "y": 70.70601,
+      "fileLabel": "III_Cappella"
     },
     {
       "id": "c04",
@@ -812,7 +821,8 @@
       "fixed": {},
       "number": 4,
       "x": 68.89693,
-      "y": 72.91886
+      "y": 72.91886,
+      "fileLabel": "IV_Cappella"
     },
     {
       "id": "c05",
@@ -821,7 +831,8 @@
       "fixed": {},
       "number": 5,
       "x": 64.01447,
-      "y": 64.80506
+      "y": 64.80506,
+      "fileLabel": "V_Cappella"
     },
     {
       "id": "grotte",
@@ -829,7 +840,8 @@
       "kind": "chapel",
       "fixed": {},
       "x": 47.7396,
-      "y": 67.86091
+      "y": 67.86091,
+      "fileLabel": "Grotta_delle_Romite"
     },
     {
       "id": "c06",
@@ -838,7 +850,8 @@
       "fixed": {},
       "number": 6,
       "x": 44.12297,
-      "y": 68.38778
+      "y": 68.38778,
+      "fileLabel": "VI_Cappella"
     },
     {
       "id": "c07",
@@ -847,7 +860,8 @@
       "fixed": {},
       "number": 7,
       "x": 40.3255,
-      "y": 65.54268
+      "y": 65.54268,
+      "fileLabel": "VII_Cappella"
     },
     {
       "id": "c08",
@@ -856,7 +870,8 @@
       "fixed": {},
       "number": 8,
       "x": 38.51718,
-      "y": 57.3235
+      "y": 57.3235,
+      "fileLabel": "VIII_Cappella"
     },
     {
       "id": "c09",
@@ -865,7 +880,8 @@
       "fixed": {},
       "number": 9,
       "x": 39.24051,
-      "y": 49.94731
+      "y": 49.94731,
+      "fileLabel": "IX_Cappella"
     },
     {
       "id": "c10",
@@ -874,7 +890,8 @@
       "fixed": {},
       "number": 10,
       "x": 37.43219,
-      "y": 37.19705
+      "y": 37.19705,
+      "fileLabel": "X_Cappella"
     },
     {
       "id": "c11",
@@ -883,7 +900,8 @@
       "fixed": {},
       "number": 11,
       "x": 47.37794,
-      "y": 46.68072
+      "y": 46.68072,
+      "fileLabel": "XI_Cappella"
     },
     {
       "id": "c12",
@@ -892,7 +910,8 @@
       "fixed": {},
       "number": 12,
       "x": 56.41953,
-      "y": 51.42255
+      "y": 51.42255,
+      "fileLabel": "XII_Cappella"
     },
     {
       "id": "c13",
@@ -901,7 +920,8 @@
       "fixed": {},
       "number": 13,
       "x": 56.05787,
-      "y": 41.51739
+      "y": 41.51739,
+      "fileLabel": "XIII_Cappella"
     },
     {
       "id": "c14",
@@ -910,7 +930,8 @@
       "fixed": {},
       "number": 14,
       "x": 44.3038,
-      "y": 26.23815
+      "y": 26.23815,
+      "fileLabel": "XIV_Cappella"
     },
     {
       "id": "arco1",
@@ -919,7 +940,8 @@
       "fixed": {},
       "number": 1,
       "x": 44.48463,
-      "y": 90.93783
+      "y": 90.93783,
+      "fileLabel": "Primo_Arco"
     },
     {
       "id": "arco2",
@@ -928,7 +950,8 @@
       "fixed": {},
       "number": 2,
       "x": 53.52622,
-      "y": 65.33193
+      "y": 65.33193,
+      "fileLabel": "Secondo_Arco"
     },
     {
       "id": "arco3",
@@ -937,7 +960,8 @@
       "fixed": {},
       "number": 3,
       "x": 42.67631,
-      "y": 42.36038
+      "y": 42.36038,
+      "fileLabel": "Terzo_Arco"
     },
     {
       "id": "f1",
@@ -946,7 +970,8 @@
       "fixed": {},
       "number": 1,
       "x": 42.85714,
-      "y": 88.40885
+      "y": 88.40885,
+      "fileLabel": "Prima_Fontana"
     },
     {
       "id": "f2",
@@ -955,7 +980,8 @@
       "fixed": {},
       "number": 2,
       "x": 54.43038,
-      "y": 63.96207
+      "y": 63.96207,
+      "fileLabel": "Seconda_Fontana"
     },
     {
       "id": "f3",
@@ -964,7 +990,8 @@
       "fixed": {},
       "number": 3,
       "x": 42.49548,
-      "y": 41.83351
+      "y": 41.83351,
+      "fileLabel": "Terza_Fontana"
     },
     {
       "id": "fm",
@@ -973,13 +1000,22 @@
       "fixed": {},
       "number": 4,
       "x": 39.60217,
-      "y": 11.90727
+      "y": 11.90727,
+      "fileLabel": "Fontana_del_Mos\xE8"
+    },
+    {
+      "id": "acquedotto",
+      "label": "Acquedotto",
+      "kind": "aqueduct",
+      "fixed": {},
+      "fileLabel": "Acquedotto"
     },
     {
       "id": "strada",
       "label": "Viale del Santuario e delle Cappelle",
       "kind": "road",
-      "fixed": {}
+      "fixed": {},
+      "fileLabel": "Viale"
     }
   ];
 
@@ -1125,7 +1161,7 @@
   }
 
   // recovered-smv/js/config.js
-  var VERSION = "3.6.11";
+  var VERSION = "3.6.13";
   var PWA_URL = "https://alessandromandelli.github.io/SMV/";
 
   // recovered-smv/js/pdf-layout.js
@@ -1582,7 +1618,7 @@
         if (offset < lines.length) this.next();
       }
     }
-    table(headers, rows, proportions, { riskColumn = -1 } = {}) {
+    table(headers, rows, proportions, { riskColumn = -1, rowFill = null } = {}) {
       if (!rows.length) return;
       const total = proportions.reduce((a, b) => a + b, 0);
       const widths = proportions.map((w) => w / total * this.width);
@@ -1637,7 +1673,7 @@
           const height = count * TYPE.leading + 8;
           cells.forEach((lines, i) => {
             this.report.rect(this.page, xs[i], this.y, widths[i], height, {
-              fill: index % 2 ? COLORS.alternate : "#ffffff",
+              fill: rowFill || (index % 2 ? COLORS.alternate : "#ffffff"),
               border: COLORS.border
             });
             const fragment = offset > 0 && lines.length <= offset ? lines : lines.slice(offset, offset + count);
@@ -2211,8 +2247,15 @@
     flow.section(PREVENTIVE_TITLE, rows.length ? 40 : 0);
     rows.forEach((row, index) => {
       const actions = row.actions.filter(actionHasContent);
+      const headers = ["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo"];
       const values = [row.reference, row.area, row.element, row.pathology, row.causes, displayDate(row.detectedDate)];
-      const weights = [700, 2700, 2700, 3860, 3100, 1900], sum = weights.reduce((total, width) => total + width, 0);
+      let weights = [700, 2700, 2700, 3860, 3100, 1900];
+      if (row.resolvedDate) {
+        headers.push("Risolto in data");
+        values.push(displayDate(row.resolvedDate));
+        weights = [650, 2200, 2200, 3300, 2600, 1800, 1800];
+      }
+      const sum = weights.reduce((total, width) => total + width, 0);
       const contextHeight = Math.max(
         ...values.map(
           (value, i) => report.wrap(value, weights[i] / sum * flow.width - 8).length
@@ -2231,18 +2274,8 @@
           height <= flow.freshHeight() ? height : Math.min(contextHeight + 40, flow.freshHeight())
         );
       flow.paragraph("Azioni preventive programmate il", displayDate(row.programmedDate));
-      if (row.resolvedDate) {
-        flow.ensure(32);
-        report.rect(flow.page, flow.x, flow.y, flow.width, 26, { fill: "#e4f3e6", border: "#a9cdb0", borderWidth: 0.6 });
-        report.text(flow.page, "RISOLTO IN DATA " + displayDate(row.resolvedDate), flow.x + 7, flow.y + 7, { bold: true });
-        flow.y += 34;
-      }
       if (values.some(hasText))
-        flow.table(
-          ["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo"],
-          [values],
-          weights
-        );
+        flow.table(headers, [values], weights, { rowFill: row.resolvedDate ? "#e4f3e6" : null });
       actions.forEach((action) => actionPackage(flow, action));
       flow.y += 8;
     });
@@ -2385,15 +2418,15 @@
     }).join("");
     return `<w:tbl><w:tblPr>${position}<w:tblW w:w="${widths.reduce((a, b) => a + b, 0)}" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblBorders>${borders}</w:tblBorders><w:tblCellMar>${["top", "left", "bottom", "right"].map((side) => `<w:${side} w:w="${padding}" w:type="dxa"/>`).join("")}</w:tblCellMar></w:tblPr><w:tblGrid>${widths.map((width) => `<w:gridCol w:w="${width}"/>`).join("")}</w:tblGrid>${body}</w:tbl>`;
   }
-  function dataTable(headers, rows, weights) {
+  function dataTable(headers, rows, weights, { rowFill = "" } = {}) {
     if (!rows.length) return "";
     return table([
       headers.map((text) => para(run(text, { bold: true, color: "FFFFFF" }), { after: 0 })),
-      ...rows.map((row) => row.map((text, index) => para(run(text, { color: /livello di rischio/i.test(headers[index]) ? riskColor2(text) : "1E3232" }), { after: 0 })))
+      ...rows.map((row) => row.map((text, index) => ({ content: para(run(text, { color: /livello di rischio/i.test(headers[index]) ? riskColor2(text) : "1E3232" }), { after: 0 }), shade: rowFill })))
     ], scaled(weights), { headers: true }) + blank();
   }
   function note(value, height = 1200) {
-    return filled(value) ? table([[label("Note aggiuntive:", value)]], [WIDTH], { shade: "F2F2F2", borderColor: "005B60", minHeight: height, bottom: true, keepRows: false }) + blank() : "";
+    return filled(value) ? table([[para(run("Note aggiuntive:", { bold: true }), { keep: true, after: 70 }) + para(run(value), { after: 0 })]], [WIDTH], { shade: "F2F2F2", borderColor: "005B60", minHeight: height, bottom: true, keepRows: false }) + blank() : "";
   }
   async function bytes(path) {
     const response = await fetch(path);
@@ -2489,7 +2522,7 @@
     let left = heading("SCHEDA DI ISPEZIONE PERIODICA", g.date, true) + band("1. IDENTIFICAZIONE DEL BENE");
     for (const [title, value] of [["Oggetto:", g.object], ["Cronologia:", g.chronology], ["Autore:", g.author], ["Quota s.l.m.:", measureText(g.altitude)], ["Distanza Santuario:", measureText(g.distance)], ["Complesso:", g.complex], ["Ente Proprietario:", g.owner]]) left += label(title, value, { always: true });
     left += band("2. SOGGETTO E DATI TECNICO-DIMENSIONALI") + label("Soggetto:", g.subject, { always: true });
-    left += label("Dimensioni:", `H: ${measureText(g.height)}	L: ${measureText(g.width)}	P: ${measureText(g.depth)}`, { always: true });
+    left += label("Dimensioni:", `H: ${measureText(g.height)}		L: ${measureText(g.width)}		P: ${measureText(g.depth)}`, { always: true });
     left += label("Materie e Tecniche:", g.materials, { always: true });
     const right = table([[para(run("LOCALIZZAZIONE BENE", { bold: true, size: 22, color: "005B60" }), { align: "center", after: 120 }) + para(image(map, 254.15, 254.15 * ROAD_SIZE.height / ROAD_SIZE.width, "Planimetria del bene selezionato"), { align: "center", after: 0 })]], [6688], { borderColor: "005B60", shade: "F8FAF9", padding: 80, minHeight: 1e4 });
     let body = table([[left, "", right]], [7424, 576, 6688], { border: false, padding: 0, keepRows: false });
@@ -2555,8 +2588,15 @@
     body += sectionBreak() + heading("PROGRAMMAZIONE AZIONI PREVENTIVE", state2.preventive.date) + band("AZIONI PREVENTIVE");
     for (const row of preventiveGroups(state2)) {
       let context = label("Azioni preventive programmate il", displayDate(row.programmedDate), { keep: true });
-      if (row.resolvedDate) context += table([[para(run("RISOLTO IN DATA " + displayDate(row.resolvedDate), { bold: true }), { after: 0, keep: true })]], [WIDTH], { shade: "E4F3E6", borderColor: "A9CDB0", padding: 100 }) + blank();
-      context += dataTable(["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo"], [[row.reference, row.area, row.element, row.pathology, row.causes, displayDate(row.detectedDate)]], [700, 2700, 2700, 3860, 3100, 1900]);
+      const headers = ["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo"];
+      const values = [row.reference, row.area, row.element, row.pathology, row.causes, displayDate(row.detectedDate)];
+      let weights = [700, 2700, 2700, 3860, 3100, 1900];
+      if (row.resolvedDate) {
+        headers.push("Risolto in data");
+        values.push(displayDate(row.resolvedDate));
+        weights = [650, 2200, 2200, 3300, 2600, 1800, 1800];
+      }
+      context += dataTable(headers, [values], weights, { rowFill: row.resolvedDate ? "E4F3E6" : "" });
       for (const [index, action] of row.actions.filter(actionFilled).entries()) {
         let content2 = (index === 0 ? context : "") + timing(action.risk, action.window, "Finestra d'Intervento:");
         for (const [title, key, level] of [["Descrizione:", "description", 0], ["Azione:", "action", 1], ["Obiettivo:", "objective", 1], ["Operatore:", "operator", 1]]) if (filled(action[key])) content2 += para(run(title, { bold: true }) + run(" " + action[key]), { bullet: level });
@@ -2822,6 +2862,10 @@
       if (diagnosis && property === "resolvedDate") {
         if (correction && !value) row.resolvedAction = "";
       }
+    }
+    if (path === "general.id") {
+      state2.customFilename = false;
+      state2.filename = "";
     }
     if (keys[0] === "general" && ["complex", "owner"].includes(property) && state2.fixedCommon)
       state2.fixedCommon[property] = value;
@@ -3091,8 +3135,10 @@
   }
   function syncFilename() {
     if (!state) return;
+    const name = currentName();
+    if (!state.customFilename) state.filename = name;
     if (document.activeElement !== $("filename"))
-      $("filename").value = currentName();
+      $("filename").value = name;
   }
   function changed() {
     exportFiles.clear();
@@ -3310,7 +3356,7 @@
     $("resumeButton").disabled = value || !draftAvailable;
     for (const button of $("sectionContent").querySelectorAll('[data-action="camera"], [data-action="photos"]'))
       button.disabled = value;
-    for (const form of [$("newForm"), $("surveyForm")])
+    for (const form of [$("newDialog"), $("newForm"), $("surveyForm")])
       for (const control of form.querySelectorAll("button, input, select, textarea")) control.disabled = value;
   }
   function render() {
@@ -3393,6 +3439,8 @@
       const selected = assets.find((item) => item.id === marker.dataset.mapAsset);
       if (!selected || selected.kind !== ((_a = asset()) == null ? void 0 : _a.kind) || selected.id === state.assetId) return;
       state.assetId = selected.id;
+      state.customFilename = false;
+      state.filename = "";
       state.assetSnapshot = structuredClone(selected);
       editField(state, "general.object", selected.label, { correction: true });
       for (const visit of state.surveys) visit.data.assetId = selected.id;
@@ -3501,12 +3549,11 @@
   $("infoButton").onclick = openInfo;
   $("homeInfoButton").onclick = openInfo;
   $("newButton").onclick = () => {
-    $("objectChoice").hidden = true;
     $("assetSelect").replaceChildren();
-    for (const button of $("newForm").querySelectorAll("[data-kind]")) button.setAttribute("aria-pressed", "false");
+    for (const button of $("newDialog").querySelectorAll("[data-kind]")) button.setAttribute("aria-pressed", "false");
     $("newDialog").showModal();
   };
-  $("newForm").addEventListener("click", (event) => {
+  $("newDialog").addEventListener("click", (event) => {
     const button = event.target.closest("[data-kind]");
     if (!button || busy) return;
     const kind = button.dataset.kind;
@@ -3517,18 +3564,17 @@
       option.textContent = item.label;
       return option;
     }));
-    for (const category of $("newForm").querySelectorAll("[data-kind]"))
+    for (const category of $("newDialog").querySelectorAll("[data-kind]"))
       category.setAttribute("aria-pressed", String(category === button));
-    $("objectChoice").hidden = kind === "road";
-    if (kind === "road") createSheet();
-    else $("assetSelect").focus();
+    if (kind === "road" || kind === "aqueduct") createSheet(items[0].id);
+    else $("assetDialog").showModal();
   });
   $("newForm").onsubmit = (event) => {
     event.preventDefault();
     return createSheet();
   };
-  async function createSheet() {
-    if (busy || !$("assetSelect").value) return;
+  async function createSheet(assetId = $("assetSelect").value) {
+    if (busy || !assets.some((item) => item.id === assetId)) return;
     if (draftAvailable && !confirm(
       "Creare una nuova scheda sostituendo la bozza corrente? Salva prima la scheda se vuoi conservarla."
     ))
@@ -3537,8 +3583,9 @@
     try {
       clearTimeout(saveTimer);
       await saveChain;
-      state = applyFixed(newState($("assetSelect").value), assets);
+      state = applyFixed(newState(assetId), assets);
       unlockedPages.clear();
+      $("assetDialog").close();
       $("newDialog").close();
       changed();
       show("editor");
@@ -3579,7 +3626,10 @@
       setBusy(false);
     }
   };
-  var transactionalDialogs = /* @__PURE__ */ new Set(["newDialog", "surveyDialog", "saveDialog"]);
+  $("newDialog").addEventListener("close", () => {
+    if ($("assetDialog").open) $("assetDialog").close();
+  });
+  var transactionalDialogs = /* @__PURE__ */ new Set(["newDialog", "assetDialog", "surveyDialog", "saveDialog"]);
   initDialogs((dialog) => !busy || !transactionalDialogs.has(dialog.id));
   document.addEventListener("click", (e) => {
     for (const id of ["options", "homeOptions"])

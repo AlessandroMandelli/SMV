@@ -1021,7 +1021,6 @@ select:disabled { color: var(--ink, #1e3232); opacity: 1; background: #f1f3f4; }
 .object-dialog h2 { text-align: center; }
 .object-categories { display: grid; grid-template-columns: max-content; justify-content: center; gap: 14px; }
 .object-categories .home-button { width: 100%; min-height: 60px; padding: 15px 38px; background: #2c558b; }
-#objectChoice { margin-top: 24px; }
 #assetSelect { width: 100%; min-width: 0; }
 .map-check { padding: 0; border-radius: 0; pointer-events: auto; }
 .map-check:disabled { opacity: 1; cursor: default; }
@@ -1031,3 +1030,10 @@ select:disabled { color: var(--ink, #1e3232); opacity: 1; background: #f1f3f4; }
 
 .preventive-table { min-width: 800px; }
 .preventive-table td:nth-last-child(-n+2) { white-space: nowrap; }
+
+/* Scelta in due finestre: torna alle categorie chiudendo soltanto quella del bene. */
+.category-dialog { min-height: min(560px, calc(100dvh - 32px)); }
+.category-dialog .object-categories { padding-block: 16px 32px; }
+.asset-dialog { width: min(680px, calc(100% - 28px)); }
+.asset-actions { justify-content: center; margin-top: 24px; }
+.asset-open { min-height: 56px; }

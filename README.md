@@ -1,29 +1,26 @@
-# Schede Restauro 3.6.11
+# Schede Restauro 3.6.13
 
 PWA per il Sacro Monte di Varese, utilizzabile offline su desktop e telefono. Esporta PDF, Word modificabile e JSON. Lo ZIP contiene il sito già compilato, pronto per GitHub Pages senza npm o un server applicativo.
 
 ## Novità della revisione
 
-- Nuova planimetria, con geometria condivisa fra editor, PDF e Word. Vengono mostrati soltanto i checkbox della categoria selezionata. Il Viale è evidenziato in rosso senza checkbox.
-- Nuova scheda: scelta fra Cappelle, Archi, Fontane e Viale. I quattro pulsanti sono incolonnati su desktop e mobile, blu uniforme, con iniziale maiuscola e larghezza comune determinata dal testo più lungo. Il titolo Seleziona oggetto è centrato. Le prime tre categorie aprono una tendina con i nomi estesi; Viale apre direttamente la scheda.
-- Catalogo con 14 cappelle, Grotte delle Romite fra V e VI Cappella, tre archi, quattro fontane e Viale del Santuario e delle Cappelle. Gli ID tecnici precedenti restano compatibili con i JSON già salvati.
-- Oggetto viene compilato e bloccato anche nella nuova scheda. Sbloccare la prima pagina permette di correggerlo o selezionare un altro checkbox della stessa categoria. Rimane sempre una sola selezione.
-- Risolvere un degrado non copia il piano preventivo nelle Azioni condotte in loco: il campo rimane vuoto da compilare con quanto effettivamente eseguito. I testi di esecuzione già registrati vengono conservati.
-- Nell'editor delle preventive, nuova ultima colonna Risolto in data e riga verde per i degradi risolti nei sopralluoghi successivi. Rimossi il riepilogo verde separato e la tendina: il piano precedente è consultabile dalla cronologia della pagina.
-- Un nuovo sopralluogo propone la data odierna e non richiede note del sopralluogo. La data rimane modificabile e non può precedere la visita importata.
-- Nei documenti, eliminati i riepiloghi Storico sopralluoghi e Storico del degrado, le note e le priorità ripetute per sopralluogo. Il normale Storico manutentivo e i piani preventivi conservati restano presenti.
-- Nei documenti: Azioni preventive programmate il con la data originaria del piano; per le risoluzioni successive, RISOLTO IN DATA con data interamente in grassetto su fondo verde chiaro. Eliminata la dicitura Programmazione originaria conservata. Accento grave À e tabulazioni controllati.
-- Nel Word, qualifiche incolonnate sotto Operatore, senza pallino aggiuntivo davanti al Tecnico manutentore. Struttura nativa ripresa dalla 3.4.3, con tabelle e immagini in linea.
-- Home: menu Opzioni con Info, separatore rientrato e Installa app. Se l'installazione è rilevata rimane soltanto Info. Reset scheda resta nel menu dell'editor.
+- Nomenclatura automatica per nuove schede e JSON importati: `scheda_ispezione_periodica_I_Cappella_ID_01.02_2026_2026-10-30`. Prefisso minuscolo, numeri romani per le cappelle, Primo/Secondo/Terzo per gli archi, ID maiuscolo e data finale con trattini, senza ora.
+- Nome aggiornato mentre viene compilato l'ID. Finché il campo è vuoto viene usato `XX.XX_anno`, con l'anno di apertura. Modificare l'ID riattiva la nomenclatura automatica anche dopo una rinomina manuale del file. Il testo originale dell'ID nei dati rimane intatto; eventuali caratteri non ammessi nel nome di un file sono sostituiti soltanto nel nome scaricato.
+- Le fontane usano Prima_Fontana, Seconda_Fontana, Terza_Fontana e Fontana_del_Mosè. Le altre eccezioni sono Grotta_delle_Romite, Viale e Acquedotto. I nomi estesi dei beni nell'anagrafica e nelle tendine restano conservati.
+- La data del nome è quella locale di apertura della nuova scheda o di avvio dell'aggiornamento da JSON. Modificare la data del documento o del sopralluogo non cambia la data del nome. Riprendere la compilazione conserva la data di apertura; importare un JSON genera il nuovo nome con la data odierna e conserva l'ID esistente.
+- Aggiunto Acquedotto nella scelta oggetto, nell'ordine Cappelle, Archi, Fontane, Acquedotto, Viale. Acquedotto e Viale aprono direttamente la scheda; le altre categorie mantengono la seconda finestra per scegliere il bene. I pulsanti restano incolonnati e di uguale larghezza, adeguata al testo più lungo.
+- Acquedotto dispone della stessa compilazione ed esportazione Word, PDF e JSON. Non gli sono assegnati marcatori o tracciati non forniti. I file condividono lo stesso nome, compresi i file interni allo ZIP su iPhone.
+
+Conservate le modifiche della 3.6.12: finestre sovrapposte con chiusura al livello precedente, tabulazioni delle dimensioni nel Word, note sotto al titolo e azioni preventive risolte con ultima colonna Risolto in data e riga verde chiaro.
 
 ## Pubblicazione
 
-Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.11 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
+Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.13 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
 
 ## Home e compilazione
 
 - **Compila una nuova scheda** avvia la prima ispezione.
-- **Carica e aggiorna stato conservativo** importa l'ultimo JSON e avvia un nuovo sopralluogo. La data della visita è conservata nello storico; le note delle visite già esistenti nei vecchi JSON sono mantenute. Il nome del file assume data e ora del caricamento; la data originaria della scheda e gli stati precedenti restano disponibili. Il file importato resta intatto.
+- **Carica e aggiorna stato conservativo** importa l'ultimo JSON e avvia un nuovo sopralluogo. La data della visita è conservata nello storico; le note delle visite già esistenti nei vecchi JSON sono mantenute. Il nome del file assume la data del caricamento secondo la nomenclatura indicata sopra; la data originaria della scheda e gli stati precedenti restano disponibili. Il file importato resta intatto.
 - **Riprendi la compilazione** riapre la bozza sullo stesso dispositivo e profilo browser, senza iniziare una visita o aggiornare le date.
 
 Storico manutentivo e stato conservativo hanno schermate distinte. I titoli superiori duplicati e i campi ID/data/oggetto delle sezioni finali non occupano spazio nella compilazione; le corrispondenti intestazioni rimangono nei documenti. Tra nome file e Opzioni si trovano il lucchetto e l'icona cronologia. La cronologia mostra soltanto le versioni precedenti della pagina corrente.
@@ -46,7 +43,7 @@ Le nuove priorità e le azioni preventive sono collegate al degrado tramite iden
 
 Risolto in data genera automaticamente la voce negli interventi eseguiti. Per la visita corrente le azioni condotte in loco sono compilabili; per gli interventi chiusi sono protette. Non c'è un comando per aggiungere manualmente nuovi interventi eseguiti. Gli interventi manuali dei vecchi JSON e le vecchie priorità senza collegamento rimangono disponibili, senza attribuire loro un degrado arbitrario.
 
-Il degrado risolto che era aperto in un sopralluogo precedente mantiene la programmazione originaria: nell'editor la riga della tabella è verde chiaro e contiene la data di risoluzione. Il piano precedente si consulta dall'icona cronologia, senza un riquadro o una tendina aggiuntivi sotto la tabella. Nei documenti il piano viene riportato per intero con la data originaria e l'avviso di risoluzione. Le voci inserite e risolte nella loro prima visita restano soltanto negli interventi eseguiti.
+Il degrado risolto che era aperto in un sopralluogo precedente mantiene la programmazione originaria: nell'editor la riga della tabella è verde chiaro e contiene la data di risoluzione. Il piano precedente si consulta dall'icona cronologia, senza un riquadro o una tendina aggiuntivi sotto la tabella. Nei documenti il piano viene riportato per intero con la data originaria e la data di risoluzione nell'ultima colonna della tabella, la cui riga è verde chiaro. Le voci inserite e risolte nella loro prima visita restano soltanto negli interventi eseguiti.
 
 ## Fotografie e salvataggio
 
@@ -68,7 +65,7 @@ Il Word rimane modificabile e scorre con il contenuto: numero di pagine e interr
 
 ## Manutenzione del codice
 
-I sorgenti leggibili sono in `js/`; per ricompilarli eseguire `npm ci` e `npm run build`. Il sito distribuito funziona senza questi comandi. `assets/beni.json` contiene l'anagrafica, `assets/map.jpg` la planimetria e `js/road.js` il tracciato sovrapposto del Viale. Il catalogo contiene le nuove coordinate delle cappelle, delle grotte, degli archi e delle fontane. Non viene utilizzato un vecchio template PDF.
+I sorgenti leggibili sono in `js/`; per ricompilarli eseguire `npm ci` e `npm run build`. Il sito distribuito funziona senza questi comandi. `assets/beni.json` contiene l'anagrafica e il campo `fileLabel` per la parte del nome relativa a ciascun bene, `assets/map.jpg` la planimetria e `js/road.js` il tracciato sovrapposto del Viale. Il catalogo contiene le nuove coordinate delle cappelle, delle grotte, degli archi e delle fontane. Non viene utilizzato un vecchio template PDF.
 
 `js/corrections.js` applica le correzioni definitive, `js/surveys.js` gestisce sopralluoghi e collegamenti, `js/pdf.js` e `js/docx.js` generano i documenti. Le note scritte manualmente restano testi autonomi: eventuali riferimenti da correggere vanno modificati nel relativo campo.
 
