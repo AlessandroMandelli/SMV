@@ -30,7 +30,7 @@ export function beginSurvey(state, date = localDate(), notes = "") {
     actions: state.diagnosis.flatMap(r => r.actions.map(a => a.id)),
   };
   state.survey = { id: uid(), date, notes };
-  state.filenameDate = new Date().toISOString();
+  state.filenameDate = localDate();
   state.customFilename = false;
   state.filename = "";
   state.immediate.date = date;

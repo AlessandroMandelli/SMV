@@ -510,7 +510,7 @@ export class Flow {
       if (offset < lines.length) this.next();
     }
   }
-  table(headers, rows, proportions, { riskColumn = -1 } = {}) {
+  table(headers, rows, proportions, { riskColumn = -1, rowFill = null } = {}) {
     if (!rows.length) return;
     const total = proportions.reduce((a, b) => a + b, 0);
     const widths = proportions.map((w) => (w / total) * this.width);
@@ -569,7 +569,7 @@ export class Flow {
         const height = count * TYPE.leading + 8;
         cells.forEach((lines, i) => {
           this.report.rect(this.page, xs[i], this.y, widths[i], height, {
-            fill: index % 2 ? COLORS.alternate : "#ffffff",
+            fill: rowFill || (index % 2 ? COLORS.alternate : "#ffffff"),
             border: COLORS.border,
           });
           const fragment =

@@ -6,5 +6,5 @@ export const ROAD_SVG_POINTS = ROAD_POINTS.map(point => point.join(",")).join(" 
 /** Sono visibili solo i marcatori della categoria selezionata. */
 export function mapAssets(assets, assetId) {
   const kind = assets.find(asset => asset.id === assetId)?.kind;
-  return kind && kind !== "road" ? assets.filter(asset => asset.kind === kind) : [];
+  return kind && kind !== "road" ? assets.filter(asset => asset.kind === kind && Number.isFinite(asset.x) && Number.isFinite(asset.y)) : [];
 }

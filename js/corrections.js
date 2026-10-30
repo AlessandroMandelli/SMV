@@ -56,6 +56,10 @@ export function editField(state, path, value, { correction = false } = {}) {
       if (correction && !value) row.resolvedAction = "";
     }
   }
+  if (path === "general.id") {
+    state.customFilename = false;
+    state.filename = "";
+  }
   if (keys[0] === "general" && ["complex", "owner"].includes(property) && state.fixedCommon)
     state.fixedCommon[property] = value;
   if (path === "general.date" && !state.updateBaseline &&

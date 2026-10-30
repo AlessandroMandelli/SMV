@@ -103,8 +103,10 @@ function currentName() {
 }
 function syncFilename() {
   if (!state) return;
+  const name = currentName();
+  if (!state.customFilename) state.filename = name;
   if (document.activeElement !== $("filename"))
-    $("filename").value = currentName();
+    $("filename").value = name;
 }
 function changed() {
   exportFiles.clear();
@@ -347,7 +349,7 @@ function setBusy(value) {
   $("resumeButton").disabled = value || !draftAvailable;
   for (const button of $("sectionContent").querySelectorAll('[data-action="camera"], [data-action="photos"]'))
     button.disabled = value;
-  for (const form of [$("newForm"), $("surveyForm")])
+  for (const form of [$("newDialog"), $("newForm"), $("surveyForm")])
     for (const control of form.querySelectorAll("button, input, select, textarea")) control.disabled = value;
 }
 function render() {
@@ -445,6 +447,8 @@ $("sectionContent").addEventListener("click", (event) => {
     const selected = assets.find(item => item.id === marker.dataset.mapAsset);
     if (!selected || selected.kind !== asset()?.kind || selected.id === state.assetId) return;
     state.assetId = selected.id;
+    state.customFilename = false;
+    state.filename = "";
     state.assetSnapshot = structuredClone(selected);
     editField(state, "general.object", selected.label, { correction: true });
     for (const visit of state.surveys) visit.data.assetId = selected.id;
@@ -559,12 +563,11 @@ function openInfo() {
 $("infoButton").onclick = openInfo;
 $("homeInfoButton").onclick = openInfo;
 $("newButton").onclick = () => {
-  $("objectChoice").hidden = true;
   $("assetSelect").replaceChildren();
-  for (const button of $("newForm").querySelectorAll("[data-kind]")) button.setAttribute("aria-pressed", "false");
+  for (const button of $("newDialog").querySelectorAll("[data-kind]")) button.setAttribute("aria-pressed", "false");
   $("newDialog").showModal();
 };
-$("newForm").addEventListener("click", event => {
+$("newDialog").addEventListener("click", event => {
   const button = event.target.closest("[data-kind]");
   if (!button || busy) return;
   const kind = button.dataset.kind;
@@ -573,15 +576,14 @@ $("newForm").addEventListener("click", event => {
     const option = document.createElement("option");
     option.value = item.id; option.textContent = item.label; return option;
   }));
-  for (const category of $("newForm").querySelectorAll("[data-kind]"))
+  for (const category of $("newDialog").querySelectorAll("[data-kind]"))
     category.setAttribute("aria-pressed", String(category === button));
-  $("objectChoice").hidden = kind === "road";
-  if (kind === "road") createSheet();
-  else $("assetSelect").focus();
+  if (kind === "road" || kind === "aqueduct") createSheet(items[0].id);
+  else $("assetDialog").showModal();
 });
 $("newForm").onsubmit = event => { event.preventDefault(); return createSheet(); };
-async function createSheet() {
-  if (busy || !$("assetSelect").value) return;
+async function createSheet(assetId = $("assetSelect").value) {
+  if (busy || !assets.some(item => item.id === assetId)) return;
   if (
     draftAvailable &&
     !confirm(
@@ -593,8 +595,9 @@ async function createSheet() {
   try {
     clearTimeout(saveTimer);
     await saveChain;
-    state = applyFixed(newState($("assetSelect").value), assets);
+    state = applyFixed(newState(assetId), assets);
     unlockedPages.clear();
+    $("assetDialog").close();
     $("newDialog").close();
     changed();
     show("editor");
@@ -628,7 +631,12 @@ $("resetButton").onclick = async () => {
     notify("Reset non riuscito: " + error.message);
   } finally { setBusy(false); }
 };
-const transactionalDialogs = new Set(["newDialog", "surveyDialog", "saveDialog"]);
+// Le finestre sono sorelle nel DOM: il tocco sullo sfondo di quella superiore
+// non viene propagato alla finestra delle categorie sottostante.
+$("newDialog").addEventListener("close", () => {
+  if ($("assetDialog").open) $("assetDialog").close();
+});
+const transactionalDialogs = new Set(["newDialog", "assetDialog", "surveyDialog", "saveDialog"]);
 initDialogs(dialog => !busy || !transactionalDialogs.has(dialog.id));
 document.addEventListener("click", (e) => {
   for (const id of ["options", "homeOptions"])

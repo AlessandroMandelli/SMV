@@ -624,9 +624,15 @@ function preventive(report, state) {
   flow.section(PREVENTIVE_TITLE, rows.length ? 40 : 0);
   rows.forEach((row, index) => {
     const actions = row.actions.filter(actionHasContent);
+    const headers = ["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo"];
     const values = [row.reference, row.area, row.element, row.pathology, row.causes, displayDate(row.detectedDate)];
-    const weights = [700, 2700, 2700, 3860, 3100, 1900],
-      sum = weights.reduce((total, width) => total + width, 0);
+    let weights = [700, 2700, 2700, 3860, 3100, 1900];
+    if (row.resolvedDate) {
+      headers.push("Risolto in data");
+      values.push(displayDate(row.resolvedDate));
+      weights = [650, 2200, 2200, 3300, 2600, 1800, 1800];
+    }
+    const sum = weights.reduce((total, width) => total + width, 0);
     const contextHeight =
       Math.max(
         ...values.map(
@@ -660,18 +666,8 @@ function preventive(report, state) {
           : Math.min(contextHeight + 40, flow.freshHeight()),
       );
     flow.paragraph("Azioni preventive programmate il", displayDate(row.programmedDate));
-    if (row.resolvedDate) {
-      flow.ensure(32);
-      report.rect(flow.page, flow.x, flow.y, flow.width, 26, { fill: "#e4f3e6", border: "#a9cdb0", borderWidth: 0.6 });
-      report.text(flow.page, "RISOLTO IN DATA " + displayDate(row.resolvedDate), flow.x + 7, flow.y + 7, { bold: true });
-      flow.y += 34;
-    }
     if (values.some(hasText))
-      flow.table(
-        ["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo"],
-        [values],
-        weights,
-      );
+      flow.table(headers, [values], weights, { rowFill: row.resolvedDate ? "#e4f3e6" : null });
     actions.forEach((action) => actionPackage(flow, action));
     flow.y += 8;
   });

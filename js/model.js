@@ -175,7 +175,7 @@ export function newState(assetId) {
     customFilename: false,
     section: 0,
     editorVersion: EDITOR_LAYOUT_VERSION,
-    filenameDate: "",
+    filenameDate: date,
     general: {
       id: "",
       date,
@@ -211,26 +211,31 @@ export function newState(assetId) {
     preventive: { date, notes: "" },
   };
 }
+/** Data locale fissata all'apertura, indipendente dalle date compilate nel documento.
+ * I JSON precedenti possono contenere ancora un timestamp ISO in filenameDate. */
+export function filenameDay(state) {
+  const value = state.filenameDate || state.createdAt;
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : localDate(new Date(value));
+}
 export function baseName(state, assets) {
   if (state.customFilename && state.filename.trim())
     return safeFilename(state.filename);
-  const asset = assets.find((a) => a.id === state.assetId);
-  const name =
-    asset?.kind === "road"
-      ? "Viale"
-      : asset?.kind === "arch"
-        ? `Arco_${String(asset.number).padStart(2, "0")}`
-        : asset?.kind === "fountain"
-          ? (asset.id === "fm" ? "Fontana_Mose" : `Fontana_${String(asset.number).padStart(2, "0")}`)
-          : asset?.id === "grotte" ? "Grotte_delle_Romite"
-            : `Cappella_${String(asset?.number || "").padStart(2, "0")}`;
-  const stamp = new Date(state.filenameDate || state.createdAt);
-  const date = state.filenameDate ? localDate(stamp) : state.general.date || localDate(stamp);
-  return `Sacro_Monte_Varese_${name}_${date.replaceAll("-", "_")}_${localTime(stamp).replace(":", "_")}`;
+  const asset = assets.find(item => item.id === state.assetId);
+  const date = filenameDay(state);
+  const prefix = `scheda_ispezione_periodica_${asset?.fileLabel || "Bene"}_ID_`;
+  const suffix = "_" + date;
+  const identifier = (String(state.general.id || "").trim() || `XX.XX_${date.slice(0, 4)}`)
+    .normalize("NFC")
+    .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_")
+    .replace(/\s+/g, "_");
+  // Riserva lo spazio per prefisso e data anche con identificativi molto lunghi.
+  const id = identifier.slice(0, Math.max(1, 160 - prefix.length - suffix.length));
+  return safeFilename(prefix + id + suffix);
 }
 export function safeFilename(name) {
   return (
     name
+      .normalize("NFC")
       .trim()
       .replace(/\.(docx|pdf|json|zip)$/i, "")
       .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_")
