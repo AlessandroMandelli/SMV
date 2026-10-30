@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#15568d" />
+    <meta
+      name="description"
+      content="Schede di ispezione e manutenzione del Sacro Monte di Varese. Compilazione e salvataggio anche offline."
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>Schede di Restauro — Sacro Monte di Varese</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./assets/icon-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="./assets/icon-180.png" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./pwa-install.js?v=3.6.11" defer></script>
+    <script src="./app.bundle.js?v=3.6.11" defer></script>
+  </head>
+  <body>
+    <section id="home" class="home">
+      <details id="homeOptions" class="options home-options">
+        <summary aria-label="Opzioni">⋮ <span>Opzioni</span></summary>
+        <div class="menu">
+          <button id="homeInfoButton" type="button">Info</button>
+          <hr id="homeInstallSeparator" class="menu-separator" />
+          <button id="installHeader" type="button">Installa app</button>
+        </div>
+      </details>
+      <main class="welcome">
+        <div class="home-branding">
+          <h1><span id="homeTitle">Schede di Restauro</span></h1>
+          <p class="subtitle">
+            <span id="homeSubtitle">Sacro Monte di Varese</span>
+          </p>
+        </div>
+        <div class="home-actions">
+          <button id="newButton" class="home-button primary">
+            <span>Compila una</span> <span>nuova scheda</span>
+          </button>
+          <button id="importButton" class="home-button secondary"><span>Carica e aggiorna</span> <span>stato conservativo</span></button>
+          <button id="resumeButton" class="home-button" disabled><span>Riprendi la</span> <span>compilazione</span></button>
+        </div>
+        <p id="homeStatus" class="quiet" role="status" hidden="hidden">
+          Caricamento…
+        </p>
+      </main>
+      <div class="landscape" aria-hidden="true"></div>
+    </section>
+
+    <section id="editor" hidden>
+      <header class="toolbar">
+        <label for="filename">Nome del file</label>
+        <input
+          id="filename"
+          type="text"
+          autocomplete="off"
+          aria-label="Nome del file senza estensione"
+        />
+        <button id="pageLockButton" class="history-icon page-lock" type="button" title="Sblocca la pagina" aria-label="Sblocca la pagina" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="5" y="11" width="14" height="10" rx="2" />
+            <path id="pageLockShackle" d="M8 11V7a4 4 0 0 1 8 0v4" />
+            <path d="M12 15v2" />
+          </svg>
+        </button>
+        <button id="surveyHistoryButton" class="history-icon" type="button" title="Storico sopralluoghi" aria-label="Storico sopralluoghi"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6M12 7v5l3 2"/></svg></button>
+        <details id="options" class="options">
+          <summary aria-label="Opzioni">⋮ <span>Opzioni</span></summary>
+          <div class="menu">
+            <button id="resetButton" class="danger">Reset scheda</button>
+            <button id="infoButton" type="button">Info</button>
+            <hr id="installSeparator" class="menu-separator" />
+            <button id="installMenu" type="button">Installa app</button>
+          </div>
+        </details>
+      </header>
+      <main id="sectionContent" class="sheet" tabindex="-1"></main>
+      <section
+        id="exportReady"
+        class="export-ready"
+        aria-label="File da scaricare"
+        hidden
+      >
+        <div class="export-files">
+          <a id="saveDocx" data-format="docx" target="_blank" rel="noopener" class="file-button" hidden>Salva DOCX</a>
+          <a id="savePdf" data-format="pdf" target="_blank" rel="noopener" class="file-button" hidden>Salva PDF</a>
+          <a id="saveJson" data-format="json" target="_blank" rel="noopener" class="file-button" hidden>Salva JSON</a>
+          <a id="savePackage" target="_blank" rel="noopener" class="file-button primary" hidden>Salva ZIP</a>
+          <button id="sharePdf" type="button" hidden>Condividi PDF</button>
+        </div>
+      </section>
+      <footer class="navigation">
+        <button id="previous" type="button"></button>
+        <div class="nav-status">
+          <span id="sectionCounter"></span
+          ><small id="saveStatus" role="status"></small>
+        </div>
+        <button id="next" type="button" class="primary"></button>
+      </footer>
+    </section>
+
+    <dialog id="surveyDialog" class="survey-dialog" aria-labelledby="surveyTitle">
+      <form id="surveyForm">
+        <div class="dialog-heading"><h2 id="surveyTitle">Nuovo sopralluogo</h2><button type="button" class="dialog-close" data-close="surveyDialog" aria-label="Chiudi">×</button></div>
+        <p>La scheda precedente resta conservata. I dati importati sono bloccati; puoi aggiungere nuovi rilievi e aggiornare le date di risoluzione.</p>
+        <label class="field"><span>Data del sopralluogo</span><input id="surveyDate" type="date" required></label>
+        <p id="surveyError" class="save-error" role="alert" hidden></p>
+        <div class="dialog-actions"><button type="button" data-close="surveyDialog">Annulla</button><button class="primary" type="submit">Inizia sopralluogo</button></div>
+      </form>
+    </dialog>
+    <dialog id="surveyHistoryDialog" class="survey-history-dialog" aria-labelledby="surveyHistoryTitle">
+      <div class="dialog-heading"><h2 id="surveyHistoryTitle">Storico sopralluoghi</h2><button type="button" class="dialog-close" data-close="surveyHistoryDialog" aria-label="Chiudi">×</button></div>
+      <div id="surveyHistoryContent"></div>
+    </dialog>
+    <dialog id="infoDialog" class="info-dialog" aria-labelledby="infoTitle">
+      <div class="dialog-heading"><h2 id="infoTitle">Info</h2><button type="button" class="dialog-close" data-close="infoDialog" aria-label="Chiudi">×</button></div>
+      <a id="pwaLink" class="info-link" href="https://alessandromandelli.github.io/SMV/" target="_blank" rel="noopener">https://alessandromandelli.github.io/SMV/</a>
+      <p id="appVersion" class="app-version"></p>
+    </dialog>
+    <dialog id="saveDialog" class="save-dialog" aria-labelledby="saveTitle">
+      <form id="saveForm">
+        <div class="dialog-heading"><h2 id="saveTitle">Salva scheda</h2><button type="button" id="closeSave" class="dialog-close" data-close="saveDialog" aria-label="Chiudi">×</button></div>
+        <div class="save-formats">
+          <label><input type="checkbox" name="format" value="docx" checked />DOCX</label>
+          <label><input type="checkbox" name="format" value="pdf" checked />PDF</label>
+          <label title="Il JSON è sempre incluso per conservare la scheda e lo storico"><input type="checkbox" name="format" value="json" checked disabled aria-label="JSON, sempre incluso" />JSON</label>
+        </div>
+        <p id="saveError" class="save-error" role="alert" hidden></p>
+        <button id="confirmSave" class="primary" type="submit">Salva</button>
+      </form>
+    </dialog>
+    <dialog id="newDialog" class="object-dialog" aria-labelledby="newTitle">
+      <form id="newForm">
+        <div class="dialog-heading"><h2 id="newTitle">Seleziona oggetto</h2><button type="button" class="dialog-close" data-close="newDialog" aria-label="Chiudi">×</button></div>
+        <div class="object-categories">
+          <button type="button" class="home-button" data-kind="chapel">Cappelle</button>
+          <button type="button" class="home-button" data-kind="arch">Archi</button>
+          <button type="button" class="home-button" data-kind="fountain">Fontane</button>
+          <button type="button" class="home-button" data-kind="road">Viale</button>
+        </div>
+        <div id="objectChoice" hidden>
+          <label class="field"><span id="objectChoiceLabel">Seleziona il bene</span><select id="assetSelect" required aria-labelledby="objectChoiceLabel"></select></label>
+          <div class="dialog-actions"><button class="primary" type="submit">Apri scheda</button></div>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="messageDialog" aria-labelledby="dialogTitle">
+      <div class="dialog-heading"><h2 id="dialogTitle"></h2><button type="button" class="dialog-close" data-close="messageDialog" aria-label="Chiudi">×</button></div>
+      <p id="dialogMessage"></p>
+      <div class="dialog-actions">
+        <button data-close="messageDialog" class="primary">Chiudi</button>
+      </div>
+    </dialog>
+    <input id="jsonInput" type="file" accept=".json,application/json" hidden />
+    <input id="photoInput" type="file" accept="image/*" multiple hidden />
+    <input
+      id="cameraInput"
+      type="file"
+      accept="image/*"
+      capture="environment"
+      hidden
+    />
+    <div id="toast" role="status" hidden></div>
+    <noscript>Attiva JavaScript per compilare le schede.</noscript>
+  </body>
+</html>
