@@ -14,6 +14,22 @@ export function registerSurvey(state) {
   const current = new Set(state.photos.map(photo => photo.id));
   state.photoArchive = state.photoArchive.filter(photo => referenced.has(photo.id) && !current.has(photo.id));
 }
+/** Propone l'ultima esecuzione registrata; senza interventi datati riparte
+ * dall'ultimo sopralluogo. Non considera scadenze o programmazioni future. */
+export function suggestedSurveyDate(state) {
+  const visits = surveyEntries(state);
+  const valid = value => /^\d{4}-\d{2}-\d{2}$/.test(value || "") &&
+    localDate(new Date(value + "T12:00:00")) === value;
+  const visitDates = visits.map(visit => visit.date).filter(valid);
+  const latestVisit = visitDates.sort().at(-1) || state.general.date || localDate();
+  const executionDates = visits.flatMap(visit => [
+    ...visit.data.diagnosis.map(row => row.resolvedDate),
+    ...visit.data.immediate.records.filter(row => row.area || row.action)
+      .map(row => row.date || visit.data.immediate.executedDate),
+  ]).filter(valid);
+  // La proposta non può precedere una visita già registrata.
+  return [latestVisit, ...executionDates].sort().at(-1);
+}
 export function beginSurvey(state, date = localDate(), notes = "") {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || localDate(new Date(date + "T12:00:00")) !== date)
     throw Error("Inserisci la data del nuovo sopralluogo.");
@@ -30,7 +46,7 @@ export function beginSurvey(state, date = localDate(), notes = "") {
     actions: state.diagnosis.flatMap(r => r.actions.map(a => a.id)),
   };
   state.survey = { id: uid(), date, notes };
-  state.filenameDate = localDate();
+  state.filenameDate = new Date().toISOString();
   state.customFilename = false;
   state.filename = "";
   state.immediate.date = date;

@@ -160,12 +160,12 @@ export function syncDiagnosticLinks(state, { createPriorities = true, createActi
 }
 
 export function newState(assetId) {
-  const date = localDate();
+  const openedAt = new Date(), date = localDate(openedAt);
   return {
     app: APP_ID,
     schemaVersion: SCHEMA_VERSION,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: openedAt.toISOString(),
+    updatedAt: openedAt.toISOString(),
     assetId,
     survey: { id: uid(), date, notes: "" },
     surveys: [],
@@ -175,11 +175,11 @@ export function newState(assetId) {
     customFilename: false,
     section: 0,
     editorVersion: EDITOR_LAYOUT_VERSION,
-    filenameDate: date,
+    filenameDate: openedAt.toISOString(),
     general: {
       id: "",
       date,
-      time: localTime(),
+      time: localTime(openedAt),
       object: "",
       chronology: "",
       author: "",
@@ -211,11 +211,18 @@ export function newState(assetId) {
     preventive: { date, notes: "" },
   };
 }
-/** Data locale fissata all'apertura, indipendente dalle date compilate nel documento.
- * I JSON precedenti possono contenere ancora un timestamp ISO in filenameDate. */
+/** Giorno locale dell'apertura, indipendente dalle date compilate nel documento.
+ * Accetta timestamp ISO e sola data, presente in alcune versioni precedenti. */
 export function filenameDay(state) {
   const value = state.filenameDate || state.createdAt;
   return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : localDate(new Date(value));
+}
+/** Le vecchie bozze con sola data recuperano l'ora dalla creazione, senza usare
+ * l'ora corrente: ripresa e salvataggi successivi mantengono lo stesso nome. */
+export function filenameTime(state) {
+  const value = state.filenameDate;
+  const timestamp = value && !/^\d{4}-\d{2}-\d{2}$/.test(value) ? value : state.createdAt;
+  return localTime(new Date(timestamp)).replace(":", "-");
 }
 export function baseName(state, assets) {
   if (state.customFilename && state.filename.trim())
@@ -223,7 +230,7 @@ export function baseName(state, assets) {
   const asset = assets.find(item => item.id === state.assetId);
   const date = filenameDay(state);
   const prefix = `scheda_ispezione_periodica_${asset?.fileLabel || "Bene"}_ID_`;
-  const suffix = "_" + date;
+  const suffix = "_" + date + "_" + filenameTime(state);
   const identifier = (String(state.general.id || "").trim() || `XX.XX_${date.slice(0, 4)}`)
     .normalize("NFC")
     .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_")

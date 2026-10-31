@@ -624,14 +624,9 @@ function preventive(report, state) {
   flow.section(PREVENTIVE_TITLE, rows.length ? 40 : 0);
   rows.forEach((row, index) => {
     const actions = row.actions.filter(actionHasContent);
-    const headers = ["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo"];
-    const values = [row.reference, row.area, row.element, row.pathology, row.causes, displayDate(row.detectedDate)];
-    let weights = [700, 2700, 2700, 3860, 3100, 1900];
-    if (row.resolvedDate) {
-      headers.push("Risolto in data");
-      values.push(displayDate(row.resolvedDate));
-      weights = [650, 2200, 2200, 3300, 2600, 1800, 1800];
-    }
+    const headers = ["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo", "Risolto in data"];
+    const values = [row.reference, row.area, row.element, row.pathology, row.causes, displayDate(row.detectedDate), displayDate(row.resolvedDate)];
+    const weights = [650, 2200, 2200, 3300, 2600, 1800, 1800];
     const sum = weights.reduce((total, width) => total + width, 0);
     const contextHeight =
       Math.max(

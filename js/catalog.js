@@ -55,8 +55,8 @@ export const ASSETS = [
     "label": "Grotte delle Romite, Beate Caterina e Giuliana",
     "kind": "chapel",
     "fixed": {},
-    "x": 47.7396,
-    "y": 67.86091,
+    "x": 49,
+    "y": 65,
     "fileLabel": "Grotta_delle_Romite"
   },
   {
@@ -66,7 +66,7 @@ export const ASSETS = [
     "fixed": {},
     "number": 6,
     "x": 44.12297,
-    "y": 68.38778,
+    "y": 70.5,
     "fileLabel": "VI_Cappella"
   },
   {

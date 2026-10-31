@@ -65,10 +65,17 @@ function table(rows, widths, { border = true, headers = false, stripe = headers,
 function dataTable(headers, rows, weights, { rowFill = "" } = {}) {
   if (!rows.length) return "";
   return table([headers.map(text => para(run(text, { bold: true, color: "FFFFFF" }), { after: 0 })),
-    ...rows.map(row => row.map((text, index) => ({ content: para(run(text, { color: /livello di rischio/i.test(headers[index]) ? riskColor(text) : "1E3232" }), { after: 0 }), shade: rowFill })))], scaled(weights), { headers: true }) + blank();
+    ...rows.map(row => row.map((text, index) => {
+      const resolution = /^risolto in data$/i.test(headers[index]);
+      const empty = resolution && !filled(text);
+      return { content: para(run(empty ? "-" : text, {
+        bold: resolution && !empty,
+        color: /livello di rischio/i.test(headers[index]) ? riskColor(text) : "1E3232",
+      }), { after: 0, align: empty ? "center" : "left" }), shade: rowFill, center: empty };
+    }))], scaled(weights), { headers: true }) + blank();
 }
 function note(value, height = 1200) {
-  return filled(value) ? table([[para(run("Note aggiuntive:", { bold: true }), { keep: true, after: 70 }) + para(run(value), { after: 0 })]], [WIDTH], { shade: "F2F2F2", borderColor: "005B60", minHeight: height, bottom: true, keepRows: false }) + blank() : "";
+  return filled(value) ? table([[para(run("Note aggiuntive:", { bold: true }), { keep: true, after: 70, align: "left" }) + para(run(value), { after: 0, align: "left" })]], [WIDTH], { shade: "F2F2F2", borderColor: "005B60", minHeight: height, bottom: true, keepRows: false }) + blank() : "";
 }
 async function bytes(path) {
   const response = await fetch(path);
@@ -203,14 +210,9 @@ export async function makeDocx(state, assets) {
   body += sectionBreak() + heading("PROGRAMMAZIONE AZIONI PREVENTIVE", state.preventive.date) + band("AZIONI PREVENTIVE");
   for (const row of preventiveGroups(state)) {
     let context = label("Azioni preventive programmate il", displayDate(row.programmedDate), { keep: true });
-    const headers = ["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo"];
-    const values = [row.reference, row.area, row.element, row.pathology, row.causes, displayDate(row.detectedDate)];
-    let weights = [700, 2700, 2700, 3860, 3100, 1900];
-    if (row.resolvedDate) {
-      headers.push("Risolto in data");
-      values.push(displayDate(row.resolvedDate));
-      weights = [650, 2200, 2200, 3300, 2600, 1800, 1800];
-    }
+    const headers = ["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo", "Risolto in data"];
+    const values = [row.reference, row.area, row.element, row.pathology, row.causes, displayDate(row.detectedDate), displayDate(row.resolvedDate)];
+    const weights = [650, 2200, 2200, 3300, 2600, 1800, 1800];
     context += dataTable(headers, [values], weights, { rowFill: row.resolvedDate ? "E4F3E6" : "" });
     for (const [index, action] of row.actions.filter(actionFilled).entries()) {
       let content = (index === 0 ? context : "") + timing(action.risk, action.window, "Finestra d'Intervento:");

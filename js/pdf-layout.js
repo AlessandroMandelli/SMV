@@ -501,7 +501,7 @@ export class Flow {
           this.report.text(
             this.page,
             line,
-            this.x + 8,
+            this.x + 4,
             this.y + 19 + i * TYPE.leading,
           ),
         );
@@ -512,6 +512,10 @@ export class Flow {
   }
   table(headers, rows, proportions, { riskColumn = -1, rowFill = null } = {}) {
     if (!rows.length) return;
+    const resolutionColumn = headers.findIndex(title => /^risolto in data$/i.test(title));
+    rows = rows.map(row => row.map((value, i) =>
+      i === resolutionColumn && !hasText(value) ? "-" : value));
+    const isBold = (value, i) => i === resolutionColumn && value !== "-";
     const total = proportions.reduce((a, b) => a + b, 0);
     const widths = proportions.map((w) => (w / total) * this.width);
     this.report.beginTable(headers, widths);
@@ -544,7 +548,7 @@ export class Flow {
       this.y += headerHeight;
     };
     const firstRowHeight = Math.max(...rows[0].map((value, i) =>
-      this.report.wrap(value, widths[i] - 8).length)) * TYPE.leading + 8;
+      this.report.wrap(value, widths[i] - 8, TYPE.body, isBold(value, i)).length)) * TYPE.leading + 8;
     this.ensure(headerHeight + Math.min(firstRowHeight, this.freshHeight() - headerHeight));
     header();
     const next = () => {
@@ -553,7 +557,7 @@ export class Flow {
     };
     rows.forEach((row, index) => {
       const cells = row.map((value, i) =>
-        this.report.wrap(value, widths[i] - 8),
+        this.report.wrap(value, widths[i] - 8, TYPE.body, isBold(value, i)),
       );
       const lineCount = Math.max(...cells.map((c) => c.length));
       const whole = lineCount * TYPE.leading + 8;
@@ -582,9 +586,11 @@ export class Flow {
               this.report.text(
                 this.page,
                 line,
-                xs[i] + 4,
-                this.y + 4 + j * TYPE.leading,
-                { color: i === riskColumn ? riskColor(row[i]) : COLORS.ink },
+                i === resolutionColumn && row[i] === "-"
+                  ? xs[i] + (widths[i] - this.report.width(line)) / 2 : xs[i] + 4,
+                this.y + (i === resolutionColumn && row[i] === "-" ? (height - TYPE.body) / 2 : 4) + j * TYPE.leading,
+                { color: i === riskColumn ? riskColor(row[i]) : COLORS.ink,
+                  bold: isBold(row[i], i) },
               ),
             );
         });

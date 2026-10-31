@@ -7,7 +7,6 @@ import {
   ROLES,
   STATUSES,
   newState,
-  localDate,
   displayDate,
   baseName,
   formatMeasure,
@@ -20,7 +19,7 @@ import {
   inheritedRiskSource,
   syncDiagnosticLinks,
 } from "./model.js";
-import { beginSurvey, registerSurvey, lockedPath, lockedRemoval, nextReference, archivePhoto, preventiveRows } from "./surveys.js";
+import { beginSurvey, registerSurvey, suggestedSurveyDate, lockedPath, lockedRemoval, nextReference, archivePhoto, preventiveRows } from "./surveys.js";
 import * as storage from "./storage.js";
 import { ASSETS } from "./catalog.js";
 import { migrateLegacy } from "./legacy.js";
@@ -695,7 +694,7 @@ $("jsonInput").onchange = async (event) => {
 };
 function openSurveyDialog() {
   const source = pendingImport || state;
-  $("surveyDate").value = localDate();
+  $("surveyDate").value = suggestedSurveyDate(source);
   $("surveyDate").min = source.survey.date;
   $("surveyError").hidden = true;
   $("surveyDialog").showModal();
