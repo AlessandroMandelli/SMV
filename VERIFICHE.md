@@ -1,31 +1,23 @@
-# Verifiche della revisione 3.6.13
+# Verifiche della revisione 3.6.15
 
-Base utilizzata: 3.6.12. Modifiche limitate alla nomenclatura e all'aggiunta di Acquedotto.
+Base: 3.6.14. Correzione circoscritta alle coordinate dei marcatori Grotte delle Romite e VI Cappella; catalogo e bundle ricompilati. Logica dell'app, stile dei checkbox e generatori Word/PDF invariati.
 
-## Nomi dei file
+## Mappa
 
-Verificati tutti i 24 beni: 14 cappelle con numeri romani, tre archi con Primo/Secondo/Terzo, tre fontane ordinali, Fontana_del_Mosè, Grotta_delle_Romite, Viale e Acquedotto. Controllati prefisso, maiuscole e minuscole, separatori, ID maiuscolo e assenza di parentesi di template e ora.
+Verificato che soltanto le coordinate dei due beni siano cambiate: identificativi, denominazioni, ordine dei beni e tutti gli altri marcatori restano identici. Il catalogo contiene gli stessi 24 beni.
 
-Verificati segnaposto XX.XX_anno, aggiornamento immediato all'inserimento e alla correzione dell'ID, ritorno al segnaposto cancellando l'ID e conservazione dell'anno già presente nell'identificativo importato. Il nome e la data finale restano completi anche con identificativi troppo lunghi. I caratteri non validi per il filesystem sono sostituiti soltanto nel nome, senza alterare il dato originale.
+Controllata la separazione di tutte le coppie di checkbox della categoria cappelle/grotte a larghezze della mappa di 234, 250, 285, 307, 320 e 390 pixel, considerando anche il bordo esterno di selezione. Controllo visivo con selezione della grotta e della VI Cappella alle larghezze mobile e desktop.
 
-La data del nome è indipendente dalle date compilate nel documento: è fissata all'apertura e conservata da salvataggio, riapertura e ripresa della bozza. Avviare l'aggiornamento di un JSON usa la data locale odierna e conserva l'ID. Controllati il formato precedente con timestamp ISO e il nuovo formato con sola data; ripetute le prove di nomenclatura con fusi Europe/Rome e America/Los_Angeles.
+Prove di interfaccia con Happy DOM: categorie, selezione singola, mappa bloccata e sbloccata, importazione di JSON precedenti, correzione dell'oggetto e salvataggio JSON. I marcatori usano il catalogo aggiornato e non le vecchie coordinate eventualmente presenti nell'assetSnapshot importato.
 
-## Interfaccia e compatibilità
+## Esportazioni
 
-Prove con Happy DOM e IndexedDB simulato: cinque categorie nell'ordine Cappelle, Archi, Fontane, Acquedotto, Viale; Acquedotto diretto senza tendina; oggetto compilato e bloccato, nome visualizzato aggiornato con l'ID, nessun marcatore con coordinate inesistenti. Conservati i controlli su due finestre, chiusure esterne e ×, mappe per categoria, selezione singola, correzioni definitive e riconoscimento dell'installazione.
+Generati Word e PDF con la grotta selezionata: cinque pagine per formato, 15 checkbox distinti nella mappa. Verificata la geometria PDF e ispezionate tutte le pagine renderizzate, oltre alla mappa Word incorporata. I dati della scheda non vengono modificati durante la generazione.
 
-Superate le regressioni su JSON importati, visite successive, diagnostica e azioni collegate, lucchetti, materiali e foto. Conservati gli identificativi tecnici dei beni precedenti e lo schema JSON 2.
-
-## Download ed esportazione
-
-Superate tutte le combinazioni JSON, PDF + JSON, DOCX + JSON e DOCX + PDF + JSON offline, su desktop e iPhone simulato. Controllati i nomi effettivi dei download e di ciascun file interno allo ZIP. Provato Fontana_del_Mosè con accento anche nel nome dello ZIP e dei tre file interni.
-
-Creata una scheda Acquedotto di prova: Word e PDF di cinque pagine, dati e denominazione completi, titolo dei metadati coerente con il nome generato, nessuna alterazione dei dati sorgente. Controllati XML Word e tutte le pagine renderizzate di entrambi i documenti. Nessun campo modulo PDF. I generatori e il layout della 3.6.12 restano invariati.
-
-Word controllato con LibreOffice; Microsoft Word per Mac non è disponibile in questo ambiente. I test dell'interfaccia e del comportamento iPhone sono simulati, senza un collaudo su telefono fisico.
+Word verificato tramite LibreOffice, non con Microsoft Word per Mac. Le prove dell'interfaccia sono simulate; nessun collaudo su iPhone fisico in questa revisione.
 
 ## Distribuzione
 
-Cache aggiornata dalla 3.6.12 alla 3.6.13, con 21 risorse offline e conservazione di bozza e cache delle altre app. Nuovo bundle compilato, versioni e identificativi HTML controllati.
+Cache aggiornata dalla 3.6.14 alla 3.6.15 con le stesse 21 risorse offline. Confermati riconoscimento dell'installazione, conservazione delle bozze e isolamento dalle altre app.
 
-51 file pronti per la radice GitHub, inclusa la mappa. Esclusi documenti e JSON di prova, vecchi template e node_modules. Integrità ZIP controllata con CRC, unzip -t ed estrazione e confronto di tutti i file; controllo ripetuto dopo il salvataggio. La repository non viene modificata automaticamente.
+51 file pronti per la radice GitHub, inclusa la mappa. Esclusi file di prova, vecchi template e node_modules. Integrità controllata con CRC, unzip -t ed estrazione e confronto di tutti i file. Nessuna pubblicazione o modifica automatica della repository.

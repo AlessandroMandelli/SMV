@@ -1,4 +1,4 @@
-/* Schede Restauro 3.6.13 — generato dai sorgenti modulari in js/. */
+/* Schede Restauro 3.6.15 — generato dai sorgenti modulari in js/. */
 (() => {
   // recovered-smv/js/road.js
   var ROAD_SIZE = { width: 553, height: 949 };
@@ -181,12 +181,12 @@
     return changed2;
   }
   function newState(assetId) {
-    const date = localDate();
+    const openedAt = /* @__PURE__ */ new Date(), date = localDate(openedAt);
     return {
       app: APP_ID,
       schemaVersion: SCHEMA_VERSION,
-      createdAt: (/* @__PURE__ */ new Date()).toISOString(),
-      updatedAt: (/* @__PURE__ */ new Date()).toISOString(),
+      createdAt: openedAt.toISOString(),
+      updatedAt: openedAt.toISOString(),
       assetId,
       survey: { id: uid(), date, notes: "" },
       surveys: [],
@@ -196,11 +196,11 @@
       customFilename: false,
       section: 0,
       editorVersion: EDITOR_LAYOUT_VERSION,
-      filenameDate: date,
+      filenameDate: openedAt.toISOString(),
       general: {
         id: "",
         date,
-        time: localTime(),
+        time: localTime(openedAt),
         object: "",
         chronology: "",
         author: "",
@@ -236,13 +236,18 @@
     const value = state2.filenameDate || state2.createdAt;
     return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : localDate(new Date(value));
   }
+  function filenameTime(state2) {
+    const value = state2.filenameDate;
+    const timestamp = value && !/^\d{4}-\d{2}-\d{2}$/.test(value) ? value : state2.createdAt;
+    return localTime(new Date(timestamp)).replace(":", "-");
+  }
   function baseName(state2, assets2) {
     if (state2.customFilename && state2.filename.trim())
       return safeFilename(state2.filename);
     const asset2 = assets2.find((item) => item.id === state2.assetId);
     const date = filenameDay(state2);
     const prefix = `scheda_ispezione_periodica_${(asset2 == null ? void 0 : asset2.fileLabel) || "Bene"}_ID_`;
-    const suffix = "_" + date;
+    const suffix = "_" + date + "_" + filenameTime(state2);
     const identifier = (String(state2.general.id || "").trim() || `XX.XX_${date.slice(0, 4)}`).normalize("NFC").replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_").replace(/\s+/g, "_");
     const id = identifier.slice(0, Math.max(1, 160 - prefix.length - suffix.length));
     return safeFilename(prefix + id + suffix);
@@ -548,6 +553,17 @@
     const current = new Set(state2.photos.map((photo) => photo.id));
     state2.photoArchive = state2.photoArchive.filter((photo) => referenced.has(photo.id) && !current.has(photo.id));
   }
+  function suggestedSurveyDate(state2) {
+    const visits = surveyEntries(state2);
+    const valid = (value) => /^\d{4}-\d{2}-\d{2}$/.test(value || "") && localDate(/* @__PURE__ */ new Date(value + "T12:00:00")) === value;
+    const visitDates = visits.map((visit) => visit.date).filter(valid);
+    const latestVisit = visitDates.sort().at(-1) || state2.general.date || localDate();
+    const executionDates = visits.flatMap((visit) => [
+      ...visit.data.diagnosis.map((row) => row.resolvedDate),
+      ...visit.data.immediate.records.filter((row) => row.area || row.action).map((row) => row.date || visit.data.immediate.executedDate)
+    ]).filter(valid);
+    return [latestVisit, ...executionDates].sort().at(-1);
+  }
   function beginSurvey(state2, date = localDate(), notes = "") {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || localDate(/* @__PURE__ */ new Date(date + "T12:00:00")) !== date)
       throw Error("Inserisci la data del nuovo sopralluogo.");
@@ -565,7 +581,7 @@
       actions: state2.diagnosis.flatMap((r) => r.actions.map((a) => a.id))
     };
     state2.survey = { id: uid(), date, notes };
-    state2.filenameDate = localDate();
+    state2.filenameDate = (/* @__PURE__ */ new Date()).toISOString();
     state2.customFilename = false;
     state2.filename = "";
     state2.immediate.date = date;
@@ -839,8 +855,8 @@
       "label": "Grotte delle Romite, Beate Caterina e Giuliana",
       "kind": "chapel",
       "fixed": {},
-      "x": 47.7396,
-      "y": 67.86091,
+      "x": 49,
+      "y": 65,
       "fileLabel": "Grotta_delle_Romite"
     },
     {
@@ -850,7 +866,7 @@
       "fixed": {},
       "number": 6,
       "x": 44.12297,
-      "y": 68.38778,
+      "y": 70.5,
       "fileLabel": "VI_Cappella"
     },
     {
@@ -1161,7 +1177,7 @@
   }
 
   // recovered-smv/js/config.js
-  var VERSION = "3.6.13";
+  var VERSION = "3.6.15";
   var PWA_URL = "https://alessandromandelli.github.io/SMV/";
 
   // recovered-smv/js/pdf-layout.js
@@ -1609,7 +1625,7 @@
           (line, i) => this.report.text(
             this.page,
             line,
-            this.x + 8,
+            this.x + 4,
             this.y + 19 + i * TYPE.leading
           )
         );
@@ -1620,6 +1636,9 @@
     }
     table(headers, rows, proportions, { riskColumn = -1, rowFill = null } = {}) {
       if (!rows.length) return;
+      const resolutionColumn = headers.findIndex((title) => /^risolto in data$/i.test(title));
+      rows = rows.map((row) => row.map((value, i) => i === resolutionColumn && !hasText(value) ? "-" : value));
+      const isBold = (value, i) => i === resolutionColumn && value !== "-";
       const total = proportions.reduce((a, b) => a + b, 0);
       const widths = proportions.map((w) => w / total * this.width);
       this.report.beginTable(headers, widths);
@@ -1648,7 +1667,7 @@
         );
         this.y += headerHeight;
       };
-      const firstRowHeight = Math.max(...rows[0].map((value, i) => this.report.wrap(value, widths[i] - 8).length)) * TYPE.leading + 8;
+      const firstRowHeight = Math.max(...rows[0].map((value, i) => this.report.wrap(value, widths[i] - 8, TYPE.body, isBold(value, i)).length)) * TYPE.leading + 8;
       this.ensure(headerHeight + Math.min(firstRowHeight, this.freshHeight() - headerHeight));
       header();
       const next = () => {
@@ -1657,7 +1676,7 @@
       };
       rows.forEach((row, index) => {
         const cells = row.map(
-          (value, i) => this.report.wrap(value, widths[i] - 8)
+          (value, i) => this.report.wrap(value, widths[i] - 8, TYPE.body, isBold(value, i))
         );
         const lineCount = Math.max(...cells.map((c) => c.length));
         const whole = lineCount * TYPE.leading + 8;
@@ -1681,9 +1700,12 @@
               (line, j) => this.report.text(
                 this.page,
                 line,
-                xs[i] + 4,
-                this.y + 4 + j * TYPE.leading,
-                { color: i === riskColumn ? riskColor(row[i]) : COLORS.ink }
+                i === resolutionColumn && row[i] === "-" ? xs[i] + (widths[i] - this.report.width(line)) / 2 : xs[i] + 4,
+                this.y + (i === resolutionColumn && row[i] === "-" ? (height - TYPE.body) / 2 : 4) + j * TYPE.leading,
+                {
+                  color: i === riskColumn ? riskColor(row[i]) : COLORS.ink,
+                  bold: isBold(row[i], i)
+                }
               )
             );
           });
@@ -2247,14 +2269,9 @@
     flow.section(PREVENTIVE_TITLE, rows.length ? 40 : 0);
     rows.forEach((row, index) => {
       const actions = row.actions.filter(actionHasContent);
-      const headers = ["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo"];
-      const values = [row.reference, row.area, row.element, row.pathology, row.causes, displayDate(row.detectedDate)];
-      let weights = [700, 2700, 2700, 3860, 3100, 1900];
-      if (row.resolvedDate) {
-        headers.push("Risolto in data");
-        values.push(displayDate(row.resolvedDate));
-        weights = [650, 2200, 2200, 3300, 2600, 1800, 1800];
-      }
+      const headers = ["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo", "Risolto in data"];
+      const values = [row.reference, row.area, row.element, row.pathology, row.causes, displayDate(row.detectedDate), displayDate(row.resolvedDate)];
+      const weights = [650, 2200, 2200, 3300, 2600, 1800, 1800];
       const sum = weights.reduce((total, width) => total + width, 0);
       const contextHeight = Math.max(
         ...values.map(
@@ -2422,11 +2439,18 @@
     if (!rows.length) return "";
     return table([
       headers.map((text) => para(run(text, { bold: true, color: "FFFFFF" }), { after: 0 })),
-      ...rows.map((row) => row.map((text, index) => ({ content: para(run(text, { color: /livello di rischio/i.test(headers[index]) ? riskColor2(text) : "1E3232" }), { after: 0 }), shade: rowFill })))
+      ...rows.map((row) => row.map((text, index) => {
+        const resolution = /^risolto in data$/i.test(headers[index]);
+        const empty = resolution && !filled(text);
+        return { content: para(run(empty ? "-" : text, {
+          bold: resolution && !empty,
+          color: /livello di rischio/i.test(headers[index]) ? riskColor2(text) : "1E3232"
+        }), { after: 0, align: empty ? "center" : "left" }), shade: rowFill, center: empty };
+      }))
     ], scaled(weights), { headers: true }) + blank();
   }
   function note(value, height = 1200) {
-    return filled(value) ? table([[para(run("Note aggiuntive:", { bold: true }), { keep: true, after: 70 }) + para(run(value), { after: 0 })]], [WIDTH], { shade: "F2F2F2", borderColor: "005B60", minHeight: height, bottom: true, keepRows: false }) + blank() : "";
+    return filled(value) ? table([[para(run("Note aggiuntive:", { bold: true }), { keep: true, after: 70, align: "left" }) + para(run(value), { after: 0, align: "left" })]], [WIDTH], { shade: "F2F2F2", borderColor: "005B60", minHeight: height, bottom: true, keepRows: false }) + blank() : "";
   }
   async function bytes(path) {
     const response = await fetch(path);
@@ -2588,14 +2612,9 @@
     body += sectionBreak() + heading("PROGRAMMAZIONE AZIONI PREVENTIVE", state2.preventive.date) + band("AZIONI PREVENTIVE");
     for (const row of preventiveGroups(state2)) {
       let context = label("Azioni preventive programmate il", displayDate(row.programmedDate), { keep: true });
-      const headers = ["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo"];
-      const values = [row.reference, row.area, row.element, row.pathology, row.causes, displayDate(row.detectedDate)];
-      let weights = [700, 2700, 2700, 3860, 3100, 1900];
-      if (row.resolvedDate) {
-        headers.push("Risolto in data");
-        values.push(displayDate(row.resolvedDate));
-        weights = [650, 2200, 2200, 3300, 2600, 1800, 1800];
-      }
+      const headers = ["ID", "Macro-Area", "Elemento", "Patologia Riscontrata", "Cause Principali", "Data del rilievo", "Risolto in data"];
+      const values = [row.reference, row.area, row.element, row.pathology, row.causes, displayDate(row.detectedDate), displayDate(row.resolvedDate)];
+      const weights = [650, 2200, 2200, 3300, 2600, 1800, 1800];
       context += dataTable(headers, [values], weights, { rowFill: row.resolvedDate ? "E4F3E6" : "" });
       for (const [index, action] of row.actions.filter(actionFilled).entries()) {
         let content2 = (index === 0 ? context : "") + timing(action.risk, action.window, "Finestra d'Intervento:");
@@ -3689,7 +3708,7 @@
   };
   function openSurveyDialog() {
     const source = pendingImport || state;
-    $("surveyDate").value = localDate();
+    $("surveyDate").value = suggestedSurveyDate(source);
     $("surveyDate").min = source.survey.date;
     $("surveyError").hidden = true;
     $("surveyDialog").showModal();

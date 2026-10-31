@@ -1,5 +1,5 @@
 /* Cache isolata per il percorso della PWA. */
-const VERSION='3.6.13';
+const VERSION='3.6.15';
 const PREFIX='schede-restauro:'+self.registration.scope+':';
 const CACHE=PREFIX+VERSION;
 const FILES=[

@@ -1,26 +1,33 @@
-# Schede Restauro 3.6.13
+# Schede Restauro 3.6.15
 
 PWA per il Sacro Monte di Varese, utilizzabile offline su desktop e telefono. Esporta PDF, Word modificabile e JSON. Lo ZIP contiene il sito già compilato, pronto per GitHub Pages senza npm o un server applicativo.
 
 ## Novità della revisione
 
-- Nomenclatura automatica per nuove schede e JSON importati: `scheda_ispezione_periodica_I_Cappella_ID_01.02_2026_2026-10-30`. Prefisso minuscolo, numeri romani per le cappelle, Primo/Secondo/Terzo per gli archi, ID maiuscolo e data finale con trattini, senza ora.
-- Nome aggiornato mentre viene compilato l'ID. Finché il campo è vuoto viene usato `XX.XX_anno`, con l'anno di apertura. Modificare l'ID riattiva la nomenclatura automatica anche dopo una rinomina manuale del file. Il testo originale dell'ID nei dati rimane intatto; eventuali caratteri non ammessi nel nome di un file sono sostituiti soltanto nel nome scaricato.
-- Le fontane usano Prima_Fontana, Seconda_Fontana, Terza_Fontana e Fontana_del_Mosè. Le altre eccezioni sono Grotta_delle_Romite, Viale e Acquedotto. I nomi estesi dei beni nell'anagrafica e nelle tendine restano conservati.
-- La data del nome è quella locale di apertura della nuova scheda o di avvio dell'aggiornamento da JSON. Modificare la data del documento o del sopralluogo non cambia la data del nome. Riprendere la compilazione conserva la data di apertura; importare un JSON genera il nuovo nome con la data odierna e conserva l'ID esistente.
-- Aggiunto Acquedotto nella scelta oggetto, nell'ordine Cappelle, Archi, Fontane, Acquedotto, Viale. Acquedotto e Viale aprono direttamente la scheda; le altre categorie mantengono la seconda finestra per scegliere il bene. I pulsanti restano incolonnati e di uguale larghezza, adeguata al testo più lungo.
-- Acquedotto dispone della stessa compilazione ed esportazione Word, PDF e JSON. Non gli sono assegnati marcatori o tracciati non forniti. I file condividono lo stesso nome, compresi i file interni allo ZIP su iPhone.
+- Separati i checkbox delle Grotte delle Romite e della VI Cappella: restano vicini e non si sovrappongono anche nella mappa ridotta per telefono. La grotta è leggermente più in alto a destra e la VI Cappella più in basso.
+- Le stesse coordinate sono usate nell'app e nelle esportazioni Word e PDF; il nuovo catalogo viene applicato anche ai JSON precedenti caricati nell'app.
+- Restano invariati gli altri marcatori, i nomi dei beni, la selezione singola, i blocchi e le funzioni della revisione precedente.
 
-Conservate le modifiche della 3.6.12: finestre sovrapposte con chiusura al livello precedente, tabulazioni delle dimensioni nel Word, note sotto al titolo e azioni preventive risolte con ultima colonna Risolto in data e riga verde chiaro.
+## Funzionalità conservate dalla 3.6.14
+
+- Word e PDF: il testo delle Note aggiuntive è allineato a sinistra, sotto al titolo del riquadro. Le note multilinea conservano i propri a capo; i riquadri mantengono il posizionamento a fondo pagina e crescono con il contenuto.
+- Tutte le date nelle celle Risolto in data sono in grassetto. La colonna compare anche nelle tabelle delle azioni preventive non completate; le celle vuote contengono un trattino centrato. Le righe risolte mantengono il verde chiaro.
+- Nome automatico con data e ora locali di apertura/importazione: `scheda_ispezione_periodica_I_Cappella_ID_01.02_2026_2026-10-30_16-56`. Riprendere la compilazione mantiene la data e l'ora memorizzate. Modificare una data del documento non modifica il nome.
+- Durante il caricamento da JSON, la data proposta è l'ultima esecuzione registrata, senza precedere l'ultimo sopralluogo; in assenza di interventi datati si usa l'ultimo sopralluogo. La proposta rimane modificabile. Non vengono usate la data odierna o le scadenze delle azioni preventive.
+- La gestione delle versioni delle azioni preventive è conservata: una variazione del testo può continuare a produrre più versioni nei documenti, come richiesto. Nessuna eliminazione automatica dei duplicati e nessuna riscrittura dello storico.
+
+Conservati i 24 beni e le cinque categorie Cappelle, Archi, Fontane, Acquedotto e Viale. I pulsanti restano incolonnati; Acquedotto e Viale aprono direttamente la scheda. Restano invariati nomi estesi, mappe e lucchetti. La nomenclatura conserva numeri romani, Primo/Secondo/Terzo, Prima_Fontana, Seconda_Fontana, Terza_Fontana, Fontana_del_Mosè, Grotta_delle_Romite, Viale e Acquedotto.
+
+Il campo ID aggiorna il nome immediatamente. Se vuoto usa XX.XX_anno; le modifiche all'ID riattivano il nome automatico anche dopo una rinomina manuale. I caratteri non ammessi nei nomi dei file vengono sostituiti soltanto nel nome, mantenendo il valore originale nei dati. Tutti i formati e i file interni allo ZIP condividono lo stesso nome.
 
 ## Pubblicazione
 
-Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.13 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
+Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.15 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
 
 ## Home e compilazione
 
 - **Compila una nuova scheda** avvia la prima ispezione.
-- **Carica e aggiorna stato conservativo** importa l'ultimo JSON e avvia un nuovo sopralluogo. La data della visita è conservata nello storico; le note delle visite già esistenti nei vecchi JSON sono mantenute. Il nome del file assume la data del caricamento secondo la nomenclatura indicata sopra; la data originaria della scheda e gli stati precedenti restano disponibili. Il file importato resta intatto.
+- **Carica e aggiorna stato conservativo** importa l'ultimo JSON e avvia un nuovo sopralluogo. La data della visita è conservata nello storico; le note delle visite già esistenti nei vecchi JSON sono mantenute. Il nome del file assume la data e l'ora del caricamento secondo la nomenclatura indicata sopra; la data originaria della scheda e gli stati precedenti restano disponibili. Il file importato resta intatto.
 - **Riprendi la compilazione** riapre la bozza sullo stesso dispositivo e profilo browser, senza iniziare una visita o aggiornare le date.
 
 Storico manutentivo e stato conservativo hanno schermate distinte. I titoli superiori duplicati e i campi ID/data/oggetto delle sezioni finali non occupano spazio nella compilazione; le corrispondenti intestazioni rimangono nei documenti. Tra nome file e Opzioni si trovano il lucchetto e l'icona cronologia. La cronologia mostra soltanto le versioni precedenti della pagina corrente.
