@@ -33,8 +33,8 @@ function para(content = "", { keep = false, keepLines = false, after = 90, befor
 }
 const blank = () => para("", { after: 0 });
 const pageBreak = () => '<w:p><w:pPr><w:pageBreakBefore/><w:keepNext/><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr></w:p>';
-function label(title, value, { always = false, boldValue = false, ...options } = {}) {
-  return always || filled(value) ? para(run(title, { bold: true }) + run(" " + (value ?? ""), { bold: boldValue }), options) : "";
+function label(title, value, { always = false, boldValue = false, valueSize = 19, ...options } = {}) {
+  return always || filled(value) ? para(run(title, { bold: true }) + run(" " + (value ?? ""), { bold: boldValue, size: valueSize }), options) : "";
 }
 const band = (title, keep = true) => para(run(title, { bold: true, size: 20, color: "FFFFFF" }), { before: 100, after: 0, shade: "005B60", keep, separator: true, line: 18 }) + `<w:p><w:pPr>${keep ? "<w:keepNext/>" : ""}<w:spacing w:before="0" w:after="0" w:line="120" w:lineRule="exact"/></w:pPr></w:p>`;
 const choices = (options, selected) => options.map(option => run((Array.isArray(selected) ? selected.includes(option) : selected === option) ? "☑ " : "☐ ", { font: "DejaVu Sans" }) + run(option)).join(run("\t"));
@@ -132,8 +132,8 @@ export async function makeDocx(state, assets) {
   const g = state.general;
   function heading(title, date, first = false) {
     let metadata = para(run(title, { bold: true, size: 26, color: "005B60" }), { after: 210, style: "Title" });
-    metadata += label("ID Scheda:", g.id, { always: true, shade: "D9D9D9", after: 0, boldValue: isGeneralBold(state, "id") });
-    metadata += label("Data:", displayDate(date), { always: true, shade: "D9D9D9", after: first ? 0 : 180 });
+    metadata += label("ID Scheda:", g.id, { always: true, shade: "D9D9D9", after: 0, boldValue: isGeneralBold(state, "id"), valueSize: 24 });
+    metadata += label("Data:", filled(g.date) ? displayDate(date) : "", { always: true, shade: "D9D9D9", after: first ? 0 : 180 });
     if (first) {
       metadata += label("Ora:", g.time, { always: true, shade: "D9D9D9", after: 160 });
       metadata += para(run("Operatore: " + COMMON.operator, { bold: true }), { after: 90 });

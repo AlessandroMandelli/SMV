@@ -103,16 +103,19 @@ function identification(report, state, assets) {
     ["Data:", displayDate(state.general.date)],
     ["Ora:", state.general.time],
   ]) {
+    const valueSize = label === "ID Scheda:" ? 12 : TYPE.body;
+    const boldValue = label === "ID Scheda:" && isGeneralBold(state, "id");
+    const valueWidth = 266.2 - report.width(label, TYPE.body, true) - 5;
     const height = Math.max(
       14.5,
-      report.wrap(value, 220).length * TYPE.leading + 3,
+      report.wrap(value, valueWidth, valueSize, boldValue).length * Math.max(TYPE.leading, valueSize * 1.2) + 3,
     );
     report.rect(page, textX - 1, headerY - 2, 271.2, height, {
       fill: "#d9d9d9",
     });
     report.label(page, label, value, textX, headerY, 266.2, {
       minHeight: height,
-      boldValue: label === "ID Scheda:" && isGeneralBold(state, "id"),
+      boldValue, valueSize,
     });
     headerY += height;
   }

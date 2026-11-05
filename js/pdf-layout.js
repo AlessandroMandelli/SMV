@@ -255,15 +255,17 @@ export class PdfReport {
     x,
     top,
     width,
-    { bold = true, boldValue = false, size = TYPE.body, minHeight = 12.5 } = {},
+    { bold = true, boldValue = false, size = TYPE.body, valueSize = size, minHeight = 12.5 } = {},
   ) {
     const valueX = x + this.width(label, size, bold) + 5;
-    const lines = this.wrap(value, Math.max(25, width - (valueX - x)), size, boldValue);
+    const leading = Math.max(TYPE.leading, valueSize * 1.2);
+    const valueTop = top + (size - valueSize) * 0.905;
+    const lines = this.wrap(value, Math.max(25, width - (valueX - x)), valueSize, boldValue);
     this.text(page, label, x, top, { bold, size });
     lines.forEach((line, i) =>
-      this.text(page, line, valueX, top + i * TYPE.leading, { size, bold: boldValue }),
+      this.text(page, line, valueX, valueTop + i * leading, { size: valueSize, bold: boldValue }),
     );
-    return Math.max(minHeight, lines.length * TYPE.leading);
+    return Math.max(minHeight, lines.length * leading);
   }
   header(page, kind, meta) {
     const x = PAGE.margin + 92;
@@ -281,17 +283,20 @@ export class PdfReport {
     let y = 60.8;
     for (const [label, value] of [
       ["ID Scheda:", this.state.general.id],
-      ["Data:", displayDate(meta.date)],
+      ["Data:", hasText(this.state.general.date) ? displayDate(meta.date) : ""],
     ]) {
+      const valueSize = label === "ID Scheda:" ? 12 : TYPE.body;
+      const boldValue = label === "ID Scheda:" && isGeneralBold(this.state, "id");
+      const valueWidth = 346.6 - this.width(label, TYPE.body, true) - 5;
       const height = Math.max(
         14.5,
-        this.wrap(value, 300).length * TYPE.leading + 3,
+        this.wrap(value, valueWidth, valueSize, boldValue).length * Math.max(TYPE.leading, valueSize * 1.2) + 3,
       );
       this.rect(page, x - 1, y - 2, 356.6, height, {
         fill: "#d9d9d9",
       });
       this.label(page, label, value, x, y, 346.6, {
-        minHeight: height, boldValue: label === "ID Scheda:" && isGeneralBold(this.state, "id"),
+        minHeight: height, boldValue, valueSize,
       });
       y += height;
     }
