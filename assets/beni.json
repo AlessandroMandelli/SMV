@@ -1,235 +1,471 @@
 [
   {
     "id": "c01",
-    "label": "I Cappella – L'Annunciazione",
+    "label": "I Cappella, Annunciazione dell’Angelo a Maria",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "I CAPPELLA, ANNUNCIAZIONE DELL’ANGELO A MARIA",
+      "id": "02.03_2026",
+      "chronology": "XVII secolo",
+      "altitude": "600",
+      "distance": "2.072"
+    },
     "number": 1,
     "x": 48.82459,
     "y": 88.72497,
-    "fileLabel": "I_Cappella"
+    "fileLabel": "I_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "c02",
-    "label": "II Cappella – La Visitazione di Maria a Elisabetta",
+    "label": "II Cappella, La Visita di Maria ad Elisabetta",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "II CAPPELLA, LA VISITA DI MARIA AD ELISABETTA",
+      "id": "02.04_2026",
+      "chronology": "XVII secolo",
+      "altitude": "612",
+      "distance": "1.947"
+    },
     "number": 2,
     "x": 51.7179,
     "y": 81.34879,
-    "fileLabel": "II_Cappella"
+    "fileLabel": "II_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "c03",
-    "label": "III Cappella – La Natività di Gesù",
+    "label": "III Cappella, La Nascita di Gesù",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "III CAPPELLA, LA NASCITA DI GESÙ",
+      "id": "02.05_2026",
+      "chronology": "XVII secolo",
+      "altitude": "623",
+      "distance": "1.830"
+    },
     "number": 3,
     "x": 53.88788,
     "y": 70.70601,
-    "fileLabel": "III_Cappella"
+    "fileLabel": "III_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "c04",
-    "label": "IV Cappella – La Presentazione di Gesù al Tempio",
+    "label": "IV Cappella, La Presentazione al Tempio",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "IV CAPPELLA, LA PRESENTAZIONE AL TEMPIO",
+      "id": "02.06_2026",
+      "chronology": "XVII secolo",
+      "altitude": "627",
+      "distance": "1.754"
+    },
     "number": 4,
     "x": 68.89693,
     "y": 72.91886,
-    "fileLabel": "IV_Cappella"
+    "fileLabel": "IV_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "c05",
-    "label": "V Cappella – La Disputa di Gesù con i Dottori nel Tempio",
+    "label": "V Cappella, La Disputa di Gesù con i Dottori",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "V CAPPELLA, LA DISPUTA DI GESÙ CON I DOTTORI",
+      "id": "02.07_2026",
+      "chronology": "XVII secolo",
+      "altitude": "646",
+      "distance": "1.651"
+    },
     "number": 5,
     "x": 64.01447,
     "y": 64.80506,
-    "fileLabel": "V_Cappella"
+    "fileLabel": "V_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "grotte",
-    "label": "Grotte delle Romite, Beate Caterina e Giuliana",
+    "label": "Grotta delle Romite",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "GROTTA DELLE ROMITE",
+      "id": "02.11_2026",
+      "chronology": "XVII secolo",
+      "altitude": "668",
+      "distance": "1.374"
+    },
     "x": 49,
     "y": 65,
-    "fileLabel": "Grotta_delle_Romite"
+    "fileLabel": "Grotta_delle_Romite",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "c06",
-    "label": "VI Cappella – L'Orazione di Gesù nell'Orto degli Ulivi",
+    "label": "VI Cappella, L’Orazione nell’Orto",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "VI CAPPELLA, L’ORAZIONE NELL’ORTO",
+      "id": "02.10_2026",
+      "chronology": "XVII secolo",
+      "altitude": "660",
+      "distance": "1.651"
+    },
     "number": 6,
     "x": 44.12297,
     "y": 70.5,
-    "fileLabel": "VI_Cappella"
+    "fileLabel": "VI_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "c07",
-    "label": "VII Cappella – La Flagellazione di Gesù",
+    "label": "VII Cappella, La Flagellazione",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "VII CAPPELLA, LA FLAGELLAZIONE",
+      "id": "02.13_2026",
+      "chronology": "XVII secolo",
+      "altitude": "670",
+      "distance": "1.371"
+    },
     "number": 7,
     "x": 40.3255,
     "y": 65.54268,
-    "fileLabel": "VII_Cappella"
+    "fileLabel": "VII_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "c08",
-    "label": "VIII Cappella – L'Incoronazione di Spine",
+    "label": "VIII Cappella, La Coronazione di Spine",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "VIII CAPPELLA, LA CORONAZIONE DI SPINE",
+      "id": "02.14_2026",
+      "chronology": "XVII secolo",
+      "altitude": "683",
+      "distance": "1.200"
+    },
     "number": 8,
     "x": 38.51718,
     "y": 57.3235,
-    "fileLabel": "VIII_Cappella"
+    "fileLabel": "VIII_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "c09",
-    "label": "IX Cappella – La Salita di Gesù al Calvario",
+    "label": "IX Cappella, La Salita al Calvario",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "IX CAPPELLA, LA SALITA AL CALVARIO",
+      "id": "02.15_2026",
+      "chronology": "XVII secolo",
+      "altitude": "700",
+      "distance": "1.074"
+    },
     "number": 9,
     "x": 39.24051,
     "y": 49.94731,
-    "fileLabel": "IX_Cappella"
+    "fileLabel": "IX_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "c10",
-    "label": "X Cappella – La Crocifissione di Gesù",
+    "label": "X Cappella, La Crocefissione",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "X CAPPELLA, LA CROCEFISSIONE",
+      "id": "02.16_2026",
+      "chronology": "XVII secolo",
+      "altitude": "721",
+      "distance": "945"
+    },
     "number": 10,
     "x": 37.43219,
     "y": 37.19705,
-    "fileLabel": "X_Cappella"
+    "fileLabel": "X_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "c11",
-    "label": "XI Cappella – La Risurrezione di Gesù",
+    "label": "XI Cappella, La Resurrezione",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "XI CAPPELLA, LA RESURREZIONE",
+      "id": "02.18_2026",
+      "chronology": "XVII secolo",
+      "altitude": "738",
+      "distance": "825"
+    },
     "number": 11,
     "x": 47.37794,
     "y": 46.68072,
-    "fileLabel": "XI_Cappella"
+    "fileLabel": "XI_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "c12",
-    "label": "XII Cappella – L'Ascensione di Gesù al Cielo",
+    "label": "XII Cappella, L’Ascensione",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "XII CAPPELLA, L’ASCENSIONE",
+      "id": "02.19_2026",
+      "chronology": "XVII secolo",
+      "altitude": "746",
+      "distance": "590"
+    },
     "number": 12,
     "x": 56.41953,
     "y": 51.42255,
-    "fileLabel": "XII_Cappella"
+    "fileLabel": "XII_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "c13",
-    "label": "XIII Cappella – La Discesa dello Spirito Santo",
+    "label": "XIII Cappella, La Discesa dello Spirito Santo",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "XIII CAPPELLA, LA DISCESA DELLO SPIRITO SANTO",
+      "id": "02.20_2026",
+      "chronology": "XVII secolo",
+      "altitude": "752",
+      "distance": "360"
+    },
     "number": 13,
     "x": 56.05787,
     "y": 41.51739,
-    "fileLabel": "XIII_Cappella"
+    "fileLabel": "XIII_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "c14",
-    "label": "XIV Cappella – L'Assunzione di Maria Vergine al Cielo",
+    "label": "XIV Cappella, L’Assunzione della Vergine",
     "kind": "chapel",
-    "fixed": {},
+    "fixed": {
+      "object": "XIV CAPPELLA, L’ASSUNZIONE DELLA VERGINE",
+      "id": "02.21_2026",
+      "chronology": "XVII secolo",
+      "altitude": "785",
+      "distance": "360"
+    },
     "number": 14,
     "x": 44.3038,
     "y": 26.23815,
-    "fileLabel": "XIV_Cappella"
+    "fileLabel": "XIV_Cappella",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "arco1",
-    "label": "Primo Arco – Arco della Madonna del Rosario",
+    "label": "Primo Arco, Arco della Madonna del Rosario",
     "kind": "arch",
-    "fixed": {},
+    "fixed": {
+      "object": "PRIMO ARCO, ARCO DELLA MADONNA DEL ROSARIO",
+      "id": "02.01_2026",
+      "chronology": "XVII secolo",
+      "altitude": "595",
+      "distance": "2.080"
+    },
     "number": 1,
     "x": 44.48463,
     "y": 90.93783,
-    "fileLabel": "Primo_Arco"
+    "fileLabel": "Primo_Arco",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "arco2",
-    "label": "Secondo Arco – Arco di San Carlo",
+    "label": "Secondo Arco, Arco di San Carlo",
     "kind": "arch",
-    "fixed": {},
+    "fixed": {
+      "object": "SECONDO ARCO, ARCO DI SAN CARLO",
+      "id": "02.08_2026",
+      "chronology": "XVII secolo",
+      "altitude": "646",
+      "distance": "1.646"
+    },
     "number": 2,
     "x": 53.52622,
     "y": 65.33193,
-    "fileLabel": "Secondo_Arco"
+    "fileLabel": "Secondo_Arco",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "arco3",
-    "label": "Terzo Arco – Arco di Sant'Ambrogio",
+    "label": "Terzo Arco, Arco di Sant’Ambrogio",
     "kind": "arch",
-    "fixed": {},
+    "fixed": {
+      "object": "TERZO ARCO, ARCO DI SANT’AMBROGIO",
+      "id": "02.17_2026",
+      "chronology": "XVII secolo",
+      "altitude": "724",
+      "distance": "938"
+    },
     "number": 3,
     "x": 42.67631,
     "y": 42.36038,
-    "fileLabel": "Terzo_Arco"
+    "fileLabel": "Terzo_Arco",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "f1",
-    "label": "Prima Fontana o delle Samaritane",
+    "label": "Prima Fontana, Fontana della Samaritana",
     "kind": "fountain",
-    "fixed": {},
+    "fixed": {
+      "object": "PRIMA FONTANA, FONTANA DELLA SAMARITANA",
+      "id": "02.02_2026",
+      "chronology": "XVII secolo",
+      "altitude": "600",
+      "distance": "2.072"
+    },
     "number": 1,
     "x": 42.85714,
     "y": 88.40885,
-    "fileLabel": "Prima_Fontana"
+    "fileLabel": "Prima_Fontana",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "f2",
-    "label": "Seconda Fontana",
+    "label": "Seconda Fontana, Arco di San Carlo",
     "kind": "fountain",
-    "fixed": {},
+    "fixed": {
+      "object": "SECONDA FONTANA, ARCO DI SAN CARLO",
+      "id": "02.09_2026",
+      "chronology": "XVII secolo",
+      "altitude": "646",
+      "distance": "1.648"
+    },
     "number": 2,
     "x": 54.43038,
     "y": 63.96207,
-    "fileLabel": "Seconda_Fontana"
+    "fileLabel": "Seconda_Fontana",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "f3",
-    "label": "Terza Fontana",
+    "label": "Terza Fontana, Arco di Sant’Ambrogio",
     "kind": "fountain",
-    "fixed": {},
+    "fixed": {
+      "object": "TERZA FONTANA, ARCO DI SANT’AMBROGIO",
+      "id": "02.24_2026",
+      "chronology": "XVII secolo",
+      "altitude": "724",
+      "distance": "938"
+    },
     "number": 3,
     "x": 42.49548,
     "y": 41.83351,
-    "fileLabel": "Terza_Fontana"
+    "fileLabel": "Terza_Fontana",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "fm",
     "label": "Fontana del Mosè",
     "kind": "fountain",
-    "fixed": {},
+    "fixed": {
+      "object": "FONTANA DEL MOSÈ",
+      "id": "02.22_2026",
+      "chronology": "XIX secolo",
+      "altitude": "805",
+      "distance": "340"
+    },
     "number": 4,
     "x": 39.60217,
     "y": 11.90727,
-    "fileLabel": "Fontana_del_Mosè"
+    "fileLabel": "Fontana_del_Mosè",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "acquedotto",
     "label": "Acquedotto",
     "kind": "aqueduct",
-    "fixed": {},
-    "fileLabel": "Acquedotto"
+    "fixed": {
+      "object": "ACQUEDOTTO",
+      "id": "02.12_2026",
+      "chronology": "Probabile XVII secolo"
+    },
+    "fileLabel": "Acquedotto",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   },
   {
     "id": "strada",
     "label": "Viale del Santuario e delle Cappelle",
     "kind": "road",
-    "fixed": {},
-    "fileLabel": "Viale"
+    "fixed": {
+      "object": "VIALE DEL SANTUARIO E DELLE CAPPELLE",
+      "id": "02.23_2026",
+      "chronology": "XVII secolo"
+    },
+    "fileLabel": "Viale",
+    "boldFields": [
+      "object",
+      "id"
+    ]
   }
 ]
