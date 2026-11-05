@@ -26,10 +26,10 @@ function run(value, { bold = false, size = 19, color = "1E3232", font = "Arial" 
   ).join("");
   return `<w:r><w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}" w:eastAsia="${font}"/><w:sz w:val="${size}"/><w:szCs w:val="${size}"/><w:color w:val="${color}"/>${bold ? "<w:b/>" : ""}</w:rPr>${text}</w:r>`;
 }
-function para(content = "", { keep = false, after = 90, before = 0, align = "left", shade, bullet = -1, style, separator = false, line, indent = 0 } = {}) {
+function para(content = "", { keep = false, keepLines = false, after = 90, before = 0, align = "left", shade, bullet = -1, style, separator = false, line, indent = 0 } = {}) {
   const imageHeight = content.match(/<wp:extent[^>]*cy="(\d+)"/);
   const spacing = imageHeight ? `w:line="${Math.ceil(Number(imageHeight[1]) / 635 + 40)}" w:lineRule="atLeast"` : line ? `w:line="${Math.round(line * 20)}" w:lineRule="atLeast"` : 'w:line="228" w:lineRule="auto"';
-  return `<w:p><w:pPr>${style ? `<w:pStyle w:val="${style}"/>` : ""}${keep ? "<w:keepNext/>" : ""}${indent ? `<w:ind w:left="${indent}"/>` : ""}<w:widowControl/><w:spacing w:before="${before}" w:after="${after}" ${spacing}/><w:jc w:val="${align}"/>${separator ? '<w:pBdr><w:bottom w:val="single" w:sz="12" w:space="0" w:color="FFFFFF"/></w:pBdr>' : ""}${shade ? `<w:shd w:fill="${shade}"/>` : ""}${bullet >= 0 ? `<w:numPr><w:ilvl w:val="${bullet}"/><w:numId w:val="1"/></w:numPr>` : ""}</w:pPr>${content}</w:p>`;
+  return `<w:p><w:pPr>${style ? `<w:pStyle w:val="${style}"/>` : ""}${keep ? "<w:keepNext/>" : ""}${keepLines ? "<w:keepLines/>" : ""}${indent ? `<w:ind w:left="${indent}"/>` : ""}<w:widowControl/><w:spacing w:before="${before}" w:after="${after}" ${spacing}/><w:jc w:val="${align}"/>${separator ? '<w:pBdr><w:bottom w:val="single" w:sz="12" w:space="0" w:color="FFFFFF"/></w:pBdr>' : ""}${shade ? `<w:shd w:fill="${shade}"/>` : ""}${bullet >= 0 ? `<w:numPr><w:ilvl w:val="${bullet}"/><w:numId w:val="1"/></w:numPr>` : ""}</w:pPr>${content}</w:p>`;
 }
 const blank = () => para("", { after: 0 });
 const pageBreak = () => '<w:p><w:pPr><w:pageBreakBefore/><w:keepNext/><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr></w:p>';
@@ -154,7 +154,12 @@ export async function makeDocx(state, assets) {
   for (const [key, title] of [["restorations", "Interventi di RESTAURO precedenti"], ["maintenance", "Interventi di MANUTENZIONE precedenti"]]) {
     const rows = state.history[key].filter(row => any(row, ["date", "action"]));
     if (rows.length) body += para(run(title, { bold: true }), { keep: true });
-    for (const row of rows) body += table([[label("Data:", row.date, { keep: filled(row.action) }) + label("Azione:", row.action)]], [WIDTH], { border: false, padding: 0 }) + blank();
+    for (const row of rows) {
+      const action = filled(row.action)
+        ? para(run("Azione:", { bold: true }), { keep: true }) + para(run(row.action), { align: "left", keepLines: true })
+        : "";
+      body += table([[label("Data:", row.date, { keep: filled(row.action) }) + action]], [WIDTH], { border: false, padding: 0, keepRows: false }) + blank();
+    }
   }
   body += band("4. STATO CONSERVATIVO ATTUALE");
   for (const row of state.conditions.filter(row => any(row, ["exposure", "assessment"]) || row.methods.length)) {
@@ -176,9 +181,11 @@ export async function makeDocx(state, assets) {
     body += table([[content]], [WIDTH], { borderColor: "005B60", shade: "E8F1F2" }) + blank();
   }
   const visits = surveyEntries(state);
-  body += note(state.inspectionNotes);
   const photos = allPhotos(state);
-  if (!photos.length) body += pageBreak() + band("6. ATLANTE FOTOGRAFICO", false);
+  // Il paragrafo di separazione è già incluso nella fascia precedente.
+  // Le note generali dell'ispezione restano nel riquadro a fondo pagina.
+  if (!photos.length) body += band("6. ATLANTE FOTOGRAFICO", false);
+  body += note(state.inspectionNotes);
   for (let offset = 0; offset < photos.length; offset += 4) {
     body += pageBreak();
     const rows = [[{ content: band("6. ATLANTE FOTOGRAFICO"), span: 2, shade: "FFFFFF" }]];

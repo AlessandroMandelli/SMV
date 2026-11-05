@@ -255,14 +255,21 @@ function historyAndCondition(flow, state) {
           ? flow.paragraphHeight("Data:", row.date)
           : 0) +
         (hasText(row.action)
-          ? flow.paragraphHeight("Azione:", row.action)
+          ? TYPE.leading + flow.paragraphHeight("", row.action)
           : 0) +
         8;
-      flow.ensure(Math.min(height, flow.freshHeight()));
+      // I testi superiori a una pagina iniziano con titolo, data ed etichetta,
+      // poi proseguono al margine sinistro senza lasciare un titolo isolato.
+      const minimum = 18 + (hasText(row.date) ? flow.paragraphHeight("Data:", row.date) : 0) +
+        (hasText(row.action) ? TYPE.leading * 2 : 0) + 8;
+      flow.ensure(height <= flow.freshHeight() ? height : minimum);
       flow.report.text(flow.page, title, flow.x, flow.y, { bold: true });
       flow.y += 18;
       flow.paragraph("Data:", row.date);
-      flow.paragraph("Azione:", row.action);
+      if (hasText(row.action)) {
+        flow.paragraph("Azione:", "", { showEmpty: true, after: 0 });
+        flow.paragraph("", row.action, { keepTogether: false });
+      }
       flow.y += 8;
     }
   }
@@ -436,13 +443,14 @@ function priorities(flow, state) {
       if (offset < anomalyLines.length) flow.next();
     }
   }
-  flow.box("Note aggiuntive:", state.inspectionNotes, { minHeight: 60, anchorBottom: true });
 }
 async function photographs(flow, state) {
   const photos = allPhotos(state);
+  if (!photos.length) flow.section(PHOTO_TITLE);
+  flow.box("Note aggiuntive:", state.inspectionNotes, { minHeight: 60, anchorBottom: true });
+  if (!photos.length) return;
   flow.next();
   flow.section(PHOTO_TITLE);
-  if (!photos.length) return;
   const r = flow.report, gap = 12, width = (BODY_WIDTH - gap) / 2;
   const dated = surveyEntries(state).length > 1;
   const groups = dated ? [...new Set(photos.map(p => p.surveyDate || ""))].map(date =>
