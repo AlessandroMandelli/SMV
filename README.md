@@ -1,8 +1,15 @@
-# Schede Restauro 3.6.16
+# Schede Restauro 3.6.17
 
 PWA per il Sacro Monte di Varese, utilizzabile offline su desktop e telefono. Esporta PDF, Word modificabile e JSON. Lo ZIP contiene il sito già compilato, pronto per GitHub Pages senza npm o un server applicativo.
 
 ## Novità della revisione
+
+- Nello storico manutentivo, sia per gli interventi di restauro sia per quelli di manutenzione, il testo compilato inizia sotto l'etichetta **Azione:** ed è allineato a sinistra nel Word e nel PDF. Le righe e gli a capo del testo vengono conservati anche per contenuti lunghi.
+- Se non ci sono fotografie, il titolo **6. ATLANTE FOTOGRAFICO** segue la sezione 5 senza un'interruzione di pagina obbligatoria. Se la sezione 5 è vuota, tra i due titoli rimane lo spazio di un paragrafo; se è compilata, il titolo 6 segue i suoi contenuti. Le note generali rimangono nel riquadro a fondo pagina. Anche le fotografie dei sopralluoghi precedenti sono considerate per stabilire se l'atlante è vuoto.
+
+La base è la 3.6.16. Le modifiche riguardano i due generatori dei documenti; catalogo, mappa, interfaccia di compilazione e gestione dei sopralluoghi sono conservati.
+
+## Anagrafica introdotta nella 3.6.16
 
 - Inserita l'anagrafica dei 23 beni dal file DATI_SMV(1).docx e completata la Terza Fontana secondo le indicazioni dell'utente. Tutti i 24 beni hanno un ID univoco: da 02.01_2026 a 02.24_2026.
 - Le nuove schede precompilano Oggetto, ID, Cronologia, Quota e Distanza dal Santuario dove forniti. I campi partono bloccati e si sbloccano con il lucchetto della prima pagina. Per Acquedotto e Viale non sono state inventate quote o distanze.
@@ -11,11 +18,11 @@ PWA per il Sacro Monte di Varese, utilizzabile offline su desktop e telefono. Es
 - La Terza Fontana ha ID 02.24_2026, cronologia XVII secolo, quota 724 m e distanza dal Santuario 938 m.
 - Aprire il lucchetto permette di correggere anche i dati forniti dal catalogo. Le correzioni, comprese le cancellazioni di un valore, rimangono dopo salvataggio, ripresa e importazione JSON; non vengono sostituite dai valori iniziali. Nei JSON precedenti si conservano i dati presenti, compresi quelli vuoti; vengono inizializzati soltanto i campi mancanti. Cambiare bene dalla mappa a lucchetto aperto aggiorna i relativi dati anagrafici.
 
-La base è la 3.6.15 pubblicata nella repository SMV_V5, recuperata prima delle modifiche. Conservati i checkbox separati di Grotta e VI Cappella, le altre coordinate, il tracciato del Viale, i nomi dei file con data e ora, le note sotto al titolo, la colonna Risolto in data e la gestione delle versioni delle azioni preventive. Non vengono eliminati automaticamente i gruppi di azioni ripetuti.
+Conservati i checkbox separati di Grotta e VI Cappella, le altre coordinate, il tracciato del Viale, i nomi dei file con data e ora, le note sotto al titolo, la colonna Risolto in data e la gestione delle versioni delle azioni preventive. Non vengono eliminati automaticamente i gruppi di azioni ripetuti.
 
 ## Pubblicazione
 
-Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.16 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
+Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.17 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
 
 ## Home e compilazione
 
@@ -49,7 +56,7 @@ Il degrado risolto che era aperto in un sopralluogo precedente mantiene la progr
 
 Scatta foto e Carica foto registrano la data locale di inserimento, distinta dalla data dello scatto. Ogni foto ha una didascalia facoltativa multilinea, allineata a sinistra in Arial 9,5 sotto l'immagine. Nei documenti con più sopralluoghi è indicata anche la visita di riferimento. I JSON precedenti senza metadati usano la data e la didascalia disponibili.
 
-L'atlante inizia sempre su una nuova pagina, contiene fino a quattro fotografie per pagina e ripete l'intestazione sulle continuazioni, sia nel PDF sia nel Word. Didascalie particolarmente lunghe possono richiedere altre pagine. Le didascalie delle visite chiuse sono conservate separatamente dall'immagine; correggerle a lucchetto aperto aggiorna anche le copie precedenti della stessa fotografia.
+Quando contiene fotografie, l'atlante inizia su una nuova pagina, contiene fino a quattro fotografie per pagina e ripete l'intestazione sulle continuazioni, sia nel PDF sia nel Word. Se è vuoto, viene stampato soltanto il titolo dopo la sezione 5, sulla stessa pagina quando lo spazio lo consente. Didascalie particolarmente lunghe possono richiedere altre pagine. Le didascalie delle visite chiuse sono conservate separatamente dall'immagine; correggerle a lucchetto aperto aggiorna anche le copie precedenti della stessa fotografia.
 
 Salva scheda include sempre il JSON e permette di aggiungere DOCX e PDF. Il JSON non può essere deselezionato. Su iPhone il solo JSON viene scaricato direttamente; più formati sono raccolti in un unico ZIP. Su desktop vengono scaricati separatamente. Il JSON conserva i dati e lo storico necessari per il sopralluogo successivo.
 

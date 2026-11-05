@@ -1,4 +1,4 @@
-/* Schede Restauro 3.6.16 — generato dai sorgenti modulari in js/. */
+/* Schede Restauro 3.6.17 — generato dai sorgenti modulari in js/. */
 (() => {
   // recovered-smv/js/road.js
   var ROAD_SIZE = { width: 553, height: 949 };
@@ -1427,7 +1427,7 @@
   }
 
   // recovered-smv/js/config.js
-  var VERSION = "3.6.16";
+  var VERSION = "3.6.17";
   var PWA_URL = "https://alessandromandelli.github.io/SMV/";
 
   // recovered-smv/js/pdf-layout.js
@@ -2184,12 +2184,16 @@
       for (const row of state2.history[key].filter(
         (r) => [r.date, r.action].some(hasText)
       )) {
-        const height = 18 + (hasText(row.date) ? flow.paragraphHeight("Data:", row.date) : 0) + (hasText(row.action) ? flow.paragraphHeight("Azione:", row.action) : 0) + 8;
-        flow.ensure(Math.min(height, flow.freshHeight()));
+        const height = 18 + (hasText(row.date) ? flow.paragraphHeight("Data:", row.date) : 0) + (hasText(row.action) ? TYPE.leading + flow.paragraphHeight("", row.action) : 0) + 8;
+        const minimum = 18 + (hasText(row.date) ? flow.paragraphHeight("Data:", row.date) : 0) + (hasText(row.action) ? TYPE.leading * 2 : 0) + 8;
+        flow.ensure(height <= flow.freshHeight() ? height : minimum);
         flow.report.text(flow.page, title, flow.x, flow.y, { bold: true });
         flow.y += 18;
         flow.paragraph("Data:", row.date);
-        flow.paragraph("Azione:", row.action);
+        if (hasText(row.action)) {
+          flow.paragraph("Azione:", "", { showEmpty: true, after: 0 });
+          flow.paragraph("", row.action, { keepTogether: false });
+        }
         flow.y += 8;
       }
     }
@@ -2340,14 +2344,15 @@
         if (offset < anomalyLines.length) flow.next();
       }
     }
-    flow.box("Note aggiuntive:", state2.inspectionNotes, { minHeight: 60, anchorBottom: true });
   }
   async function photographs(flow, state2) {
     var _a;
     const photos = allPhotos(state2);
+    if (!photos.length) flow.section(PHOTO_TITLE);
+    flow.box("Note aggiuntive:", state2.inspectionNotes, { minHeight: 60, anchorBottom: true });
+    if (!photos.length) return;
     flow.next();
     flow.section(PHOTO_TITLE);
-    if (!photos.length) return;
     const r = flow.report, gap = 12, width = (BODY_WIDTH - gap) / 2;
     const dated = surveyEntries(state2).length > 1;
     const groups = dated ? [...new Set(photos.map((p) => p.surveyDate || ""))].map((date) => ({ date, photos: photos.filter((p) => (p.surveyDate || "") === date) })) : [{ date: "", photos }];
@@ -2655,10 +2660,10 @@
     ).join("");
     return `<w:r><w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}" w:eastAsia="${font}"/><w:sz w:val="${size}"/><w:szCs w:val="${size}"/><w:color w:val="${color}"/>${bold ? "<w:b/>" : ""}</w:rPr>${text}</w:r>`;
   }
-  function para(content2 = "", { keep = false, after = 90, before = 0, align = "left", shade, bullet = -1, style, separator = false, line, indent = 0 } = {}) {
+  function para(content2 = "", { keep = false, keepLines = false, after = 90, before = 0, align = "left", shade, bullet = -1, style, separator = false, line, indent = 0 } = {}) {
     const imageHeight = content2.match(/<wp:extent[^>]*cy="(\d+)"/);
     const spacing = imageHeight ? `w:line="${Math.ceil(Number(imageHeight[1]) / 635 + 40)}" w:lineRule="atLeast"` : line ? `w:line="${Math.round(line * 20)}" w:lineRule="atLeast"` : 'w:line="228" w:lineRule="auto"';
-    return `<w:p><w:pPr>${style ? `<w:pStyle w:val="${style}"/>` : ""}${keep ? "<w:keepNext/>" : ""}${indent ? `<w:ind w:left="${indent}"/>` : ""}<w:widowControl/><w:spacing w:before="${before}" w:after="${after}" ${spacing}/><w:jc w:val="${align}"/>${separator ? '<w:pBdr><w:bottom w:val="single" w:sz="12" w:space="0" w:color="FFFFFF"/></w:pBdr>' : ""}${shade ? `<w:shd w:fill="${shade}"/>` : ""}${bullet >= 0 ? `<w:numPr><w:ilvl w:val="${bullet}"/><w:numId w:val="1"/></w:numPr>` : ""}</w:pPr>${content2}</w:p>`;
+    return `<w:p><w:pPr>${style ? `<w:pStyle w:val="${style}"/>` : ""}${keep ? "<w:keepNext/>" : ""}${keepLines ? "<w:keepLines/>" : ""}${indent ? `<w:ind w:left="${indent}"/>` : ""}<w:widowControl/><w:spacing w:before="${before}" w:after="${after}" ${spacing}/><w:jc w:val="${align}"/>${separator ? '<w:pBdr><w:bottom w:val="single" w:sz="12" w:space="0" w:color="FFFFFF"/></w:pBdr>' : ""}${shade ? `<w:shd w:fill="${shade}"/>` : ""}${bullet >= 0 ? `<w:numPr><w:ilvl w:val="${bullet}"/><w:numId w:val="1"/></w:numPr>` : ""}</w:pPr>${content2}</w:p>`;
   }
   var blank = () => para("", { after: 0 });
   var pageBreak = () => '<w:p><w:pPr><w:pageBreakBefore/><w:keepNext/><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr></w:p>';
@@ -2811,7 +2816,10 @@
     for (const [key, title] of [["restorations", "Interventi di RESTAURO precedenti"], ["maintenance", "Interventi di MANUTENZIONE precedenti"]]) {
       const rows = state2.history[key].filter((row) => any(row, ["date", "action"]));
       if (rows.length) body += para(run(title, { bold: true }), { keep: true });
-      for (const row of rows) body += table([[label("Data:", row.date, { keep: filled(row.action) }) + label("Azione:", row.action)]], [WIDTH], { border: false, padding: 0 }) + blank();
+      for (const row of rows) {
+        const action = filled(row.action) ? para(run("Azione:", { bold: true }), { keep: true }) + para(run(row.action), { align: "left", keepLines: true }) : "";
+        body += table([[label("Data:", row.date, { keep: filled(row.action) }) + action]], [WIDTH], { border: false, padding: 0, keepRows: false }) + blank();
+      }
     }
     body += band("4. STATO CONSERVATIVO ATTUALE");
     for (const row of state2.conditions.filter((row2) => any(row2, ["exposure", "assessment"]) || row2.methods.length)) {
@@ -2833,9 +2841,9 @@
       body += table([[content2]], [WIDTH], { borderColor: "005B60", shade: "E8F1F2" }) + blank();
     }
     const visits = surveyEntries(state2);
-    body += note(state2.inspectionNotes);
     const photos = allPhotos(state2);
-    if (!photos.length) body += pageBreak() + band("6. ATLANTE FOTOGRAFICO", false);
+    if (!photos.length) body += band("6. ATLANTE FOTOGRAFICO", false);
+    body += note(state2.inspectionNotes);
     for (let offset = 0; offset < photos.length; offset += 4) {
       body += pageBreak();
       const rows = [[{ content: band("6. ATLANTE FOTOGRAFICO"), span: 2, shade: "FFFFFF" }]];
