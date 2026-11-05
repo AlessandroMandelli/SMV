@@ -1,6 +1,6 @@
-/* Schede Restauro 3.6.17 — generato dai sorgenti modulari in js/. */
+/* Schede Restauro 3.6.18 — generato dai sorgenti modulari in js/. */
 (() => {
-  // recovered-smv/js/road.js
+  // js/road.js
   var ROAD_SIZE = { width: 553, height: 949 };
   var ROAD_POINTS = [[246, 860], [256, 827], [270, 783], [285, 737], [295, 704], [294, 686], [293, 679], [308, 683], [330, 690], [352, 697], [365, 698], [368, 686], [366, 669], [360, 648], [352, 634], [341, 626], [324, 619], [307, 616], [292, 623], [280, 636], [271, 644], [255, 646], [235, 646], [211, 646], [202, 644], [198, 639], [198, 626], [201, 599], [201, 574], [200, 548], [208, 520], [205, 490], [204, 466], [210, 449], [204, 422], [196, 396], [193, 379], [194, 369], [199, 364], [208, 363], [218, 369], [224, 383], [231, 406], [240, 433], [255, 458], [270, 476], [277, 484], [292, 483], [302, 476], [306, 463], [306, 445], [306, 419], [294, 399], [298, 377], [296, 355], [284, 330], [273, 309], [254, 287], [235, 268], [226, 249], [225, 229], [221, 205], [219, 181], [217, 156], [215, 137], [212, 123], [226, 121], [236, 115]];
   var ROAD_SVG_POINTS = ROAD_POINTS.map((point) => point.join(",")).join(" ");
@@ -10,7 +10,7 @@
     return kind && kind !== "road" ? assets2.filter((asset2) => asset2.kind === kind && Number.isFinite(asset2.x) && Number.isFinite(asset2.y)) : [];
   }
 
-  // recovered-smv/js/sections.js
+  // js/sections.js
   var EDITOR_LAYOUT_VERSION = 36;
   var SECTION_DEFINITIONS = Object.freeze([
     { key: "context", label: "Identificazione e dati del bene" },
@@ -28,7 +28,7 @@
     return Math.max(0, Math.min(SECTIONS.length - 1, migrated));
   }
 
-  // recovered-smv/js/model.js
+  // js/model.js
   var APP_ID = "schede-restauro";
   var SCHEMA_VERSION = 2;
   var COMMON = Object.freeze({
@@ -550,7 +550,7 @@
     return clone ? structuredClone(data) : data;
   }
 
-  // recovered-smv/js/surveys.js
+  // js/surveys.js
   function surveyEntries(state2) {
     return [
       ...(state2.surveys || []).filter((v) => v.id !== state2.survey.id),
@@ -744,7 +744,7 @@
     return entries;
   }
 
-  // recovered-smv/js/storage.js
+  // js/storage.js
   var DB_NAME = "SchedeRestauroV3";
   var DRAFT_KEY = "current-structured-v1";
   var database;
@@ -812,7 +812,7 @@
     return s.delete(DRAFT_KEY);
   });
 
-  // recovered-smv/js/catalog.js
+  // js/catalog.js
   var ASSETS = [
     {
       "id": "c01",
@@ -1285,7 +1285,7 @@
     }
   ];
 
-  // recovered-smv/js/legacy.js
+  // js/legacy.js
   async function migrateLegacy(legacy, assets2) {
     if ((legacy == null ? void 0 : legacy.version) !== 3 || !legacy.values || !legacy.meta)
       throw Error("Formato della bozza precedente non riconosciuto.");
@@ -1426,11 +1426,11 @@
     return applyFixed(out, assets2, { initialize: false });
   }
 
-  // recovered-smv/js/config.js
-  var VERSION = "3.6.17";
+  // js/config.js
+  var VERSION = "3.6.18";
   var PWA_URL = "https://alessandromandelli.github.io/SMV/";
 
-  // recovered-smv/js/pdf-layout.js
+  // js/pdf-layout.js
   var PAGE = Object.freeze({
     width: 792,
     height: 612,
@@ -1658,14 +1658,16 @@
       );
       return lines.length * 16;
     }
-    label(page, label2, value, x, top, width, { bold = true, boldValue = false, size = TYPE.body, minHeight = 12.5 } = {}) {
+    label(page, label2, value, x, top, width, { bold = true, boldValue = false, size = TYPE.body, valueSize = size, minHeight = 12.5 } = {}) {
       const valueX = x + this.width(label2, size, bold) + 5;
-      const lines = this.wrap(value, Math.max(25, width - (valueX - x)), size, boldValue);
+      const leading = Math.max(TYPE.leading, valueSize * 1.2);
+      const valueTop = top + (size - valueSize) * 0.905;
+      const lines = this.wrap(value, Math.max(25, width - (valueX - x)), valueSize, boldValue);
       this.text(page, label2, x, top, { bold, size });
       lines.forEach(
-        (line, i) => this.text(page, line, valueX, top + i * TYPE.leading, { size, bold: boldValue })
+        (line, i) => this.text(page, line, valueX, valueTop + i * leading, { size: valueSize, bold: boldValue })
       );
-      return Math.max(minHeight, lines.length * TYPE.leading);
+      return Math.max(minHeight, lines.length * leading);
     }
     header(page, kind, meta) {
       const x = PAGE.margin + 92;
@@ -1681,18 +1683,22 @@
       let y = 60.8;
       for (const [label2, value] of [
         ["ID Scheda:", this.state.general.id],
-        ["Data:", displayDate(meta.date)]
+        ["Data:", hasText(this.state.general.date) ? displayDate(meta.date) : ""]
       ]) {
+        const valueSize = label2 === "ID Scheda:" ? 12 : TYPE.body;
+        const boldValue = label2 === "ID Scheda:" && isGeneralBold(this.state, "id");
+        const valueWidth = 346.6 - this.width(label2, TYPE.body, true) - 5;
         const height = Math.max(
           14.5,
-          this.wrap(value, 300).length * TYPE.leading + 3
+          this.wrap(value, valueWidth, valueSize, boldValue).length * Math.max(TYPE.leading, valueSize * 1.2) + 3
         );
         this.rect(page, x - 1, y - 2, 356.6, height, {
           fill: "#d9d9d9"
         });
         this.label(page, label2, value, x, y, 346.6, {
           minHeight: height,
-          boldValue: label2 === "ID Scheda:" && isGeneralBold(this.state, "id")
+          boldValue,
+          valueSize
         });
         y += height;
       }
@@ -1975,7 +1981,7 @@
     }
   };
 
-  // recovered-smv/js/pdf.js
+  // js/pdf.js
   var files = /* @__PURE__ */ new Map();
   async function resource(path) {
     if (!files.has(path))
@@ -2044,16 +2050,20 @@
       ["Data:", displayDate(state2.general.date)],
       ["Ora:", state2.general.time]
     ]) {
+      const valueSize = label2 === "ID Scheda:" ? 12 : TYPE.body;
+      const boldValue = label2 === "ID Scheda:" && isGeneralBold(state2, "id");
+      const valueWidth = 266.2 - report.width(label2, TYPE.body, true) - 5;
       const height = Math.max(
         14.5,
-        report.wrap(value, 220).length * TYPE.leading + 3
+        report.wrap(value, valueWidth, valueSize, boldValue).length * Math.max(TYPE.leading, valueSize * 1.2) + 3
       );
       report.rect(page, textX - 1, headerY - 2, 271.2, height, {
         fill: "#d9d9d9"
       });
       report.label(page, label2, value, textX, headerY, 266.2, {
         minHeight: height,
-        boldValue: label2 === "ID Scheda:" && isGeneralBold(state2, "id")
+        boldValue,
+        valueSize
       });
       headerY += height;
     }
@@ -2625,7 +2635,7 @@
     return layout ? { layout: documentLayout, pdf: blob } : blob;
   }
 
-  // recovered-smv/js/zip.js
+  // js/zip.js
   var loading;
   async function zipLibrary() {
     if (window.JSZip) return window.JSZip;
@@ -2645,7 +2655,7 @@
     return loading;
   }
 
-  // recovered-smv/js/docx.js
+  // js/docx.js
   var WIDTH = 14688;
   var XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
   var NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
@@ -2667,8 +2677,8 @@
   }
   var blank = () => para("", { after: 0 });
   var pageBreak = () => '<w:p><w:pPr><w:pageBreakBefore/><w:keepNext/><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr></w:p>';
-  function label(title, value, { always = false, boldValue = false, ...options } = {}) {
-    return always || filled(value) ? para(run(title, { bold: true }) + run(" " + (value ?? ""), { bold: boldValue }), options) : "";
+  function label(title, value, { always = false, boldValue = false, valueSize = 19, ...options } = {}) {
+    return always || filled(value) ? para(run(title, { bold: true }) + run(" " + (value ?? ""), { bold: boldValue, size: valueSize }), options) : "";
   }
   var band = (title, keep = true) => para(run(title, { bold: true, size: 20, color: "FFFFFF" }), { before: 100, after: 0, shade: "005B60", keep, separator: true, line: 18 }) + `<w:p><w:pPr>${keep ? "<w:keepNext/>" : ""}<w:spacing w:before="0" w:after="0" w:line="120" w:lineRule="exact"/></w:pPr></w:p>`;
   var choices = (options, selected) => options.map((option) => run((Array.isArray(selected) ? selected.includes(option) : selected === option) ? "\u2611 " : "\u2610 ", { font: "DejaVu Sans" }) + run(option)).join(run("	"));
@@ -2794,8 +2804,8 @@
     const g = state2.general;
     function heading(title, date, first = false) {
       let metadata = para(run(title, { bold: true, size: 26, color: "005B60" }), { after: 210, style: "Title" });
-      metadata += label("ID Scheda:", g.id, { always: true, shade: "D9D9D9", after: 0, boldValue: isGeneralBold(state2, "id") });
-      metadata += label("Data:", displayDate(date), { always: true, shade: "D9D9D9", after: first ? 0 : 180 });
+      metadata += label("ID Scheda:", g.id, { always: true, shade: "D9D9D9", after: 0, boldValue: isGeneralBold(state2, "id"), valueSize: 24 });
+      metadata += label("Data:", filled(g.date) ? displayDate(date) : "", { always: true, shade: "D9D9D9", after: first ? 0 : 180 });
       if (first) {
         metadata += label("Ora:", g.time, { always: true, shade: "D9D9D9", after: 160 });
         metadata += para(run("Operatore: " + COMMON.operator, { bold: true }), { after: 90 });
@@ -2912,7 +2922,7 @@
     return new Blob([await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 6 } })], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
   }
 
-  // recovered-smv/js/documents.js
+  // js/documents.js
   async function buildExportFiles(state2, assets2, formats) {
     const files2 = /* @__PURE__ */ new Map();
     if (formats.includes("pdf")) {
@@ -2926,7 +2936,7 @@
     return formats.map((extension) => ({ extension, blob: files2.get(extension) }));
   }
 
-  // recovered-smv/js/history-view.js
+  // js/history-view.js
   var escape = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
   var content = (value) => escape(value || "\u2014");
   var labels = {
@@ -3029,7 +3039,7 @@
     return visits.map((visit, index) => `<details class="visit-history"><summary>Sopralluogo del ${content(displayDate(visit.date))}</summary><div class="historic-page">${historyPage(visit.data, section, images, visits.slice(0, index))}</div></details>`).join("");
   }
 
-  // recovered-smv/js/photos.js
+  // js/photos.js
   async function readPhoto(file, surveyDate) {
     const url = URL.createObjectURL(file);
     const image = new Image();
@@ -3063,7 +3073,7 @@
     }
   }
 
-  // recovered-smv/js/dialogs.js
+  // js/dialogs.js
   function initDialogs(canClose = () => true) {
     const close = (dialog) => {
       if ((dialog == null ? void 0 : dialog.open) && canClose(dialog)) dialog.close();
@@ -3095,7 +3105,7 @@
     }
   }
 
-  // recovered-smv/js/corrections.js
+  // js/corrections.js
   var dataVersions = (state2) => [state2, ...state2.surveys.map((visit) => visit.data)];
   var at = (data, keys) => keys.reduce((value, key) => value == null ? void 0 : value[key], data);
   function fieldTargets(state2, keys, correction) {
@@ -3245,7 +3255,7 @@
     return true;
   }
 
-  // recovered-smv/js/export.js
+  // js/export.js
   function isAppleMobile(nav = navigator) {
     return /iPhone|iPad|iPod/.test(nav.userAgent) || nav.platform === "MacIntel" && nav.maxTouchPoints > 1;
   }
@@ -3334,7 +3344,7 @@
     }
   };
 
-  // recovered-smv/js/home-title.js
+  // js/home-title.js
   function initHomeTitle() {
     const branding = document.querySelector(".home-branding");
     const title = document.getElementById("homeTitle");
@@ -3360,7 +3370,7 @@
     }
   }
 
-  // recovered-smv/js/app.js
+  // js/app.js
   var $ = (id) => document.getElementById(id);
   var exportFiles = new ExportFiles($("exportReady"), notify);
   var unlockedPages = /* @__PURE__ */ new Set();

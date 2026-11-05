@@ -1,13 +1,18 @@
-# Schede Restauro 3.6.17
+# Schede Restauro 3.6.18
 
 PWA per il Sacro Monte di Varese, utilizzabile offline su desktop e telefono. Esporta PDF, Word modificabile e JSON. Lo ZIP contiene il sito già compilato, pronto per GitHub Pages senza npm o un server applicativo.
 
 ## Novità della revisione
 
+- Se la data della prima scheda è vuota, Word e PDF lasciano vuota anche la data nelle intestazioni del registro di manutenzione immediata e delle azioni preventive. Le etichette Data rimangono. Le date dei singoli rilievi, interventi e programmi non vengono cancellate. Quando la data iniziale è presente, le sezioni mantengono le proprie date indipendenti.
+- Il valore dell'ID è a 12 pt nelle tre intestazioni Word e PDF. L'etichetta **ID Scheda:** rimane a 9,5 pt. I grassetti restano quelli previsti; un ID lungo va a capo senza uscire dal suo riquadro.
+
+La base è la 3.6.17. Le modifiche riguardano i generatori dei documenti; catalogo, mappa, interfaccia di compilazione e gestione dei sopralluoghi sono conservati.
+
+## Modifiche ai documenti già incluse nella 3.6.17
+
 - Nello storico manutentivo, sia per gli interventi di restauro sia per quelli di manutenzione, il testo compilato inizia sotto l'etichetta **Azione:** ed è allineato a sinistra nel Word e nel PDF. Le righe e gli a capo del testo vengono conservati anche per contenuti lunghi.
 - Se non ci sono fotografie, il titolo **6. ATLANTE FOTOGRAFICO** segue la sezione 5 senza un'interruzione di pagina obbligatoria. Se la sezione 5 è vuota, tra i due titoli rimane lo spazio di un paragrafo; se è compilata, il titolo 6 segue i suoi contenuti. Le note generali rimangono nel riquadro a fondo pagina. Anche le fotografie dei sopralluoghi precedenti sono considerate per stabilire se l'atlante è vuoto.
-
-La base è la 3.6.16. Le modifiche riguardano i due generatori dei documenti; catalogo, mappa, interfaccia di compilazione e gestione dei sopralluoghi sono conservati.
 
 ## Anagrafica introdotta nella 3.6.16
 
@@ -22,7 +27,7 @@ Conservati i checkbox separati di Grotta e VI Cappella, le altre coordinate, il 
 
 ## Pubblicazione
 
-Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.17 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
+Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.18 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
 
 ## Home e compilazione
 
