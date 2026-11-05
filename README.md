@@ -1,28 +1,21 @@
-# Schede Restauro 3.6.15
+# Schede Restauro 3.6.16
 
 PWA per il Sacro Monte di Varese, utilizzabile offline su desktop e telefono. Esporta PDF, Word modificabile e JSON. Lo ZIP contiene il sito già compilato, pronto per GitHub Pages senza npm o un server applicativo.
 
 ## Novità della revisione
 
-- Separati i checkbox delle Grotte delle Romite e della VI Cappella: restano vicini e non si sovrappongono anche nella mappa ridotta per telefono. La grotta è leggermente più in alto a destra e la VI Cappella più in basso.
-- Le stesse coordinate sono usate nell'app e nelle esportazioni Word e PDF; il nuovo catalogo viene applicato anche ai JSON precedenti caricati nell'app.
-- Restano invariati gli altri marcatori, i nomi dei beni, la selezione singola, i blocchi e le funzioni della revisione precedente.
+- Inserita l'anagrafica dei 23 beni dal file DATI_SMV(1).docx e completata la Terza Fontana secondo le indicazioni dell'utente. Tutti i 24 beni hanno un ID univoco: da 02.01_2026 a 02.24_2026.
+- Le nuove schede precompilano Oggetto, ID, Cronologia, Quota e Distanza dal Santuario dove forniti. I campi partono bloccati e si sbloccano con il lucchetto della prima pagina. Per Acquedotto e Viale non sono state inventate quote o distanze.
+- Nei campi e nei documenti si conservano le maiuscole del Word. Oggetto e ID sono in grassetto; i valori di cronologia, quota e distanza sono normali. Distanze e quote mantengono il separatore italiano delle migliaia e l'unità di misura.
+- La scelta del bene dalla home usa le nuove denominazioni con l'attuale uso di maiuscole e minuscole. Confermate Seconda Fontana, Arco di San Carlo e Terza Fontana, Arco di Sant’Ambrogio.
+- La Terza Fontana ha ID 02.24_2026, cronologia XVII secolo, quota 724 m e distanza dal Santuario 938 m.
+- Aprire il lucchetto permette di correggere anche i dati forniti dal catalogo. Le correzioni, comprese le cancellazioni di un valore, rimangono dopo salvataggio, ripresa e importazione JSON; non vengono sostituite dai valori iniziali. Nei JSON precedenti si conservano i dati presenti, compresi quelli vuoti; vengono inizializzati soltanto i campi mancanti. Cambiare bene dalla mappa a lucchetto aperto aggiorna i relativi dati anagrafici.
 
-## Funzionalità conservate dalla 3.6.14
-
-- Word e PDF: il testo delle Note aggiuntive è allineato a sinistra, sotto al titolo del riquadro. Le note multilinea conservano i propri a capo; i riquadri mantengono il posizionamento a fondo pagina e crescono con il contenuto.
-- Tutte le date nelle celle Risolto in data sono in grassetto. La colonna compare anche nelle tabelle delle azioni preventive non completate; le celle vuote contengono un trattino centrato. Le righe risolte mantengono il verde chiaro.
-- Nome automatico con data e ora locali di apertura/importazione: `scheda_ispezione_periodica_I_Cappella_ID_01.02_2026_2026-10-30_16-56`. Riprendere la compilazione mantiene la data e l'ora memorizzate. Modificare una data del documento non modifica il nome.
-- Durante il caricamento da JSON, la data proposta è l'ultima esecuzione registrata, senza precedere l'ultimo sopralluogo; in assenza di interventi datati si usa l'ultimo sopralluogo. La proposta rimane modificabile. Non vengono usate la data odierna o le scadenze delle azioni preventive.
-- La gestione delle versioni delle azioni preventive è conservata: una variazione del testo può continuare a produrre più versioni nei documenti, come richiesto. Nessuna eliminazione automatica dei duplicati e nessuna riscrittura dello storico.
-
-Conservati i 24 beni e le cinque categorie Cappelle, Archi, Fontane, Acquedotto e Viale. I pulsanti restano incolonnati; Acquedotto e Viale aprono direttamente la scheda. Restano invariati nomi estesi, mappe e lucchetti. La nomenclatura conserva numeri romani, Primo/Secondo/Terzo, Prima_Fontana, Seconda_Fontana, Terza_Fontana, Fontana_del_Mosè, Grotta_delle_Romite, Viale e Acquedotto.
-
-Il campo ID aggiorna il nome immediatamente. Se vuoto usa XX.XX_anno; le modifiche all'ID riattivano il nome automatico anche dopo una rinomina manuale. I caratteri non ammessi nei nomi dei file vengono sostituiti soltanto nel nome, mantenendo il valore originale nei dati. Tutti i formati e i file interni allo ZIP condividono lo stesso nome.
+La base è la 3.6.15 pubblicata nella repository SMV_V5, recuperata prima delle modifiche. Conservati i checkbox separati di Grotta e VI Cappella, le altre coordinate, il tracciato del Viale, i nomi dei file con data e ora, le note sotto al titolo, la colonna Risolto in data e la gestione delle versioni delle azioni preventive. Non vengono eliminati automaticamente i gruppi di azioni ripetuti.
 
 ## Pubblicazione
 
-Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.15 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
+Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.16 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
 
 ## Home e compilazione
 
@@ -36,7 +29,7 @@ Salva scheda registra lo stato corrente. Non sono necessari pulsanti separati Nu
 
 ## Blocchi e correzioni definitive
 
-Nella nuova scheda Materie e tecniche è direttamente compilabile. Dopo l'importazione del JSON è bloccato insieme agli altri dati precedenti della prima pagina. Oggetto, Complesso ed Ente proprietario partono protetti anche nella nuova scheda. Il lucchetto della prima pagina permette di correggerli.
+Nella nuova scheda Materie e tecniche è direttamente compilabile. Dopo l'importazione del JSON è bloccato insieme agli altri dati precedenti della prima pagina. Oggetto, ID, Cronologia e gli altri campi forniti dal catalogo, oltre a Complesso ed Ente proprietario, partono protetti anche nella nuova scheda. Il lucchetto della prima pagina permette di correggerli.
 
 - Il lucchetto agisce soltanto sulla pagina visualizzata. Un secondo clic ripristina i blocchi; le altre pagine conservano il proprio stato.
 - Dopo un'importazione sono protetti gli interventi pregressi, gli stati conservativi, la diagnostica precedente salvo Risolto in data, le priorità, gli interventi eseguiti, le azioni preventive e le fotografie storicizzate. Le nuove voci restano compilabili.
@@ -72,7 +65,7 @@ Il Word rimane modificabile e scorre con il contenuto: numero di pagine e interr
 
 ## Manutenzione del codice
 
-I sorgenti leggibili sono in `js/`; per ricompilarli eseguire `npm ci` e `npm run build`. Il sito distribuito funziona senza questi comandi. `assets/beni.json` contiene l'anagrafica e il campo `fileLabel` per la parte del nome relativa a ciascun bene, `assets/map.jpg` la planimetria e `js/road.js` il tracciato sovrapposto del Viale. Il catalogo contiene le nuove coordinate delle cappelle, delle grotte, degli archi e delle fontane. Non viene utilizzato un vecchio template PDF.
+I sorgenti leggibili sono in `js/`; per ricompilarli eseguire `npm ci` e `npm run build`. Il sito distribuito funziona senza questi comandi. `assets/beni.json` contiene l'anagrafica, i valori iniziali `fixed`, i campi in grassetto `boldFields` e il campo `fileLabel` per la parte del nome relativa a ciascun bene, `assets/map.jpg` la planimetria e `js/road.js` il tracciato sovrapposto del Viale. Il catalogo contiene le nuove coordinate delle cappelle, delle grotte, degli archi e delle fontane. Non viene utilizzato un vecchio template PDF.
 
 `js/corrections.js` applica le correzioni definitive, `js/surveys.js` gestisce sopralluoghi e collegamenti, `js/pdf.js` e `js/docx.js` generano i documenti. Le note scritte manualmente restano testi autonomi: eventuali riferimenti da correggere vanno modificati nel relativo campo.
 

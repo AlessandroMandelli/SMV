@@ -270,6 +270,7 @@ h3 {
 .field > span {
   font-weight: 600;
 }
+.field-value-bold { font-weight: 700; }
 .field.wide {
   grid-column: 1/-1;
 }

@@ -1,4 +1,4 @@
-/* Schede Restauro 3.6.15 — generato dai sorgenti modulari in js/. */
+/* Schede Restauro 3.6.16 — generato dai sorgenti modulari in js/. */
 (() => {
   // recovered-smv/js/road.js
   var ROAD_SIZE = { width: 553, height: 949 };
@@ -269,18 +269,28 @@
   }
   var measureText = (value) => value ? `${formatMeasure(value)} m` : "";
   var displayDate = (value) => /^\d{4}-\d{2}-\d{2}$/.test(value || "") ? value.split("-").reverse().join("/") : String(value || "");
-  function applyFixed(state2, assets2) {
+  function applyFixed(state2, assets2, { initialize = true } = {}) {
     const selected = assets2.find((a) => a.id === state2.assetId);
     const fixed = (selected == null ? void 0 : selected.fixed) || {};
-    if (!state2.general.object && selected) state2.general.object = selected.label;
     state2.assetSnapshot = selected ? structuredClone(selected) : null;
-    for (const key of Object.keys(state2.general))
-      if (Object.hasOwn(fixed, key)) state2.general[key] = String(fixed[key]);
+    if (initialize) {
+      if (!state2.general.object && selected) state2.general.object = fixed.object || selected.label;
+      for (const key of Object.keys(state2.general))
+        if (Object.hasOwn(fixed, key)) state2.general[key] = String(fixed[key]);
+    }
+    if (state2.assetSnapshot) {
+      for (const key of Object.keys(fixed))
+        if (Object.hasOwn(state2.general, key)) state2.assetSnapshot.fixed[key] = state2.general[key];
+    }
     state2.fixedCommon = { ...COMMON, complex: state2.general.complex, owner: state2.general.owner };
     return state2;
   }
+  var isGeneralBold = (state2, key) => {
+    var _a, _b;
+    return ((_b = (_a = state2.assetSnapshot) == null ? void 0 : _a.boldFields) == null ? void 0 : _b.includes(key)) === true;
+  };
   function parseState(input, assets2, { allowIncomplete = false } = {}) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
     if (!input || input.app !== APP_ID || ![1, SCHEMA_VERSION].includes(input.schemaVersion))
       throw Error(
         "JSON non compatibile. Usa una scheda esportata da questa versione. Le bozze precedenti rimangono nel browser."
@@ -324,10 +334,13 @@
     out.filename = safeFilename(text(input.filename));
     out.customFilename = input.customFilename === true;
     out.section = importedSection(input.section, input.editorVersion);
+    const defaults = ((_a = assets2.find((asset2) => asset2.id === input.assetId)) == null ? void 0 : _a.fixed) || {};
     for (const key of Object.keys(out.general)) {
       if (["complex", "owner"].includes(key) && !Object.hasOwn(input.general || {}, key))
-        out.general[key] = typeof ((_a = input.fixedCommon) == null ? void 0 : _a[key]) === "string" ? input.fixedCommon[key] : COMMON[key];
-      else out.general[key] = text((_b = input.general) == null ? void 0 : _b[key]);
+        out.general[key] = typeof ((_b = input.fixedCommon) == null ? void 0 : _b[key]) === "string" ? input.fixedCommon[key] : COMMON[key];
+      else if (!Object.hasOwn(input.general || {}, key) && Object.hasOwn(defaults, key))
+        out.general[key] = String(defaults[key]);
+      else out.general[key] = text((_c = input.general) == null ? void 0 : _c[key]);
     }
     out.fixedCommon = { ...COMMON, complex: out.general.complex, owner: out.general.owner };
     out.general.date = date(out.general.date);
@@ -341,11 +354,11 @@
       }
     }
     out.history.restorations = records2(
-      (_c = input.history) == null ? void 0 : _c.restorations,
+      (_d = input.history) == null ? void 0 : _d.restorations,
       historyRecord,
       ["date", "action"]
     );
-    out.history.maintenance = records2((_d = input.history) == null ? void 0 : _d.maintenance, historyRecord, [
+    out.history.maintenance = records2((_e = input.history) == null ? void 0 : _e.maintenance, historyRecord, [
       "date",
       "action"
     ]);
@@ -423,15 +436,15 @@
     };
     out.photos = arr(input.photos).map(photo);
     out.photoArchive = arr(input.photoArchive || []).map(photo);
-    out.immediate.date = date((_e = input.immediate) == null ? void 0 : _e.date);
-    out.immediate.executedDate = date((_f = input.immediate) == null ? void 0 : _f.executedDate);
-    out.immediate.records = records2((_g = input.immediate) == null ? void 0 : _g.records, immediateRecord, [
+    out.immediate.date = date((_f = input.immediate) == null ? void 0 : _f.date);
+    out.immediate.executedDate = date((_g = input.immediate) == null ? void 0 : _g.executedDate);
+    out.immediate.records = records2((_h = input.immediate) == null ? void 0 : _h.records, immediateRecord, [
       "area",
       "action"
     ]);
-    out.immediate.notes = text((_h = input.immediate) == null ? void 0 : _h.notes);
-    out.preventive.date = date((_i = input.preventive) == null ? void 0 : _i.date);
-    out.preventive.notes = text((_j = input.preventive) == null ? void 0 : _j.notes);
+    out.immediate.notes = text((_i = input.immediate) == null ? void 0 : _i.notes);
+    out.preventive.date = date((_j = input.preventive) == null ? void 0 : _j.date);
+    out.preventive.notes = text((_k = input.preventive) == null ? void 0 : _k.notes);
     const survey = (value, fallback = {}) => ({
       id: text(value == null ? void 0 : value.id) || fallback.id || uid(),
       date: date((value == null ? void 0 : value.date) || fallback.date),
@@ -511,14 +524,14 @@
         immediate: ids("immediate"),
         resolved: ids("resolved")
       };
-      const previous = (_k = out.surveys.filter((v) => v.id !== out.survey.id).at(-1)) == null ? void 0 : _k.data;
+      const previous = (_l = out.surveys.filter((v) => v.id !== out.survey.id).at(-1)) == null ? void 0 : _l.data;
       if (previous) {
         if (!baseline.priorities) out.updateBaseline.priorities = previous.priorities.map((r) => r.id);
         if (!baseline.immediate) out.updateBaseline.immediate = previous.immediate.records.map((r) => r.id);
         if (!baseline.resolved) out.updateBaseline.resolved = previous.diagnosis.filter((r) => r.resolvedDate).map((r) => r.id);
       }
     }
-    return applyFixed(out, assets2);
+    return applyFixed(out, assets2, { initialize: false });
   }
   function surveyData(state2, { clone = true } = {}) {
     const keys = [
@@ -599,21 +612,22 @@
     return ((_a = baselineIndexes.get(baseline)[collection]) == null ? void 0 : _a.has(id)) || false;
   }
   function lockedPath(state2, path) {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     const baseline = state2.updateBaseline;
     const [group, index, key, actionIndex] = path.split(".");
+    if (group === "general" && Object.hasOwn(((_a = state2.assetSnapshot) == null ? void 0 : _a.fixed) || {}, index)) return true;
     if (group === "general" && ["object", "complex", "owner"].includes(index)) return true;
-    if (group === "diagnosis" && key === "actions" && ((_a = state2.diagnosis[index]) == null ? void 0 : _a.resolvedDate)) return true;
+    if (group === "diagnosis" && key === "actions" && ((_b = state2.diagnosis[index]) == null ? void 0 : _b.resolvedDate)) return true;
     if (!baseline) return false;
     if (group === "general") return true;
-    if (group === "priorities") return wasPresent(baseline, "priorities", (_b = state2.priorities[index]) == null ? void 0 : _b.id);
+    if (group === "priorities") return wasPresent(baseline, "priorities", (_c = state2.priorities[index]) == null ? void 0 : _c.id);
     if (group === "immediate" && index === "records")
-      return wasPresent(baseline, "immediate", (_c = state2.immediate.records[key]) == null ? void 0 : _c.id);
-    if (group === "conditions") return wasPresent(baseline, "conditions", (_d = state2.conditions[index]) == null ? void 0 : _d.id);
-    if (group === "history") return wasPresent(baseline, index, (_f = (_e = state2.history[index]) == null ? void 0 : _e[key]) == null ? void 0 : _f.id);
+      return wasPresent(baseline, "immediate", (_d = state2.immediate.records[key]) == null ? void 0 : _d.id);
+    if (group === "conditions") return wasPresent(baseline, "conditions", (_e = state2.conditions[index]) == null ? void 0 : _e.id);
+    if (group === "history") return wasPresent(baseline, index, (_g = (_f = state2.history[index]) == null ? void 0 : _f[key]) == null ? void 0 : _g.id);
     if (group === "diagnosis") {
       const row = state2.diagnosis[index];
-      if (key === "actions") return wasPresent(baseline, "actions", (_g = row == null ? void 0 : row.actions[actionIndex]) == null ? void 0 : _g.id);
+      if (key === "actions") return wasPresent(baseline, "actions", (_h = row == null ? void 0 : row.actions[actionIndex]) == null ? void 0 : _h.id);
       if (key === "resolvedAction") return wasPresent(baseline, "resolved", row == null ? void 0 : row.id);
       return key !== "resolvedDate" && wasPresent(baseline, "diagnosis", row == null ? void 0 : row.id);
     }
@@ -802,236 +816,472 @@
   var ASSETS = [
     {
       "id": "c01",
-      "label": "I Cappella \u2013 L'Annunciazione",
+      "label": "I Cappella, Annunciazione dell\u2019Angelo a Maria",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "I CAPPELLA, ANNUNCIAZIONE DELL\u2019ANGELO A MARIA",
+        "id": "02.03_2026",
+        "chronology": "XVII secolo",
+        "altitude": "600",
+        "distance": "2.072"
+      },
       "number": 1,
       "x": 48.82459,
       "y": 88.72497,
-      "fileLabel": "I_Cappella"
+      "fileLabel": "I_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "c02",
-      "label": "II Cappella \u2013 La Visitazione di Maria a Elisabetta",
+      "label": "II Cappella, La Visita di Maria ad Elisabetta",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "II CAPPELLA, LA VISITA DI MARIA AD ELISABETTA",
+        "id": "02.04_2026",
+        "chronology": "XVII secolo",
+        "altitude": "612",
+        "distance": "1.947"
+      },
       "number": 2,
       "x": 51.7179,
       "y": 81.34879,
-      "fileLabel": "II_Cappella"
+      "fileLabel": "II_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "c03",
-      "label": "III Cappella \u2013 La Nativit\xE0 di Ges\xF9",
+      "label": "III Cappella, La Nascita di Ges\xF9",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "III CAPPELLA, LA NASCITA DI GES\xD9",
+        "id": "02.05_2026",
+        "chronology": "XVII secolo",
+        "altitude": "623",
+        "distance": "1.830"
+      },
       "number": 3,
       "x": 53.88788,
       "y": 70.70601,
-      "fileLabel": "III_Cappella"
+      "fileLabel": "III_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "c04",
-      "label": "IV Cappella \u2013 La Presentazione di Ges\xF9 al Tempio",
+      "label": "IV Cappella, La Presentazione al Tempio",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "IV CAPPELLA, LA PRESENTAZIONE AL TEMPIO",
+        "id": "02.06_2026",
+        "chronology": "XVII secolo",
+        "altitude": "627",
+        "distance": "1.754"
+      },
       "number": 4,
       "x": 68.89693,
       "y": 72.91886,
-      "fileLabel": "IV_Cappella"
+      "fileLabel": "IV_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "c05",
-      "label": "V Cappella \u2013 La Disputa di Ges\xF9 con i Dottori nel Tempio",
+      "label": "V Cappella, La Disputa di Ges\xF9 con i Dottori",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "V CAPPELLA, LA DISPUTA DI GES\xD9 CON I DOTTORI",
+        "id": "02.07_2026",
+        "chronology": "XVII secolo",
+        "altitude": "646",
+        "distance": "1.651"
+      },
       "number": 5,
       "x": 64.01447,
       "y": 64.80506,
-      "fileLabel": "V_Cappella"
+      "fileLabel": "V_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "grotte",
-      "label": "Grotte delle Romite, Beate Caterina e Giuliana",
+      "label": "Grotta delle Romite",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "GROTTA DELLE ROMITE",
+        "id": "02.11_2026",
+        "chronology": "XVII secolo",
+        "altitude": "668",
+        "distance": "1.374"
+      },
       "x": 49,
       "y": 65,
-      "fileLabel": "Grotta_delle_Romite"
+      "fileLabel": "Grotta_delle_Romite",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "c06",
-      "label": "VI Cappella \u2013 L'Orazione di Ges\xF9 nell'Orto degli Ulivi",
+      "label": "VI Cappella, L\u2019Orazione nell\u2019Orto",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "VI CAPPELLA, L\u2019ORAZIONE NELL\u2019ORTO",
+        "id": "02.10_2026",
+        "chronology": "XVII secolo",
+        "altitude": "660",
+        "distance": "1.651"
+      },
       "number": 6,
       "x": 44.12297,
       "y": 70.5,
-      "fileLabel": "VI_Cappella"
+      "fileLabel": "VI_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "c07",
-      "label": "VII Cappella \u2013 La Flagellazione di Ges\xF9",
+      "label": "VII Cappella, La Flagellazione",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "VII CAPPELLA, LA FLAGELLAZIONE",
+        "id": "02.13_2026",
+        "chronology": "XVII secolo",
+        "altitude": "670",
+        "distance": "1.371"
+      },
       "number": 7,
       "x": 40.3255,
       "y": 65.54268,
-      "fileLabel": "VII_Cappella"
+      "fileLabel": "VII_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "c08",
-      "label": "VIII Cappella \u2013 L'Incoronazione di Spine",
+      "label": "VIII Cappella, La Coronazione di Spine",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "VIII CAPPELLA, LA CORONAZIONE DI SPINE",
+        "id": "02.14_2026",
+        "chronology": "XVII secolo",
+        "altitude": "683",
+        "distance": "1.200"
+      },
       "number": 8,
       "x": 38.51718,
       "y": 57.3235,
-      "fileLabel": "VIII_Cappella"
+      "fileLabel": "VIII_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "c09",
-      "label": "IX Cappella \u2013 La Salita di Ges\xF9 al Calvario",
+      "label": "IX Cappella, La Salita al Calvario",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "IX CAPPELLA, LA SALITA AL CALVARIO",
+        "id": "02.15_2026",
+        "chronology": "XVII secolo",
+        "altitude": "700",
+        "distance": "1.074"
+      },
       "number": 9,
       "x": 39.24051,
       "y": 49.94731,
-      "fileLabel": "IX_Cappella"
+      "fileLabel": "IX_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "c10",
-      "label": "X Cappella \u2013 La Crocifissione di Ges\xF9",
+      "label": "X Cappella, La Crocefissione",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "X CAPPELLA, LA CROCEFISSIONE",
+        "id": "02.16_2026",
+        "chronology": "XVII secolo",
+        "altitude": "721",
+        "distance": "945"
+      },
       "number": 10,
       "x": 37.43219,
       "y": 37.19705,
-      "fileLabel": "X_Cappella"
+      "fileLabel": "X_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "c11",
-      "label": "XI Cappella \u2013 La Risurrezione di Ges\xF9",
+      "label": "XI Cappella, La Resurrezione",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "XI CAPPELLA, LA RESURREZIONE",
+        "id": "02.18_2026",
+        "chronology": "XVII secolo",
+        "altitude": "738",
+        "distance": "825"
+      },
       "number": 11,
       "x": 47.37794,
       "y": 46.68072,
-      "fileLabel": "XI_Cappella"
+      "fileLabel": "XI_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "c12",
-      "label": "XII Cappella \u2013 L'Ascensione di Ges\xF9 al Cielo",
+      "label": "XII Cappella, L\u2019Ascensione",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "XII CAPPELLA, L\u2019ASCENSIONE",
+        "id": "02.19_2026",
+        "chronology": "XVII secolo",
+        "altitude": "746",
+        "distance": "590"
+      },
       "number": 12,
       "x": 56.41953,
       "y": 51.42255,
-      "fileLabel": "XII_Cappella"
+      "fileLabel": "XII_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "c13",
-      "label": "XIII Cappella \u2013 La Discesa dello Spirito Santo",
+      "label": "XIII Cappella, La Discesa dello Spirito Santo",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "XIII CAPPELLA, LA DISCESA DELLO SPIRITO SANTO",
+        "id": "02.20_2026",
+        "chronology": "XVII secolo",
+        "altitude": "752",
+        "distance": "360"
+      },
       "number": 13,
       "x": 56.05787,
       "y": 41.51739,
-      "fileLabel": "XIII_Cappella"
+      "fileLabel": "XIII_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "c14",
-      "label": "XIV Cappella \u2013 L'Assunzione di Maria Vergine al Cielo",
+      "label": "XIV Cappella, L\u2019Assunzione della Vergine",
       "kind": "chapel",
-      "fixed": {},
+      "fixed": {
+        "object": "XIV CAPPELLA, L\u2019ASSUNZIONE DELLA VERGINE",
+        "id": "02.21_2026",
+        "chronology": "XVII secolo",
+        "altitude": "785",
+        "distance": "360"
+      },
       "number": 14,
       "x": 44.3038,
       "y": 26.23815,
-      "fileLabel": "XIV_Cappella"
+      "fileLabel": "XIV_Cappella",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "arco1",
-      "label": "Primo Arco \u2013 Arco della Madonna del Rosario",
+      "label": "Primo Arco, Arco della Madonna del Rosario",
       "kind": "arch",
-      "fixed": {},
+      "fixed": {
+        "object": "PRIMO ARCO, ARCO DELLA MADONNA DEL ROSARIO",
+        "id": "02.01_2026",
+        "chronology": "XVII secolo",
+        "altitude": "595",
+        "distance": "2.080"
+      },
       "number": 1,
       "x": 44.48463,
       "y": 90.93783,
-      "fileLabel": "Primo_Arco"
+      "fileLabel": "Primo_Arco",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "arco2",
-      "label": "Secondo Arco \u2013 Arco di San Carlo",
+      "label": "Secondo Arco, Arco di San Carlo",
       "kind": "arch",
-      "fixed": {},
+      "fixed": {
+        "object": "SECONDO ARCO, ARCO DI SAN CARLO",
+        "id": "02.08_2026",
+        "chronology": "XVII secolo",
+        "altitude": "646",
+        "distance": "1.646"
+      },
       "number": 2,
       "x": 53.52622,
       "y": 65.33193,
-      "fileLabel": "Secondo_Arco"
+      "fileLabel": "Secondo_Arco",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "arco3",
-      "label": "Terzo Arco \u2013 Arco di Sant'Ambrogio",
+      "label": "Terzo Arco, Arco di Sant\u2019Ambrogio",
       "kind": "arch",
-      "fixed": {},
+      "fixed": {
+        "object": "TERZO ARCO, ARCO DI SANT\u2019AMBROGIO",
+        "id": "02.17_2026",
+        "chronology": "XVII secolo",
+        "altitude": "724",
+        "distance": "938"
+      },
       "number": 3,
       "x": 42.67631,
       "y": 42.36038,
-      "fileLabel": "Terzo_Arco"
+      "fileLabel": "Terzo_Arco",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "f1",
-      "label": "Prima Fontana o delle Samaritane",
+      "label": "Prima Fontana, Fontana della Samaritana",
       "kind": "fountain",
-      "fixed": {},
+      "fixed": {
+        "object": "PRIMA FONTANA, FONTANA DELLA SAMARITANA",
+        "id": "02.02_2026",
+        "chronology": "XVII secolo",
+        "altitude": "600",
+        "distance": "2.072"
+      },
       "number": 1,
       "x": 42.85714,
       "y": 88.40885,
-      "fileLabel": "Prima_Fontana"
+      "fileLabel": "Prima_Fontana",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "f2",
-      "label": "Seconda Fontana",
+      "label": "Seconda Fontana, Arco di San Carlo",
       "kind": "fountain",
-      "fixed": {},
+      "fixed": {
+        "object": "SECONDA FONTANA, ARCO DI SAN CARLO",
+        "id": "02.09_2026",
+        "chronology": "XVII secolo",
+        "altitude": "646",
+        "distance": "1.648"
+      },
       "number": 2,
       "x": 54.43038,
       "y": 63.96207,
-      "fileLabel": "Seconda_Fontana"
+      "fileLabel": "Seconda_Fontana",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "f3",
-      "label": "Terza Fontana",
+      "label": "Terza Fontana, Arco di Sant\u2019Ambrogio",
       "kind": "fountain",
-      "fixed": {},
+      "fixed": {
+        "object": "TERZA FONTANA, ARCO DI SANT\u2019AMBROGIO",
+        "id": "02.24_2026",
+        "chronology": "XVII secolo",
+        "altitude": "724",
+        "distance": "938"
+      },
       "number": 3,
       "x": 42.49548,
       "y": 41.83351,
-      "fileLabel": "Terza_Fontana"
+      "fileLabel": "Terza_Fontana",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "fm",
       "label": "Fontana del Mos\xE8",
       "kind": "fountain",
-      "fixed": {},
+      "fixed": {
+        "object": "FONTANA DEL MOS\xC8",
+        "id": "02.22_2026",
+        "chronology": "XIX secolo",
+        "altitude": "805",
+        "distance": "340"
+      },
       "number": 4,
       "x": 39.60217,
       "y": 11.90727,
-      "fileLabel": "Fontana_del_Mos\xE8"
+      "fileLabel": "Fontana_del_Mos\xE8",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "acquedotto",
       "label": "Acquedotto",
       "kind": "aqueduct",
-      "fixed": {},
-      "fileLabel": "Acquedotto"
+      "fixed": {
+        "object": "ACQUEDOTTO",
+        "id": "02.12_2026",
+        "chronology": "Probabile XVII secolo"
+      },
+      "fileLabel": "Acquedotto",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     },
     {
       "id": "strada",
       "label": "Viale del Santuario e delle Cappelle",
       "kind": "road",
-      "fixed": {},
-      "fileLabel": "Viale"
+      "fixed": {
+        "object": "VIALE DEL SANTUARIO E DELLE CAPPELLE",
+        "id": "02.23_2026",
+        "chronology": "XVII secolo"
+      },
+      "fileLabel": "Viale",
+      "boldFields": [
+        "object",
+        "id"
+      ]
     }
   ];
 
@@ -1173,11 +1423,11 @@
         height: image.naturalHeight
       });
     }
-    return applyFixed(out, assets2);
+    return applyFixed(out, assets2, { initialize: false });
   }
 
   // recovered-smv/js/config.js
-  var VERSION = "3.6.15";
+  var VERSION = "3.6.16";
   var PWA_URL = "https://alessandromandelli.github.io/SMV/";
 
   // recovered-smv/js/pdf-layout.js
@@ -1408,12 +1658,12 @@
       );
       return lines.length * 16;
     }
-    label(page, label2, value, x, top, width, { bold = true, size = TYPE.body, minHeight = 12.5 } = {}) {
+    label(page, label2, value, x, top, width, { bold = true, boldValue = false, size = TYPE.body, minHeight = 12.5 } = {}) {
       const valueX = x + this.width(label2, size, bold) + 5;
-      const lines = this.wrap(value, Math.max(25, width - (valueX - x)), size);
+      const lines = this.wrap(value, Math.max(25, width - (valueX - x)), size, boldValue);
       this.text(page, label2, x, top, { bold, size });
       lines.forEach(
-        (line, i) => this.text(page, line, valueX, top + i * TYPE.leading, { size })
+        (line, i) => this.text(page, line, valueX, top + i * TYPE.leading, { size, bold: boldValue })
       );
       return Math.max(minHeight, lines.length * TYPE.leading);
     }
@@ -1440,7 +1690,10 @@
         this.rect(page, x - 1, y - 2, 356.6, height, {
           fill: "#d9d9d9"
         });
-        this.label(page, label2, value, x, y, 346.6, { minHeight: height });
+        this.label(page, label2, value, x, y, 346.6, {
+          minHeight: height,
+          boldValue: label2 === "ID Scheda:" && isGeneralBold(this.state, "id")
+        });
         y += height;
       }
       y = Math.max(102.3, y + 12);
@@ -1450,7 +1703,8 @@
         this.state.general.object,
         x,
         y,
-        PAGE.width - PAGE.margin - x
+        PAGE.width - PAGE.margin - x,
+        { boldValue: isGeneralBold(this.state, "object") }
       );
       y += this.label(page, "Operatori:", COMMON.company, x, y, 620);
       y += this.label(page, "Restauratore capofila:", COMMON.operator, x, y, 620);
@@ -1545,9 +1799,9 @@
       this.report.band(this.page, title, this.y, this.x, this.width);
       this.y += 32;
     }
-    paragraphHeight(label2, value, { size = TYPE.body, labelSize = size, indent = 0, boldLabel = true } = {}) {
+    paragraphHeight(label2, value, { size = TYPE.body, labelSize = size, indent = 0, boldLabel = true, boldValue = false } = {}) {
       const start = label2 ? this.report.width(label2, labelSize, boldLabel) + 5 : 0;
-      return this.report.wrap(value, this.width - indent - start, size).length * (Math.max(size, labelSize) * 1.2) + 6;
+      return this.report.wrap(value, this.width - indent - start, size, boldValue).length * (Math.max(size, labelSize) * 1.2) + 6;
     }
     paragraph(label2, value, {
       showEmpty = false,
@@ -1555,6 +1809,7 @@
       labelSize = size,
       indent = 0,
       boldLabel = true,
+      boldValue = false,
       color = COLORS.ink,
       keepTogether = true,
       after = 6
@@ -1565,7 +1820,8 @@
       const lines = this.report.wrap(
         value,
         Math.max(30, this.width - indent - start),
-        size
+        size,
+        boldValue
       );
       const height = lines.length * leading + after;
       if (keepTogether && height <= this.freshHeight()) this.ensure(height);
@@ -1584,7 +1840,7 @@
             line,
             this.x + indent + start,
             this.y + i * leading,
-            { size, color }
+            { size, color, bold: boldValue }
           )
         );
         const taken = Math.min(count, lines.length - offset);
@@ -1796,7 +2052,8 @@
         fill: "#d9d9d9"
       });
       report.label(page, label2, value, textX, headerY, 266.2, {
-        minHeight: height
+        minHeight: height,
+        boldValue: label2 === "ID Scheda:" && isGeneralBold(state2, "id")
       });
       headerY += height;
     }
@@ -1824,12 +2081,12 @@
       { page, x: left, width: columnWidth, y: top + 30, firstColumn: true }
     );
     const fields = [
-      ["Oggetto:", state2.general.object],
+      ["Oggetto:", state2.general.object, "object"],
       ["Cronologia:", state2.general.chronology],
       ["Autore:", state2.general.author]
     ];
     fields.forEach(
-      ([label2, value]) => flow.paragraph(label2, value, { showEmpty: true })
+      ([label2, value, key]) => flow.paragraph(label2, value, { showEmpty: true, boldValue: isGeneralBold(state2, key) })
     );
     const measureRow = (label2, value, x2, width) => report.label(flow.page, label2, value, x2, flow.y, width, {
       minHeight: 17.4
@@ -2405,8 +2662,8 @@
   }
   var blank = () => para("", { after: 0 });
   var pageBreak = () => '<w:p><w:pPr><w:pageBreakBefore/><w:keepNext/><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr></w:p>';
-  function label(title, value, { always = false, ...options } = {}) {
-    return always || filled(value) ? para(run(title, { bold: true }) + run(" " + (value ?? "")), options) : "";
+  function label(title, value, { always = false, boldValue = false, ...options } = {}) {
+    return always || filled(value) ? para(run(title, { bold: true }) + run(" " + (value ?? ""), { bold: boldValue }), options) : "";
   }
   var band = (title, keep = true) => para(run(title, { bold: true, size: 20, color: "FFFFFF" }), { before: 100, after: 0, shade: "005B60", keep, separator: true, line: 18 }) + `<w:p><w:pPr>${keep ? "<w:keepNext/>" : ""}<w:spacing w:before="0" w:after="0" w:line="120" w:lineRule="exact"/></w:pPr></w:p>`;
   var choices = (options, selected) => options.map((option) => run((Array.isArray(selected) ? selected.includes(option) : selected === option) ? "\u2611 " : "\u2610 ", { font: "DejaVu Sans" }) + run(option)).join(run("	"));
@@ -2532,19 +2789,19 @@
     const g = state2.general;
     function heading(title, date, first = false) {
       let metadata = para(run(title, { bold: true, size: 26, color: "005B60" }), { after: 210, style: "Title" });
-      metadata += label("ID Scheda:", g.id, { always: true, shade: "D9D9D9", after: 0 });
+      metadata += label("ID Scheda:", g.id, { always: true, shade: "D9D9D9", after: 0, boldValue: isGeneralBold(state2, "id") });
       metadata += label("Data:", displayDate(date), { always: true, shade: "D9D9D9", after: first ? 0 : 180 });
       if (first) {
         metadata += label("Ora:", g.time, { always: true, shade: "D9D9D9", after: 160 });
         metadata += para(run("Operatore: " + COMMON.operator, { bold: true }), { after: 90 });
         for (const text of [COMMON.company + " \u2013 " + COMMON.address, COMMON.email, "PEC \u2013 " + COMMON.pec]) metadata += para(run(text, { size: 16 }), { after: 20 });
       } else {
-        for (const [title2, value] of [["Oggetto:", g.object], ["Operatori:", COMMON.company], ["Restauratore capofila:", COMMON.operator], ["Interventi autorizzati da:", COMMON.authorization]]) metadata += label(title2, value, { always: true });
+        for (const [title2, value, key] of [["Oggetto:", g.object, "object"], ["Operatori:", COMMON.company], ["Restauratore capofila:", COMMON.operator], ["Interventi autorizzati da:", COMMON.authorization]]) metadata += label(title2, value, { always: true, boldValue: isGeneralBold(state2, key) });
       }
       return table([[branding(), metadata]], [1600, first ? 5824 : WIDTH - 1600], { border: false, padding: 0, keepRows: false }) + blank();
     }
     let left = heading("SCHEDA DI ISPEZIONE PERIODICA", g.date, true) + band("1. IDENTIFICAZIONE DEL BENE");
-    for (const [title, value] of [["Oggetto:", g.object], ["Cronologia:", g.chronology], ["Autore:", g.author], ["Quota s.l.m.:", measureText(g.altitude)], ["Distanza Santuario:", measureText(g.distance)], ["Complesso:", g.complex], ["Ente Proprietario:", g.owner]]) left += label(title, value, { always: true });
+    for (const [title, value, key] of [["Oggetto:", g.object, "object"], ["Cronologia:", g.chronology], ["Autore:", g.author], ["Quota s.l.m.:", measureText(g.altitude)], ["Distanza Santuario:", measureText(g.distance)], ["Complesso:", g.complex], ["Ente Proprietario:", g.owner]]) left += label(title, value, { always: true, boldValue: isGeneralBold(state2, key) });
     left += band("2. SOGGETTO E DATI TECNICO-DIMENSIONALI") + label("Soggetto:", g.subject, { always: true });
     left += label("Dimensioni:", `H: ${measureText(g.height)}		L: ${measureText(g.width)}		P: ${measureText(g.depth)}`, { always: true });
     left += label("Materie e Tecniche:", g.materials, { always: true });
@@ -2865,6 +3122,7 @@
     return targets;
   }
   function editField(state2, path, value, { correction = false } = {}) {
+    var _a;
     const keys = path.split(".");
     if (keys.some((key) => ["__proto__", "prototype", "constructor"].includes(key)))
       throw Error("Campo non valido.");
@@ -2888,6 +3146,8 @@
     }
     if (keys[0] === "general" && ["complex", "owner"].includes(property) && state2.fixedCommon)
       state2.fixedCommon[property] = value;
+    if (keys[0] === "general" && Object.hasOwn(((_a = state2.assetSnapshot) == null ? void 0 : _a.fixed) || {}, property))
+      state2.assetSnapshot.fixed[property] = value;
     if (path === "general.date" && !state2.updateBaseline && !state2.surveys.some((visit) => visit.id !== state2.survey.id)) state2.survey.date = value;
     if (correction && diagnosis && property === "resolvedDate" && !value) pruneBaseline(state2);
     let linksChanged = false;
@@ -3210,9 +3470,10 @@
     unit = false
   } = {}) {
     const val = value ?? get(path);
+    const bold = path.startsWith("general.") && isGeneralBold(state, path.split(".")[1]);
     fixed = fixed || fieldIsLocked(path);
     const read = fixed ? ' readonly aria-readonly="true"' : "";
-    const common = `data-path="${escape2(path)}"${read}${unit ? ' data-measure="true" inputmode="decimal"' : ""}`;
+    const common = `data-path="${escape2(path)}"${bold ? ' class="field-value-bold"' : ""}${read}${unit ? ' data-measure="true" inputmode="decimal"' : ""}`;
     const control = multiline ? `<textarea ${common} rows="3">${escape2(val)}</textarea>` : `<input type="${type}" ${common} value="${escape2(val)}"${unit ? ' placeholder="m"' : ""}>`;
     return `<label class="field${wide ? " wide" : ""}"><span>${escape2(label2)}${fixed ? ' <span aria-label="non modificabile">\u{1F512}</span>' : ""}${unit ? " <small>(m)</small>" : ""}</span>${control}</label>`;
   }
@@ -3243,11 +3504,7 @@
     return `<aside class="map-panel"><h2>LOCALIZZAZIONE BENE</h2><div class="map-frame"><img src="./assets/map.jpg" alt="Planimetria del percorso del Sacro Monte di Varese">${road}${checks}</div></aside>`;
   }
   function firstSection() {
-    const fixed = asset().fixed || {};
-    const general = (label2, key, options = {}) => field2(label2, "general." + key, {
-      ...options,
-      fixed: Object.hasOwn(fixed, key)
-    });
+    const general = (label2, key, options = {}) => field2(label2, "general." + key, options);
     return `<div class="first-layout"><div><div class="fields">${field2("ID scheda", "general.id", { wide: true })}${field2("Data", "general.date", { type: "date" })}${field2("Ora", "general.time", { type: "time" })}</div>
   ${band2("1. IDENTIFICAZIONE DEL BENE")}<div class="fields">${general("Oggetto", "object", { wide: true })}${general("Cronologia", "chronology")}${general("Autore", "author")}${general("Quota s.l.m.", "altitude", { unit: true })}${general("Distanza dal Santuario", "distance", { unit: true })}${general("Complesso", "complex", { wide: true })}${general("Ente proprietario", "owner", { wide: true })}</div>
   ${band2("2. SOGGETTO E DATI TECNICO-DIMENSIONALI")}<div class="fields">${general("Soggetto", "subject", { wide: true, multiline: true })}</div><div class="fields three wide-note">${general("Altezza H", "height", { unit: true })}${general("Larghezza L", "width", { unit: true })}${general("Profondit\xE0 P", "depth", { unit: true })}</div><div class="wide-note">${general("Materie e Tecniche", "materials", { multiline: true })}</div></div>${mapHtml()}</div>`;
@@ -3461,7 +3718,8 @@
       state.customFilename = false;
       state.filename = "";
       state.assetSnapshot = structuredClone(selected);
-      editField(state, "general.object", selected.label, { correction: true });
+      for (const [key2, value] of Object.entries(selected.fixed))
+        editField(state, "general." + key2, String(value), { correction: true });
       for (const visit of state.surveys) visit.data.assetId = selected.id;
       changed();
       render();
