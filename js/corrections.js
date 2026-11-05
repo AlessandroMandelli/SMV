@@ -62,6 +62,8 @@ export function editField(state, path, value, { correction = false } = {}) {
   }
   if (keys[0] === "general" && ["complex", "owner"].includes(property) && state.fixedCommon)
     state.fixedCommon[property] = value;
+  if (keys[0] === "general" && Object.hasOwn(state.assetSnapshot?.fixed || {}, property))
+    state.assetSnapshot.fixed[property] = value;
   if (path === "general.date" && !state.updateBaseline &&
     !state.surveys.some(visit => visit.id !== state.survey.id)) state.survey.date = value;
   if (correction && diagnosis && property === "resolvedDate" && !value) pruneBaseline(state);

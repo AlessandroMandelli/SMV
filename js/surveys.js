@@ -68,6 +68,7 @@ function wasPresent(baseline, collection, id) {
 export function lockedPath(state, path) {
   const baseline = state.updateBaseline;
   const [group, index, key, actionIndex] = path.split(".");
+  if (group === "general" && Object.hasOwn(state.assetSnapshot?.fixed || {}, index)) return true;
   if (group === "general" && ["object", "complex", "owner"].includes(index)) return true;
   if (group === "diagnosis" && key === "actions" && state.diagnosis[index]?.resolvedDate) return true;
   if (!baseline) return false;

@@ -164,5 +164,5 @@ export async function migrateLegacy(legacy, assets) {
       height: image.naturalHeight,
     });
   }
-  return applyFixed(out, assets);
+  return applyFixed(out, assets, { initialize: false });
 }

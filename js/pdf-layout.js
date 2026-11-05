@@ -1,4 +1,4 @@
-import { COMMON, displayDate } from "./model.js";
+import { COMMON, displayDate, isGeneralBold } from "./model.js";
 
 /** Unità in punti PDF. Margini di 10,16 mm, come nel Word. */
 export const PAGE = Object.freeze({
@@ -255,13 +255,13 @@ export class PdfReport {
     x,
     top,
     width,
-    { bold = true, size = TYPE.body, minHeight = 12.5 } = {},
+    { bold = true, boldValue = false, size = TYPE.body, minHeight = 12.5 } = {},
   ) {
     const valueX = x + this.width(label, size, bold) + 5;
-    const lines = this.wrap(value, Math.max(25, width - (valueX - x)), size);
+    const lines = this.wrap(value, Math.max(25, width - (valueX - x)), size, boldValue);
     this.text(page, label, x, top, { bold, size });
     lines.forEach((line, i) =>
-      this.text(page, line, valueX, top + i * TYPE.leading, { size }),
+      this.text(page, line, valueX, top + i * TYPE.leading, { size, bold: boldValue }),
     );
     return Math.max(minHeight, lines.length * TYPE.leading);
   }
@@ -290,7 +290,9 @@ export class PdfReport {
       this.rect(page, x - 1, y - 2, 356.6, height, {
         fill: "#d9d9d9",
       });
-      this.label(page, label, value, x, y, 346.6, { minHeight: height });
+      this.label(page, label, value, x, y, 346.6, {
+        minHeight: height, boldValue: label === "ID Scheda:" && isGeneralBold(this.state, "id"),
+      });
       y += height;
     }
     y = Math.max(102.3, y + 12);
@@ -301,6 +303,7 @@ export class PdfReport {
       x,
       y,
       PAGE.width - PAGE.margin - x,
+      { boldValue: isGeneralBold(this.state, "object") },
     );
     y += this.label(page, "Operatori:", COMMON.company, x, y, 620);
     y += this.label(page, "Restauratore capofila:", COMMON.operator, x, y, 620);
@@ -404,13 +407,13 @@ export class Flow {
   paragraphHeight(
     label,
     value,
-    { size = TYPE.body, labelSize = size, indent = 0, boldLabel = true } = {},
+    { size = TYPE.body, labelSize = size, indent = 0, boldLabel = true, boldValue = false } = {},
   ) {
     const start = label
       ? this.report.width(label, labelSize, boldLabel) + 5
       : 0;
     return (
-      this.report.wrap(value, this.width - indent - start, size).length *
+      this.report.wrap(value, this.width - indent - start, size, boldValue).length *
         (Math.max(size, labelSize) * 1.2) +
       6
     );
@@ -424,6 +427,7 @@ export class Flow {
       labelSize = size,
       indent = 0,
       boldLabel = true,
+      boldValue = false,
       color = COLORS.ink,
       keepTogether = true,
       after = 6,
@@ -438,6 +442,7 @@ export class Flow {
       value,
       Math.max(30, this.width - indent - start),
       size,
+      boldValue,
     );
     const height = lines.length * leading + after;
     if (keepTogether && height <= this.freshHeight()) this.ensure(height);
@@ -458,7 +463,7 @@ export class Flow {
             line,
             this.x + indent + start,
             this.y + i * leading,
-            { size, color },
+            { size, color, bold: boldValue },
           ),
         );
       const taken = Math.min(count, lines.length - offset);

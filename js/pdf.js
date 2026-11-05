@@ -12,6 +12,7 @@ import {
   measureText,
   baseName,
   diagnosisHasContent,
+  isGeneralBold,
 } from "./model.js";
 import {
   PdfReport,
@@ -111,6 +112,7 @@ function identification(report, state, assets) {
     });
     report.label(page, label, value, textX, headerY, 266.2, {
       minHeight: height,
+      boldValue: label === "ID Scheda:" && isGeneralBold(state, "id"),
     });
     headerY += height;
   }
@@ -138,12 +140,12 @@ function identification(report, state, assets) {
     { page, x: left, width: columnWidth, y: top + 30, firstColumn: true },
   );
   const fields = [
-    ["Oggetto:", state.general.object],
+    ["Oggetto:", state.general.object, "object"],
     ["Cronologia:", state.general.chronology],
     ["Autore:", state.general.author],
   ];
-  fields.forEach(([label, value]) =>
-    flow.paragraph(label, value, { showEmpty: true }),
+  fields.forEach(([label, value, key]) =>
+    flow.paragraph(label, value, { showEmpty: true, boldValue: isGeneralBold(state, key) }),
   );
   const measureRow = (label, value, x, width) =>
     report.label(flow.page, label, value, x, flow.y, width, {

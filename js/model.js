@@ -275,17 +275,24 @@ export function displayMonth(value) {
   const [y, m] = value.split("-");
   return `${["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"][Number(m) - 1]} ${y}`;
 }
-/** I soli dati futuri dichiarati in fixed nell'archivio possono bloccare l'anagrafica. */
-export function applyFixed(state, assets) {
+/** I dati del catalogo inizializzano le nuove schede; la lettura di JSON e bozze
+ * conserva i valori salvati, comprese le correzioni e i campi svuotati. */
+export function applyFixed(state, assets, { initialize = true } = {}) {
   const selected = assets.find((a) => a.id === state.assetId);
   const fixed = selected?.fixed || {};
-  if (!state.general.object && selected) state.general.object = selected.label;
   state.assetSnapshot = selected ? structuredClone(selected) : null;
-  for (const key of Object.keys(state.general))
-    if (Object.hasOwn(fixed, key)) state.general[key] = String(fixed[key]);
+  if (initialize) {
+    if (!state.general.object && selected) state.general.object = fixed.object || selected.label;
+    for (const key of Object.keys(state.general))
+      if (Object.hasOwn(fixed, key)) state.general[key] = String(fixed[key]);
+  }
+  if (state.assetSnapshot)
+    for (const key of Object.keys(fixed))
+      if (Object.hasOwn(state.general, key)) state.assetSnapshot.fixed[key] = state.general[key];
   state.fixedCommon = { ...COMMON, complex: state.general.complex, owner: state.general.owner };
   return state;
 }
+export const isGeneralBold = (state, key) => state.assetSnapshot?.boldFields?.includes(key) === true;
 export function parseState(input, assets, { allowIncomplete = false } = {}) {
   if (!input || input.app !== APP_ID || ![1, SCHEMA_VERSION].includes(input.schemaVersion))
     throw Error(
@@ -335,11 +342,14 @@ export function parseState(input, assets, { allowIncomplete = false } = {}) {
   out.filename = safeFilename(text(input.filename));
   out.customFilename = input.customFilename === true;
   out.section = importedSection(input.section, input.editorVersion);
+  const defaults = assets.find(asset => asset.id === input.assetId)?.fixed || {};
   for (const key of Object.keys(out.general)) {
     // Le schede precedenti conservavano questi valori soltanto nei dati fissi.
     // Una correzione esplicitamente vuota deve invece rimanere vuota.
     if (["complex", "owner"].includes(key) && !Object.hasOwn(input.general || {}, key))
       out.general[key] = typeof input.fixedCommon?.[key] === "string" ? input.fixedCommon[key] : COMMON[key];
+    else if (!Object.hasOwn(input.general || {}, key) && Object.hasOwn(defaults, key))
+      out.general[key] = String(defaults[key]);
     else out.general[key] = text(input.general?.[key]);
   }
   out.fixedCommon = { ...COMMON, complex: out.general.complex, owner: out.general.owner };
@@ -512,7 +522,7 @@ export function parseState(input, assets, { allowIncomplete = false } = {}) {
       if (!baseline.resolved) out.updateBaseline.resolved = previous.diagnosis.filter(r => r.resolvedDate).map(r => r.id);
     }
   }
-  return applyFixed(out, assets);
+  return applyFixed(out, assets, { initialize: false });
 }
 
 /** Dati immutabili di un sopralluogo. Le foto sono referenziate, mai duplicate. */

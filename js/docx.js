@@ -1,6 +1,6 @@
 import {
   COMMON, METHODS, ROLES, STATUSES, windowsForRisk, diagnosisHasContent,
-  displayDate, measureText, baseName,
+  displayDate, measureText, baseName, isGeneralBold,
 } from "./model.js";
 import {
   surveyEntries, allPhotos, preventiveGroups, maintenanceEntries,
@@ -33,8 +33,8 @@ function para(content = "", { keep = false, after = 90, before = 0, align = "lef
 }
 const blank = () => para("", { after: 0 });
 const pageBreak = () => '<w:p><w:pPr><w:pageBreakBefore/><w:keepNext/><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr></w:p>';
-function label(title, value, { always = false, ...options } = {}) {
-  return always || filled(value) ? para(run(title, { bold: true }) + run(" " + (value ?? "")), options) : "";
+function label(title, value, { always = false, boldValue = false, ...options } = {}) {
+  return always || filled(value) ? para(run(title, { bold: true }) + run(" " + (value ?? ""), { bold: boldValue }), options) : "";
 }
 const band = (title, keep = true) => para(run(title, { bold: true, size: 20, color: "FFFFFF" }), { before: 100, after: 0, shade: "005B60", keep, separator: true, line: 18 }) + `<w:p><w:pPr>${keep ? "<w:keepNext/>" : ""}<w:spacing w:before="0" w:after="0" w:line="120" w:lineRule="exact"/></w:pPr></w:p>`;
 const choices = (options, selected) => options.map(option => run((Array.isArray(selected) ? selected.includes(option) : selected === option) ? "☑ " : "☐ ", { font: "DejaVu Sans" }) + run(option)).join(run("\t"));
@@ -132,19 +132,19 @@ export async function makeDocx(state, assets) {
   const g = state.general;
   function heading(title, date, first = false) {
     let metadata = para(run(title, { bold: true, size: 26, color: "005B60" }), { after: 210, style: "Title" });
-    metadata += label("ID Scheda:", g.id, { always: true, shade: "D9D9D9", after: 0 });
+    metadata += label("ID Scheda:", g.id, { always: true, shade: "D9D9D9", after: 0, boldValue: isGeneralBold(state, "id") });
     metadata += label("Data:", displayDate(date), { always: true, shade: "D9D9D9", after: first ? 0 : 180 });
     if (first) {
       metadata += label("Ora:", g.time, { always: true, shade: "D9D9D9", after: 160 });
       metadata += para(run("Operatore: " + COMMON.operator, { bold: true }), { after: 90 });
       for (const text of [COMMON.company + " – " + COMMON.address, COMMON.email, "PEC – " + COMMON.pec]) metadata += para(run(text, { size: 16 }), { after: 20 });
     } else {
-      for (const [title, value] of [["Oggetto:", g.object], ["Operatori:", COMMON.company], ["Restauratore capofila:", COMMON.operator], ["Interventi autorizzati da:", COMMON.authorization]]) metadata += label(title, value, { always: true });
+      for (const [title, value, key] of [["Oggetto:", g.object, "object"], ["Operatori:", COMMON.company], ["Restauratore capofila:", COMMON.operator], ["Interventi autorizzati da:", COMMON.authorization]]) metadata += label(title, value, { always: true, boldValue: isGeneralBold(state, key) });
     }
     return table([[branding(), metadata]], [1600, first ? 5824 : WIDTH - 1600], { border: false, padding: 0, keepRows: false }) + blank();
   }
   let left = heading("SCHEDA DI ISPEZIONE PERIODICA", g.date, true) + band("1. IDENTIFICAZIONE DEL BENE");
-  for (const [title, value] of [["Oggetto:", g.object], ["Cronologia:", g.chronology], ["Autore:", g.author], ["Quota s.l.m.:", measureText(g.altitude)], ["Distanza Santuario:", measureText(g.distance)], ["Complesso:", g.complex], ["Ente Proprietario:", g.owner]]) left += label(title, value, { always: true });
+  for (const [title, value, key] of [["Oggetto:", g.object, "object"], ["Cronologia:", g.chronology], ["Autore:", g.author], ["Quota s.l.m.:", measureText(g.altitude)], ["Distanza Santuario:", measureText(g.distance)], ["Complesso:", g.complex], ["Ente Proprietario:", g.owner]]) left += label(title, value, { always: true, boldValue: isGeneralBold(state, key) });
   left += band("2. SOGGETTO E DATI TECNICO-DIMENSIONALI") + label("Soggetto:", g.subject, { always: true });
   left += label("Dimensioni:", `H: ${measureText(g.height)}\t\tL: ${measureText(g.width)}\t\tP: ${measureText(g.depth)}`, { always: true });
   left += label("Materie e Tecniche:", g.materials, { always: true });

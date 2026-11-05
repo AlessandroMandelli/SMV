@@ -18,6 +18,7 @@ import {
   preventiveRecord,
   inheritedRiskSource,
   syncDiagnosticLinks,
+  isGeneralBold,
 } from "./model.js";
 import { beginSurvey, registerSurvey, suggestedSurveyDate, lockedPath, lockedRemoval, nextReference, archivePhoto, preventiveRows } from "./surveys.js";
 import * as storage from "./storage.js";
@@ -164,9 +165,10 @@ function field(
   } = {},
 ) {
   const val = value ?? get(path);
+  const bold = path.startsWith("general.") && isGeneralBold(state, path.split(".")[1]);
   fixed = fixed || fieldIsLocked(path);
   const read = fixed ? ' readonly aria-readonly="true"' : "";
-  const common = `data-path="${escape(path)}"${read}${unit ? ' data-measure="true" inputmode="decimal"' : ""}`;
+  const common = `data-path="${escape(path)}"${bold ? ' class="field-value-bold"' : ""}${read}${unit ? ' data-measure="true" inputmode="decimal"' : ""}`;
   const control = multiline
     ? `<textarea ${common} rows="3">${escape(val)}</textarea>`
     : `<input type="${type}" ${common} value="${escape(val)}"${unit ? ' placeholder="m"' : ""}>`;
@@ -203,12 +205,8 @@ function mapHtml() {
   return `<aside class="map-panel"><h2>LOCALIZZAZIONE BENE</h2><div class="map-frame"><img src="./assets/map.jpg" alt="Planimetria del percorso del Sacro Monte di Varese">${road}${checks}</div></aside>`;
 }
 function firstSection() {
-  const fixed = asset().fixed || {};
   const general = (label, key, options = {}) =>
-    field(label, "general." + key, {
-      ...options,
-      fixed: Object.hasOwn(fixed, key),
-    });
+    field(label, "general." + key, options);
   return `<div class="first-layout"><div><div class="fields">${field("ID scheda", "general.id", { wide: true })}${field("Data", "general.date", { type: "date" })}${field("Ora", "general.time", { type: "time" })}</div>
   ${band("1. IDENTIFICAZIONE DEL BENE")}<div class="fields">${general("Oggetto", "object", { wide: true })}${general("Cronologia", "chronology")}${general("Autore", "author")}${general("Quota s.l.m.", "altitude", { unit: true })}${general("Distanza dal Santuario", "distance", { unit: true })}${general("Complesso", "complex", { wide: true })}${general("Ente proprietario", "owner", { wide: true })}</div>
   ${band("2. SOGGETTO E DATI TECNICO-DIMENSIONALI")}<div class="fields">${general("Soggetto", "subject", { wide: true, multiline: true })}</div><div class="fields three wide-note">${general("Altezza H", "height", { unit: true })}${general("Larghezza L", "width", { unit: true })}${general("Profondità P", "depth", { unit: true })}</div><div class="wide-note">${general("Materie e Tecniche", "materials", { multiline: true })}</div></div>${mapHtml()}</div>`;
@@ -449,7 +447,8 @@ $("sectionContent").addEventListener("click", (event) => {
     state.customFilename = false;
     state.filename = "";
     state.assetSnapshot = structuredClone(selected);
-    editField(state, "general.object", selected.label, { correction: true });
+    for (const [key, value] of Object.entries(selected.fixed))
+      editField(state, "general." + key, String(value), { correction: true });
     for (const visit of state.surveys) visit.data.assetId = selected.id;
     changed(); render(); return;
   }
