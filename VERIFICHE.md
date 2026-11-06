@@ -1,24 +1,26 @@
-# Verifiche della revisione 3.6.18
+# Verifiche della revisione 3.6.19
 
-Base: checkpoint completo della 3.6.17. Cambiati soltanto i generatori Word/PDF e il relativo modulo di impaginazione, i metadati di versione, il bundle, la cache e la documentazione. Catalogo, immagini, stili, interfaccia e gestione dei dati conservati byte per byte.
+Base: versione 3.6.18 pubblicata nella repository SMV_V5. Recuperati tutti i 51 file e verificata la corrispondenza completa con lo ZIP precedentemente consegnato tramite SHA-256.
 
-## Word e PDF
+La modifica funzionale riguarda soltanto lo storico manutentivo nel PDF. Generatore Word, modulo generale di impaginazione, catalogo, immagini, stili, interfaccia e gestione dei dati sono identici alla 3.6.18. Aggiornati i metadati di versione, il bundle, la cache e la documentazione.
 
-Generati quattro Word e quattro PDF: date delle sezioni compilate con valori distinti, data iniziale cancellata, data reinserita dopo la cancellazione e ID lungo con data iniziale vuota. Controllate tutte le 32 pagine renderizzate e validato l'XML dei Word.
+## PDF e Word
 
-- Il valore dell'ID è a 12 pt nelle tre intestazioni; ID Scheda rimane a 9,5 pt e in grassetto. Verificati i 24 mezzi punti nell'XML Word e i 12 punti nel PDF effettivo. Conservati i grassetti del valore e l'allineamento sulla linea di base nel PDF.
-- La cancellazione della data iniziale, anche dopo esportazione e riapertura del JSON, lascia vuote le date delle tre intestazioni. Le etichette Data mantengono dimensione e posizione previste.
-- Quando la data iniziale è presente o viene reinserita, manutenzione immediata e azioni preventive conservano le proprie date, anche se diverse dalla prima scheda. Le esportazioni non modificano i valori memorizzati.
-- Date dei rilievi, di risoluzione, degli interventi eseguiti e della programmazione conservate sia con data iniziale compilata sia vuota.
-- ID lungo a capo nei riquadri senza tagli o riduzione sotto 12 pt. Quattro pagine per ciascun esempio nei due formati, senza nuove pagine dovute alla modifica.
-- Conservate le modifiche della 3.6.17: testo dello storico sotto Azione, titolo dell'atlante vuoto dopo la diagnostica senza pagina dedicata. Nessun campo modulo PDF trasparente.
+Generati due PDF con tre restauri e tre manutenzioni ciascuno, oltre a righe vuote da ignorare. Una prova contiene un'azione di restauro con 70 righe numerate e prosegue su più pagine. Verificato anche il layout della scheda priva di interventi.
 
-Word renderizzato con LibreOffice; Microsoft Word per Mac non è disponibile in questo ambiente. I test di iPhone sono simulati, senza dispositivo fisico.
+- I titoli Interventi di RESTAURO precedenti e Interventi di MANUTENZIONE precedenti compaiono una sola volta ciascuno nell'intero PDF, anche nelle continuazioni.
+- Tutti i sei pacchetti Data + Azione sono presenti, ordinati e separati da almeno una riga vuota. Data e inizio dell'azione rimangono sulla stessa pagina; i testi lunghi proseguono senza tagli o duplicazioni.
+- Conservate tutte le 70 righe del testo lungo, una sola volta. Azione mantiene l'etichetta su una riga propria e il testo seguente allineato a sinistra.
+- Le righe vuote non producono interventi; le categorie vuote non producono sottotitoli. La scheda vuota mantiene quattro pagine.
+- Verificate le correzioni della 3.6.18: valore ID a 12 pt, etichetta a 9,5 pt, date delle intestazioni vuote quando manca la data iniziale e titolo dell'atlante vuoto dopo la sezione 5.
+- I due PDF hanno rispettivamente cinque e sei pagine. Controllate visivamente tutte le 11 pagine e verificati anche testo del PDF effettivo e assenza di campi modulo trasparenti. Le esportazioni non modificano i dati della scheda.
+
+Il generatore Word è stato confrontato byte per byte con la 3.6.18 ed è invariato. Non è stata apportata alcuna modifica alla sua impaginazione.
 
 ## Download e distribuzione
 
-Superate le combinazioni JSON, PDF + JSON, DOCX + JSON e DOCX + PDF + JSON offline, su desktop e iPhone simulato. Il JSON rimane obbligatorio, il DOCX nativo non richiede un PDF intermedio. Su iPhone più formati vengono raccolti in un solo ZIP.
+Superate le combinazioni JSON, PDF + JSON, DOCX + JSON e DOCX + PDF + JSON offline, su desktop e iPhone simulato, senza dispositivo fisico. Il JSON rimane obbligatorio e il DOCX nativo non richiede un PDF intermedio. Su iPhone più formati vengono raccolti in un solo ZIP.
 
-Cache aggiornata dalla 3.6.17 alla 3.6.18 con 21 risorse, navigazione offline, bozza conservata e isolamento dalle altre app. Bundle e sorgenti JavaScript verificati.
+Cache aggiornata dalla 3.6.18 alla 3.6.19 con 21 risorse, navigazione offline e isolamento dalle altre app. Bundle e sorgenti JavaScript verificati.
 
-51 file pronti per la radice GitHub, inclusi mappa e catalogo. Esclusi Word, PDF e JSON di prova, vecchi template e node_modules. ZIP verificato con CRC, unzip -t ed estrazione e confronto di tutti i file. Nessuna pubblicazione o modifica automatica della repository.
+51 file pronti per la radice GitHub, inclusi mappa e catalogo. Esclusi documenti e JSON di prova, vecchi template e node_modules. ZIP verificato con CRC, unzip -t ed estrazione e confronto di tutti i file. Nessuna pubblicazione o modifica automatica della repository.
