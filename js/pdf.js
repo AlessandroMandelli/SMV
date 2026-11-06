@@ -249,31 +249,35 @@ function historyAndCondition(flow, state) {
     ["restorations", "Interventi di RESTAURO precedenti"],
     ["maintenance", "Interventi di MANUTENZIONE precedenti"],
   ]) {
-    for (const row of state.history[key].filter((r) =>
+    const rows = state.history[key].filter((r) =>
       [r.date, r.action].some(hasText),
-    )) {
+    );
+    for (const [index, row] of rows.entries()) {
+      const titleHeight = index === 0 ? 18 : 0;
       const height =
-        18 +
+        titleHeight +
         (hasText(row.date)
           ? flow.paragraphHeight("Data:", row.date)
           : 0) +
         (hasText(row.action)
           ? TYPE.leading + flow.paragraphHeight("", row.action)
           : 0) +
-        8;
+        TYPE.leading;
       // I testi superiori a una pagina iniziano con titolo, data ed etichetta,
       // poi proseguono al margine sinistro senza lasciare un titolo isolato.
-      const minimum = 18 + (hasText(row.date) ? flow.paragraphHeight("Data:", row.date) : 0) +
-        (hasText(row.action) ? TYPE.leading * 2 : 0) + 8;
+      const minimum = titleHeight + (hasText(row.date) ? flow.paragraphHeight("Data:", row.date) : 0) +
+        (hasText(row.action) ? TYPE.leading * 2 : 0) + TYPE.leading;
       flow.ensure(height <= flow.freshHeight() ? height : minimum);
-      flow.report.text(flow.page, title, flow.x, flow.y, { bold: true });
-      flow.y += 18;
+      if (index === 0) {
+        flow.report.text(flow.page, title, flow.x, flow.y, { bold: true });
+        flow.y += titleHeight;
+      }
       flow.paragraph("Data:", row.date);
       if (hasText(row.action)) {
         flow.paragraph("Azione:", "", { showEmpty: true, after: 0 });
         flow.paragraph("", row.action, { keepTogether: false });
       }
-      flow.y += 8;
+      flow.y += TYPE.leading;
     }
   }
   flow.section(CONDITION_TITLE, 18);
