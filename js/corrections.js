@@ -106,11 +106,6 @@ function removeId(rows, id) {
 /** Rimozione correttiva: elimina la voce da tutte le copie, senza archiviarla. */
 export function purgeRecord(state, { action, key, index, row }) {
   let i = Number(index);
-  if (action === "remove-priority" && state.priorities[i]?.diagnosisId) {
-    i = state.diagnosis.findIndex(record => record.id === state.priorities[i].diagnosisId);
-    if (i < 0) return false;
-    action = "remove-diagnosis";
-  }
   if (action === "remove-photo") {
     const photo = state.photos[i];
     if (!photo) return false;
@@ -150,6 +145,7 @@ export function purgeRecord(state, { action, key, index, row }) {
       if (action === "remove-priority" && current.diagnosisId) {
         const source = data.diagnosis.find(record => record.id === current.diagnosisId);
         if (source) source.priorityExcluded = true;
+        data.priorities = data.priorities.filter(priority => priority.diagnosisId !== current.diagnosisId);
       }
       if (action === "remove-diagnosis")
         data.priorities = data.priorities.filter(priority => priority.diagnosisId !== id);

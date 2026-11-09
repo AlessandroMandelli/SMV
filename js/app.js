@@ -466,13 +466,14 @@ $("sectionContent").addEventListener("click", (event) => {
   }
   if (removalIsLocked(button.dataset)) return;
   if (action.startsWith("remove-")) {
-    const sourceIndex = action === "remove-priority"
-      ? state.diagnosis.findIndex(record => record.id === state.priorities[i]?.diagnosisId)
-      : action === "remove-diagnosis" ? i : -1;
-    const removesDiagnosis = sourceIndex >= 0;
+    const removesDiagnosis = action === "remove-diagnosis";
     if (
       !confirm(
-        pageUnlocked()
+        action === "remove-priority"
+          ? pageUnlocked()
+            ? "Eliminare definitivamente questa priorità da tutti i sopralluoghi? Il rilievo diagnostico e le azioni collegate vengono conservati."
+            : "Rimuovere questa priorità? Il rilievo diagnostico e le azioni collegate vengono conservati."
+          : pageUnlocked()
           ? removesDiagnosis
             ? "Eliminare definitivamente questa riga e le azioni collegate da tutti i sopralluoghi?"
             : "Eliminare definitivamente questo elemento da tutti i sopralluoghi?"
@@ -509,8 +510,8 @@ $("sectionContent").addEventListener("click", (event) => {
       break;
     case "remove-priority":
       if (state.priorities[i]?.diagnosisId) {
-        const source = state.diagnosis.findIndex(record => record.id === state.priorities[i].diagnosisId);
-        if (source >= 0) state.diagnosis.splice(source, 1);
+        const source = state.diagnosis.find(record => record.id === state.priorities[i].diagnosisId);
+        if (source) source.priorityExcluded = true;
       }
       state.priorities.splice(i, 1);
       break;

@@ -90,10 +90,6 @@ export function lockedPath(state, path) {
 /** Stessa regola per il pulsante disabilitato e per l'azione di cancellazione. */
 export function lockedRemoval(state, { action, key, index, row }) {
   const i = Number(index);
-  if (action === "remove-priority" && state.priorities[i]?.diagnosisId) {
-    const source = state.diagnosis.findIndex(record => record.id === state.priorities[i].diagnosisId);
-    if (source >= 0 && lockedPath(state, `diagnosis.${source}.area`)) return true;
-  }
   if (action === "remove-photo") {
     const photo = state.photos[i];
     return !!photo && state.surveys.some(visit =>

@@ -217,20 +217,13 @@ export function filenameDay(state) {
   const value = state.filenameDate || state.createdAt;
   return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : localDate(new Date(value));
 }
-/** Le vecchie bozze con sola data recuperano l'ora dalla creazione, senza usare
- * l'ora corrente: ripresa e salvataggi successivi mantengono lo stesso nome. */
-export function filenameTime(state) {
-  const value = state.filenameDate;
-  const timestamp = value && !/^\d{4}-\d{2}-\d{2}$/.test(value) ? value : state.createdAt;
-  return localTime(new Date(timestamp)).replace(":", "-");
-}
 export function baseName(state, assets) {
   if (state.customFilename && state.filename.trim())
     return safeFilename(state.filename);
   const asset = assets.find(item => item.id === state.assetId);
   const date = filenameDay(state);
-  const prefix = `scheda_ispezione_periodica_${asset?.fileLabel || "Bene"}_ID_`;
-  const suffix = "_" + date + "_" + filenameTime(state);
+  const prefix = `${asset?.fileLabel || "Bene"}_ID_`;
+  const suffix = "_scheda_ispezione_periodica_" + date;
   const identifier = (String(state.general.id || "").trim() || `XX.XX_${date.slice(0, 4)}`)
     .normalize("NFC")
     .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_")
