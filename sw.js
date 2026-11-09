@@ -1,5 +1,5 @@
 /* Cache isolata per il percorso della PWA. */
-const VERSION='3.6.19';
+const VERSION='3.6.20';
 const PREFIX='schede-restauro:'+self.registration.scope+':';
 const CACHE=PREFIX+VERSION;
 const FILES=[
@@ -8,7 +8,6 @@ const FILES=[
   "./assets/branding/anniversary.png",
   "./assets/branding/footer.jpg",
   "./assets/branding/logo.jpg",
-  "./assets/home-landscape.png",
   "./assets/icon-180.png",
   "./assets/icon-192.png",
   "./assets/icon-512.png",

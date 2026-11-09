@@ -1,26 +1,40 @@
-# Verifiche della revisione 3.6.19
+# Verifiche della revisione 3.6.20
 
-Base: versione 3.6.18 pubblicata nella repository SMV_V5. Recuperati tutti i 51 file e verificata la corrispondenza completa con lo ZIP precedentemente consegnato tramite SHA-256.
+Base: ultima versione 3.6.19 consegnata. Recuperati i 51 file e ricostruito l'archivio precedente, verificando l'identica corrispondenza SHA-256: `0f05fada0e8184b3409e434e36262455d57255ca525f85b705910fa2182d0a10`. La repository pubblica consultabile al momento del controllo conteneva una versione precedente e non è stata usata come base.
 
-La modifica funzionale riguarda soltanto lo storico manutentivo nel PDF. Generatore Word, modulo generale di impaginazione, catalogo, immagini, stili, interfaccia e gestione dei dati sono identici alla 3.6.18. Aggiornati i metadati di versione, il bundle, la cache e la documentazione.
+## Nomi, priorità e sopralluoghi
 
-## PDF e Word
+- Verificati i nomi automatici di tutti i 24 beni, con oggetto iniziale, ID, tipo di documento e data finale senza ora. Verificati ID lunghi, caratteri non ammessi, nome personalizzato, vecchi nomi automatici e importazione JSON. Catalogo, ID assegnati e mappa restano invariati.
+- Rimozione della sola priorità su nuova scheda e su scheda importata: conservati diagnosi, livello di rischio, azioni preventive, date di programmazione e interventi eseguiti. La priorità non ricompare dopo il salvataggio, la riapertura o l'avvio di un sopralluogo successivo.
+- Verificati tre sopralluoghi consecutivi, rimozione correttiva dalle copie storiche e protezioni del lucchetto. Coperti anche dati pregressi con identificativi diversi per priorità collegate allo stesso degrado. La cancellazione esplicita della diagnostica mantiene la rimozione delle voci collegate.
+- Eseguito il percorso dell'interfaccia: nuova scheda, inserimento diagnostica, rimozione priorità, caricamento e scatto foto, esportazione JSON, reimportazione, risoluzione e correzione con lucchetto. Conservati i blocchi anagrafici e le funzioni del catalogo per tutti i 24 beni.
 
-Generati due PDF con tre restauri e tre manutenzioni ciascuno, oltre a righe vuote da ignorare. Una prova contiene un'azione di restauro con 70 righe numerate e prosegue su più pagine. Verificato anche il layout della scheda priva di interventi.
+## Fotografie
 
-- I titoli Interventi di RESTAURO precedenti e Interventi di MANUTENZIONE precedenti compaiono una sola volta ciascuno nell'intero PDF, anche nelle continuazioni.
-- Tutti i sei pacchetti Data + Azione sono presenti, ordinati e separati da almeno una riga vuota. Data e inizio dell'azione rimangono sulla stessa pagina; i testi lunghi proseguono senza tagli o duplicazioni.
-- Conservate tutte le 70 righe del testo lungo, una sola volta. Azione mantiene l'etichetta su una riga propria e il testo seguente allineato a sinistra.
-- Le righe vuote non producono interventi; le categorie vuote non producono sottotitoli. La scheda vuota mantiene quattro pagine.
-- Verificate le correzioni della 3.6.18: valore ID a 12 pt, etichetta a 9,5 pt, date delle intestazioni vuote quando manca la data iniziale e titolo dell'atlante vuoto dopo la sezione 5.
-- I due PDF hanno rispettivamente cinque e sei pagine. Controllate visivamente tutte le 11 pagine e verificati anche testo del PDF effettivo e assenza di campi modulo trasparenti. Le esportazioni non modificano i dati della scheda.
+Prove con codifica e decodifica reali di immagini e controlli sul peso binario, usando adattatori per le API del browser:
 
-Il generatore Word è stato confrontato byte per byte con la 3.6.18 ed è invariato. Non è stata apportata alcuna modifica alla sua impaginazione.
+- JPEG da 16.717.967 byte ridotto a 1.728.328 byte, 2.400 × 1.800 pixel.
+- PNG da 19.175.561 byte convertito in JPEG da 1.912.240 byte, 2.400 × 1.867 pixel.
+- JPEG da 448.401 byte e PNG da 948.024 byte conservati byte per byte.
+- WebP convertito in JPEG compatibile con i documenti; JPEG con orientamento EXIF normalizzato con corretto scambio di larghezza e altezza.
+- Verificati l'ulteriore ridimensionamento quando le prime compressioni superano il limite, l'encoder senza risultato, i file non leggibili e il rilascio delle risorse anche in errore.
+- Provati entrambi i comandi Scatta foto e Carica foto. I file originali non vengono modificati. Le foto già contenute nei JSON importati non vengono ricompresse.
+
+## Word e PDF
+
+Generatori Word, PDF e modulo di impaginazione confrontati byte per byte con la 3.6.19: nessuna modifica. Generati una scheda Word e un PDF con cinque fotografie elaborate, due restauri, due manutenzioni, diagnosi conservata dopo la rimozione della priorità, azione preventiva storicizzata e intervento eseguito.
+
+- Sei pagine per ciascun formato; controllate visivamente tutte le 12 pagine, comprese le due pagine fotografiche con distribuzione 4 + 1 e intestazione ripetuta.
+- Confermati mappa e loghi, tabelle native del Word, ID a 12 pt, titoli dello storico manutentivo una sola volta per categoria, riquadro delle note, didascalie multilinea e date di risoluzione in grassetto.
+- La priorità eliminata non compare nei documenti, mentre diagnosi, azione preventiva e intervento rimangono presenti. Nessun campo modulo PDF trasparente. Tutte le parti XML del DOCX sono valide; le immagini elaborate sono entro 2.000.000 byte ciascuna.
+- Le esportazioni non modificano lo stato della scheda. La resa Word è stata controllata con LibreOffice, non con Microsoft Word per Mac.
 
 ## Download e distribuzione
 
-Superate le combinazioni JSON, PDF + JSON, DOCX + JSON e DOCX + PDF + JSON offline, su desktop e iPhone simulato, senza dispositivo fisico. Il JSON rimane obbligatorio e il DOCX nativo non richiede un PDF intermedio. Su iPhone più formati vengono raccolti in un solo ZIP.
+Superate le combinazioni JSON, PDF + JSON, DOCX + JSON e DOCX + PDF + JSON offline, su desktop e iPhone simulato. Controllati anche i nomi effettivi dei download e dei file dentro lo ZIP. Il JSON rimane obbligatorio; il DOCX non richiede un PDF intermedio. Più formati su iPhone producono un unico ZIP; su desktop restano separati.
 
-Cache aggiornata dalla 3.6.18 alla 3.6.19 con 21 risorse, navigazione offline e isolamento dalle altre app. Bundle e sorgenti JavaScript verificati.
+Verificati aggiornamento della cache dalla 3.6.19 alla 3.6.20, navigazione offline, isolamento dalle altre app e 20 risorse in cache. L'immagine di filigrana non è più referenziata né distribuita; il relativo elemento e gli stili desktop e mobile sono rimossi. Nessun logo del Sacro Monte aggiunto.
 
-51 file pronti per la radice GitHub, inclusi mappa e catalogo. Esclusi documenti e JSON di prova, vecchi template e node_modules. ZIP verificato con CRC, unzip -t ed estrazione e confronto di tutti i file. Nessuna pubblicazione o modifica automatica della repository.
+Controllati sintassi JavaScript, identificativi HTML, bundle e versione. Archivio con 50 file, mappa e catalogo inclusi, verificato con CRC, `unzip -t`, estrazione e confronto di ogni file con i sorgenti finali. Esclusi documenti e JSON di prova, vecchi template e node_modules.
+
+Le prove dell'interfaccia e del download usano Happy DOM e IndexedDB con adattatori per le API del browser. Non è stato disponibile un browser Chromium eseguibile né un iPhone fisico: il comportamento nativo di installazione, fotocamera e download su dispositivo resta da confermare. Nessuna pubblicazione o modifica automatica della repository.

@@ -1,13 +1,20 @@
-# Schede Restauro 3.6.19
+# Schede Restauro 3.6.20
 
 PWA per il Sacro Monte di Varese, utilizzabile offline su desktop e telefono. Esporta PDF, Word modificabile e JSON. Lo ZIP contiene il sito già compilato, pronto per GitHub Pages senza npm o un server applicativo.
 
 ## Novità della revisione
 
+- I nomi automatici iniziano con l'oggetto, seguito da ID, `scheda_ispezione_periodica` e data di apertura o aggiornamento, senza ora. Esempio di struttura: `Acquedotto_ID_02.12_2026_scheda_ispezione_periodica_2026-11-09.json`. L'ID effettivo è quello della scheda; l'esempio non cambia gli ID del catalogo. La stessa base è usata per DOCX, PDF, JSON e ZIP. Il nome rimane personalizzabile; riprendere la bozza non aggiorna la data del nome.
+- Le fotografie appena scattate o caricate vengono conservate entro **2 MB ciascuna (2.000.000 byte)**. Se necessario vengono compresse in JPEG e ridimensionate; JPEG e PNG già compatibili e sotto il limite mantengono i byte originali, salvo la normalizzazione dell'orientamento EXIF. Il file originale sul dispositivo rimane intatto. Le fotografie già presenti nei JSON importati non vengono ricompresse automaticamente.
+- **Rimuovi priorità** elimina soltanto il riquadro della priorità: conserva la riga diagnostica, il livello di rischio, le azioni preventive e gli interventi eseguiti. La priorità rimossa non viene ricreata dopo salvataggio, importazione o un nuovo sopralluogo. La cancellazione esplicita della riga diagnostica conserva invece il comportamento precedente e rimuove le voci collegate.
+- Rimossa la filigrana della home su desktop e mobile, senza aggiungere il logo del Sacro Monte. L'immagine inutilizzata non è inclusa nel sito né nella cache.
+
+La base è la 3.6.19. I generatori Word e PDF e il modulo generale di impaginazione sono invariati.
+
+## Correzioni già incluse nella 3.6.19
+
 - Solo nel PDF, nello storico manutentivo, **Interventi di RESTAURO precedenti** e **Interventi di MANUTENZIONE precedenti** compaiono una sola volta ciascuno, prima del primo intervento della relativa categoria. I titoli non si ripetono per i record successivi o sulle pagine di continuazione.
 - Ogni pacchetto Data + Azione è separato dal successivo da almeno una riga vuota. Le azioni restano sotto la propria etichetta, allineate a sinistra. Le categorie prive di interventi compilati non vengono stampate.
-
-La base è la 3.6.18. Il generatore Word è invariato; sono conservate le precedenti correzioni di date, ID a 12 pt e atlante vuoto.
 
 ## Correzioni già incluse nella 3.6.18
 
@@ -28,16 +35,16 @@ La base è la 3.6.18. Il generatore Word è invariato; sono conservate le preced
 - La Terza Fontana ha ID 02.24_2026, cronologia XVII secolo, quota 724 m e distanza dal Santuario 938 m.
 - Aprire il lucchetto permette di correggere anche i dati forniti dal catalogo. Le correzioni, comprese le cancellazioni di un valore, rimangono dopo salvataggio, ripresa e importazione JSON; non vengono sostituite dai valori iniziali. Nei JSON precedenti si conservano i dati presenti, compresi quelli vuoti; vengono inizializzati soltanto i campi mancanti. Cambiare bene dalla mappa a lucchetto aperto aggiorna i relativi dati anagrafici.
 
-Conservati i checkbox separati di Grotta e VI Cappella, le altre coordinate, il tracciato del Viale, i nomi dei file con data e ora, le note sotto al titolo, la colonna Risolto in data e la gestione delle versioni delle azioni preventive. Non vengono eliminati automaticamente i gruppi di azioni ripetuti.
+Conservati i checkbox separati di Grotta e VI Cappella, le altre coordinate, il tracciato del Viale, le note sotto al titolo, la colonna Risolto in data e la gestione delle versioni delle azioni preventive. Non vengono eliminati automaticamente i gruppi di azioni ripetuti.
 
 ## Pubblicazione
 
-Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.19 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
+Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Se presente nella vecchia versione, elimina anche `assets/home-landscape.png`, che non è più utilizzato. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.20 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
 
 ## Home e compilazione
 
 - **Compila una nuova scheda** avvia la prima ispezione.
-- **Carica e aggiorna stato conservativo** importa l'ultimo JSON e avvia un nuovo sopralluogo. La data della visita è conservata nello storico; le note delle visite già esistenti nei vecchi JSON sono mantenute. Il nome del file assume la data e l'ora del caricamento secondo la nomenclatura indicata sopra; la data originaria della scheda e gli stati precedenti restano disponibili. Il file importato resta intatto.
+- **Carica e aggiorna stato conservativo** importa l'ultimo JSON e avvia un nuovo sopralluogo. La data della visita è conservata nello storico; le note delle visite già esistenti nei vecchi JSON sono mantenute. Il nome automatico assume la data del caricamento, senza ora, secondo la nomenclatura indicata sopra; la data originaria della scheda e gli stati precedenti restano disponibili. Il file importato resta intatto.
 - **Riprendi la compilazione** riapre la bozza sullo stesso dispositivo e profilo browser, senza iniziare una visita o aggiornare le date.
 
 Storico manutentivo e stato conservativo hanno schermate distinte. I titoli superiori duplicati e i campi ID/data/oggetto delle sezioni finali non occupano spazio nella compilazione; le corrispondenti intestazioni rimangono nei documenti. Tra nome file e Opzioni si trovano il lucchetto e l'icona cronologia. La cronologia mostra soltanto le versioni precedenti della pagina corrente.
@@ -58,6 +65,8 @@ Nella nuova scheda Materie e tecniche è direttamente compilabile. Dopo l'import
 
 Le nuove priorità e le azioni preventive sono collegate al degrado tramite identificativo stabile. Il grado d'urgenza eredita il Livello di rischio ed è sempre bloccato, anche a lucchetto aperto: si corregge il rischio nella riga diagnostica. Una finestra d'intervento divenuta incompatibile viene cancellata per permettere una nuova scelta. Non compare Azzera scelta.
 
+Rimuovere una priorità non modifica la diagnostica né le azioni collegate. Le priorità storicizzate rimangono protette dal lucchetto della pagina; rimuoverle a pagina sbloccata elimina la priorità anche dalle copie precedenti, conservando il degrado e le azioni. Una priorità nuova segue il proprio blocco, indipendentemente dalla data del degrado collegato.
+
 Risolto in data genera automaticamente la voce negli interventi eseguiti. Per la visita corrente le azioni condotte in loco sono compilabili; per gli interventi chiusi sono protette. Non c'è un comando per aggiungere manualmente nuovi interventi eseguiti. Gli interventi manuali dei vecchi JSON e le vecchie priorità senza collegamento rimangono disponibili, senza attribuire loro un degrado arbitrario.
 
 Il degrado risolto che era aperto in un sopralluogo precedente mantiene la programmazione originaria: nell'editor la riga della tabella è verde chiaro e contiene la data di risoluzione. Il piano precedente si consulta dall'icona cronologia, senza un riquadro o una tendina aggiuntivi sotto la tabella. Nei documenti il piano viene riportato per intero con la data originaria e la data di risoluzione nell'ultima colonna della tabella, la cui riga è verde chiaro. Le voci inserite e risolte nella loro prima visita restano soltanto negli interventi eseguiti.
@@ -65,6 +74,8 @@ Il degrado risolto che era aperto in un sopralluogo precedente mantiene la progr
 ## Fotografie e salvataggio
 
 Scatta foto e Carica foto registrano la data locale di inserimento, distinta dalla data dello scatto. Ogni foto ha una didascalia facoltativa multilinea, allineata a sinistra in Arial 9,5 sotto l'immagine. Nei documenti con più sopralluoghi è indicata anche la visita di riferimento. I JSON precedenti senza metadati usano la data e la didascalia disponibili.
+
+Il limite di 2 MB riguarda il peso binario di ogni nuova immagine, non il peso complessivo del JSON: la codifica base64 usata nel JSON occupa più spazio. La compressione verifica il peso effettivo prodotto, riducendo ulteriormente le dimensioni se necessario. I formati diversi da JPEG e PNG vengono convertiti in JPEG quando il browser riesce a leggerli; un'immagine non leggibile non viene aggiunta.
 
 Quando contiene fotografie, l'atlante inizia su una nuova pagina, contiene fino a quattro fotografie per pagina e ripete l'intestazione sulle continuazioni, sia nel PDF sia nel Word. Se è vuoto, viene stampato soltanto il titolo dopo la sezione 5, sulla stessa pagina quando lo spazio lo consente. Didascalie particolarmente lunghe possono richiedere altre pagine. Le didascalie delle visite chiuse sono conservate separatamente dall'immagine; correggerle a lucchetto aperto aggiorna anche le copie precedenti della stessa fotografia.
 

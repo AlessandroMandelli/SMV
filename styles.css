@@ -165,14 +165,6 @@ h3 {
   min-height: 32px;
   padding: 5px 10px;
 }
-.landscape {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  opacity: 1;
-  background: url("./assets/home-landscape.png") center bottom/cover no-repeat;
-  pointer-events: none;
-}
 .toolbar {
   position: sticky;
   top: 0;
@@ -953,11 +945,6 @@ dialog p {
   }
   .map-panel {
     padding: 15px;
-  }
-  .landscape {
-    inset: 32% 0 0;
-    background-size: auto 100%;
-    background-position: left bottom;
   }
   #toast {
     bottom: 100px;

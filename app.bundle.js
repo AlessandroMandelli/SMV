@@ -1,4 +1,4 @@
-/* Schede Restauro 3.6.19 — generato dai sorgenti modulari in js/. */
+/* Schede Restauro 3.6.20 — generato dai sorgenti modulari in js/. */
 (() => {
   // js/road.js
   var ROAD_SIZE = { width: 553, height: 949 };
@@ -236,18 +236,13 @@
     const value = state2.filenameDate || state2.createdAt;
     return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : localDate(new Date(value));
   }
-  function filenameTime(state2) {
-    const value = state2.filenameDate;
-    const timestamp = value && !/^\d{4}-\d{2}-\d{2}$/.test(value) ? value : state2.createdAt;
-    return localTime(new Date(timestamp)).replace(":", "-");
-  }
   function baseName(state2, assets2) {
     if (state2.customFilename && state2.filename.trim())
       return safeFilename(state2.filename);
     const asset2 = assets2.find((item) => item.id === state2.assetId);
     const date = filenameDay(state2);
-    const prefix = `scheda_ispezione_periodica_${(asset2 == null ? void 0 : asset2.fileLabel) || "Bene"}_ID_`;
-    const suffix = "_" + date + "_" + filenameTime(state2);
+    const prefix = `${(asset2 == null ? void 0 : asset2.fileLabel) || "Bene"}_ID_`;
+    const suffix = "_scheda_ispezione_periodica_" + date;
     const identifier = (String(state2.general.id || "").trim() || `XX.XX_${date.slice(0, 4)}`).normalize("NFC").replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_").replace(/\s+/g, "_");
     const id = identifier.slice(0, Math.max(1, 160 - prefix.length - suffix.length));
     return safeFilename(prefix + id + suffix);
@@ -634,12 +629,7 @@
     return false;
   }
   function lockedRemoval(state2, { action, key, index, row }) {
-    var _a;
     const i = Number(index);
-    if (action === "remove-priority" && ((_a = state2.priorities[i]) == null ? void 0 : _a.diagnosisId)) {
-      const source = state2.diagnosis.findIndex((record) => record.id === state2.priorities[i].diagnosisId);
-      if (source >= 0 && lockedPath(state2, `diagnosis.${source}.area`)) return true;
-    }
     if (action === "remove-photo") {
       const photo = state2.photos[i];
       return !!photo && state2.surveys.some((visit) => visit.id !== state2.survey.id && visit.data.photoIds.includes(photo.id));
@@ -1427,7 +1417,7 @@
   }
 
   // js/config.js
-  var VERSION = "3.6.19";
+  var VERSION = "3.6.20";
   var PWA_URL = "https://alessandromandelli.github.io/SMV/";
 
   // js/pdf-layout.js
@@ -3044,6 +3034,57 @@
   }
 
   // js/photos.js
+  var MAX_PHOTO_BYTES = 2e6;
+  var MAX_COMPRESSED_SIDE = 2400;
+  var JPEG_QUALITIES = [0.9, 0.8, 0.7, 0.6];
+  function dataUrl(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error || Error("Fotografia non leggibile."));
+      reader.readAsDataURL(blob);
+    });
+  }
+  function imageType(bytes2) {
+    if (bytes2[0] === 255 && bytes2[1] === 216 && bytes2[2] === 255) return "image/jpeg";
+    if ([137, 80, 78, 71, 13, 10, 26, 10].every((value, i) => bytes2[i] === value)) return "image/png";
+    return "";
+  }
+  function jpegOrientation(bytes2) {
+    const view = new DataView(bytes2.buffer, bytes2.byteOffset, bytes2.byteLength);
+    try {
+      for (let at2 = 2; at2 + 4 <= bytes2.length; ) {
+        if (bytes2[at2] !== 255 || [218, 217].includes(bytes2[at2 + 1])) break;
+        const length = view.getUint16(at2 + 2);
+        const end = at2 + 2 + length;
+        if (length < 2 || end > bytes2.length) return 0;
+        if (bytes2[at2 + 1] === 225 && view.getUint32(at2 + 4) === 1165519206 && view.getUint16(at2 + 8) === 0) {
+          const tiff = at2 + 10;
+          const little = view.getUint16(tiff) === 18761;
+          if (!little && view.getUint16(tiff) !== 19789 || view.getUint16(tiff + 2, little) !== 42) return 0;
+          const directory = tiff + view.getUint32(tiff + 4, little);
+          if (directory < tiff || directory + 2 > end) return 0;
+          const count = view.getUint16(directory, little);
+          for (let i = 0; i < count; i++) {
+            const entry = directory + 2 + i * 12;
+            if (entry + 12 > end) return 0;
+            if (view.getUint16(entry, little) === 274)
+              return view.getUint16(entry + 2, little) === 3 && view.getUint32(entry + 4, little) === 1 ? view.getUint16(entry + 8, little) : 0;
+          }
+        }
+        at2 = end;
+      }
+      return 1;
+    } catch {
+      return 0;
+    }
+  }
+  function encodeJpeg(canvas, quality) {
+    return new Promise((resolve, reject) => canvas.toBlob((blob) => {
+      if ((blob == null ? void 0 : blob.type) === "image/jpeg") resolve(blob);
+      else reject(Error("Impossibile comprimere la fotografia."));
+    }, "image/jpeg", quality));
+  }
   async function readPhoto(file, surveyDate) {
     const url = URL.createObjectURL(file);
     const image = new Image();
@@ -3052,24 +3093,36 @@
       image.src = url;
       await image.decode();
       if (!image.naturalWidth || !image.naturalHeight) throw Error("Immagine non leggibile.");
-      const scale = Math.min(1, 2400 / Math.max(image.naturalWidth, image.naturalHeight));
+      const photo = { id: uid(), surveyDate, insertedDate: localDate(), caption: "" };
+      const small = file.size <= MAX_PHOTO_BYTES;
+      const bytes2 = new Uint8Array(await (small ? file : file.slice(0, 12)).arrayBuffer());
+      const type = imageType(bytes2);
+      if (small && (type === "image/png" || type === "image/jpeg" && jpegOrientation(bytes2) === 1)) {
+        return {
+          ...photo,
+          data: await dataUrl(new Blob([bytes2], { type })),
+          width: image.naturalWidth,
+          height: image.naturalHeight
+        };
+      }
       canvas = document.createElement("canvas");
-      canvas.width = Math.round(image.naturalWidth * scale);
-      canvas.height = Math.round(image.naturalHeight * scale);
-      const context = canvas.getContext("2d");
-      if (!context) throw Error("Immagine non elaborabile.");
-      context.fillStyle = "#fff";
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(image, 0, 0, canvas.width, canvas.height);
-      return {
-        id: uid(),
-        surveyDate,
-        insertedDate: localDate(),
-        caption: "",
-        data: canvas.toDataURL("image/jpeg", 0.9),
-        width: canvas.width,
-        height: canvas.height
-      };
+      let scale = small && type ? 1 : Math.min(1, MAX_COMPRESSED_SIDE / Math.max(image.naturalWidth, image.naturalHeight));
+      for (; ; ) {
+        canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+        const context = canvas.getContext("2d");
+        if (!context) throw Error("Immagine non elaborabile.");
+        context.fillStyle = "#fff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        for (const quality of JPEG_QUALITIES) {
+          const blob = await encodeJpeg(canvas, quality);
+          if (blob.size <= MAX_PHOTO_BYTES)
+            return { ...photo, data: await dataUrl(blob), width: canvas.width, height: canvas.height };
+        }
+        if (canvas.width === 1 && canvas.height === 1) throw Error("Fotografia non comprimibile entro 2 MB.");
+        scale *= 0.8;
+      }
     } finally {
       URL.revokeObjectURL(url);
       image.src = "";
@@ -3205,13 +3258,8 @@
       if (rows[index].id === id) rows.splice(index, 1);
   }
   function purgeRecord(state2, { action, key, index, row }) {
-    var _a, _b, _c;
+    var _a, _b;
     let i = Number(index);
-    if (action === "remove-priority" && ((_a = state2.priorities[i]) == null ? void 0 : _a.diagnosisId)) {
-      i = state2.diagnosis.findIndex((record) => record.id === state2.priorities[i].diagnosisId);
-      if (i < 0) return false;
-      action = "remove-diagnosis";
-    }
     if (action === "remove-photo") {
       const photo = state2.photos[i];
       if (!photo) return false;
@@ -3225,7 +3273,7 @@
     }
     if (action === "remove-preventive") {
       const diagnosis = state2.diagnosis[Number(row)];
-      const id = (_b = diagnosis == null ? void 0 : diagnosis.actions[i]) == null ? void 0 : _b.id;
+      const id = (_a = diagnosis == null ? void 0 : diagnosis.actions[i]) == null ? void 0 : _a.id;
       if (!id) return false;
       for (const data of dataVersions(state2)) {
         const parent = data.diagnosis.find((record) => record.id === diagnosis.id);
@@ -3242,13 +3290,14 @@
         "remove-immediate": ["immediate", "records"]
       };
       const path = paths[action];
-      const current = path && ((_c = at(state2, path)) == null ? void 0 : _c[i]);
+      const current = path && ((_b = at(state2, path)) == null ? void 0 : _b[i]);
       const id = current == null ? void 0 : current.id;
       if (!id) return false;
       for (const data of dataVersions(state2)) {
         if (action === "remove-priority" && current.diagnosisId) {
           const source = data.diagnosis.find((record) => record.id === current.diagnosisId);
           if (source) source.priorityExcluded = true;
+          data.priorities = data.priorities.filter((priority) => priority.diagnosisId !== current.diagnosisId);
         }
         if (action === "remove-diagnosis")
           data.priorities = data.priorities.filter((priority) => priority.diagnosisId !== id);
@@ -3761,13 +3810,9 @@
     }
     if (removalIsLocked(button.dataset)) return;
     if (action.startsWith("remove-")) {
-      const sourceIndex = action === "remove-priority" ? state.diagnosis.findIndex((record) => {
-        var _a2;
-        return record.id === ((_a2 = state.priorities[i]) == null ? void 0 : _a2.diagnosisId);
-      }) : action === "remove-diagnosis" ? i : -1;
-      const removesDiagnosis = sourceIndex >= 0;
+      const removesDiagnosis = action === "remove-diagnosis";
       if (!confirm(
-        pageUnlocked() ? removesDiagnosis ? "Eliminare definitivamente questa riga e le azioni collegate da tutti i sopralluoghi?" : "Eliminare definitivamente questo elemento da tutti i sopralluoghi?" : removesDiagnosis ? "Eliminare il rilievo diagnostico, la priorit\xE0 e le azioni collegate?" : "Rimuovere questo elemento e i dati contenuti?"
+        action === "remove-priority" ? pageUnlocked() ? "Eliminare definitivamente questa priorit\xE0 da tutti i sopralluoghi? Il rilievo diagnostico e le azioni collegate vengono conservati." : "Rimuovere questa priorit\xE0? Il rilievo diagnostico e le azioni collegate vengono conservati." : pageUnlocked() ? removesDiagnosis ? "Eliminare definitivamente questa riga e le azioni collegate da tutti i sopralluoghi?" : "Eliminare definitivamente questo elemento da tutti i sopralluoghi?" : removesDiagnosis ? "Eliminare il rilievo diagnostico, la priorit\xE0 e le azioni collegate?" : "Rimuovere questo elemento e i dati contenuti?"
       ))
         return;
       if (pageUnlocked() && purgeRecord(state, button.dataset)) {
@@ -3797,8 +3842,8 @@
         break;
       case "remove-priority":
         if ((_b = state.priorities[i]) == null ? void 0 : _b.diagnosisId) {
-          const source = state.diagnosis.findIndex((record) => record.id === state.priorities[i].diagnosisId);
-          if (source >= 0) state.diagnosis.splice(source, 1);
+          const source = state.diagnosis.find((record) => record.id === state.priorities[i].diagnosisId);
+          if (source) source.priorityExcluded = true;
         }
         state.priorities.splice(i, 1);
         break;
