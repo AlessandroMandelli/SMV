@@ -40,7 +40,6 @@ const files = [
   "./assets/icon-180.png",
   "./assets/icon-192.png",
   "./assets/icon-512.png",
-  "./assets/home-landscape.png",
   "./assets/map.jpg",
   "./assets/branding/anniversary.png",
   "./assets/branding/logo.jpg",
