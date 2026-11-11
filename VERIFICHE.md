@@ -1,40 +1,39 @@
-# Verifiche della revisione 3.6.20
+# Verifiche della revisione 3.6.21
 
-Base: ultima versione 3.6.19 consegnata. Recuperati i 51 file e ricostruito l'archivio precedente, verificando l'identica corrispondenza SHA-256: `0f05fada0e8184b3409e434e36262455d57255ca525f85b705910fa2182d0a10`. La repository pubblica consultabile al momento del controllo conteneva una versione precedente e non è stata usata come base.
+Base: versione 3.6.20 recuperata dalla repository SMV al commit `8f955fe58597f2b51fd0327ca799e8240630a5c8`. Ricostruito l'archivio con i 50 file e verificata la corrispondenza esatta con l'ultima consegna: 2.704.473 byte, SHA-256 `eb4664423b5e9ac7d3bf8a3dc282a4186b69b49faf82c74229bbc26358b43d1d`.
 
-## Nomi, priorità e sopralluoghi
+## Modifica localizzata
 
-- Verificati i nomi automatici di tutti i 24 beni, con oggetto iniziale, ID, tipo di documento e data finale senza ora. Verificati ID lunghi, caratteri non ammessi, nome personalizzato, vecchi nomi automatici e importazione JSON. Catalogo, ID assegnati e mappa restano invariati.
-- Rimozione della sola priorità su nuova scheda e su scheda importata: conservati diagnosi, livello di rischio, azioni preventive, date di programmazione e interventi eseguiti. La priorità non ricompare dopo il salvataggio, la riapertura o l'avvio di un sopralluogo successivo.
-- Verificati tre sopralluoghi consecutivi, rimozione correttiva dalle copie storiche e protezioni del lucchetto. Coperti anche dati pregressi con identificativi diversi per priorità collegate allo stesso degrado. La cancellazione esplicita della diagnostica mantiene la rimozione delle voci collegate.
-- Eseguito il percorso dell'interfaccia: nuova scheda, inserimento diagnostica, rimozione priorità, caricamento e scatto foto, esportazione JSON, reimportazione, risoluzione e correzione con lucchetto. Conservati i blocchi anagrafici e le funzioni del catalogo per tutti i 24 beni.
+- Footer completo su ogni pagina del Word e del PDF, comprese le continuazioni.
+- Word con logo originale, scritta s.c.ar.l. color oro, recapiti su una riga e numerazione automatica a destra. Tabella e tabulazioni native; nessuna casella di testo sovrapposta.
+- Un solo footer Word predefinito, referenziato da tutte le sezioni; rimossa la distinzione tra footer della prima pagina e delle successive.
+- Posizione del footer PDF e dimensioni dei suoi elementi conservate; rimosso il limite alle sole pagine iniziali delle sezioni.
+- Modificati soltanto i due moduli interessati, i metadati di versione, il bundle, la cache e la documentazione. Catalogo, mappa, fotografie, nomenclatura, diagnostica, priorità, storico e collegamenti sono identici alla 3.6.20.
 
-## Fotografie
+## Documenti e continuazioni
 
-Prove con codifica e decodifica reali di immagini e controlli sul peso binario, usando adattatori per le API del browser:
+Generati due casi con gli stessi dati sia con i generatori 3.6.20 sia con quelli aggiornati:
 
-- JPEG da 16.717.967 byte ridotto a 1.728.328 byte, 2.400 × 1.800 pixel.
-- PNG da 19.175.561 byte convertito in JPEG da 1.912.240 byte, 2.400 × 1.867 pixel.
-- JPEG da 448.401 byte e PNG da 948.024 byte conservati byte per byte.
-- WebP convertito in JPEG compatibile con i documenti; JPEG con orientamento EXIF normalizzato con corretto scambio di larghezza e altezza.
-- Verificati l'ulteriore ridimensionamento quando le prime compressioni superano il limite, l'encoder senza risultato, i file non leggibili e il rilascio delle risorse anche in errore.
-- Provati entrambi i comandi Scatta foto e Carica foto. I file originali non vengono modificati. Le foto già contenute nei JSON importati non vengono ricompresse.
+1. Scheda essenziale con data generale vuota e note a fondo pagina: quattro pagine Word e quattro pagine PDF.
+2. Scheda con due sopralluoghi, testo manutentivo lungo, otto diagnosi, priorità rimossa conservando il degrado, quattro risoluzioni, azioni preventive storicizzate, cinque fotografie e note: 15 pagine Word e 19 pagine PDF.
 
-## Word e PDF
+Per entrambi i casi, il corpo XML del Word coincide con la 3.6.20 dopo l'esclusione delle sole proprietà del footer; operazioni e coordinate del corpo PDF e struttura delle tabelle coincidono integralmente. Le esportazioni non modificano i dati della scheda.
 
-Generatori Word, PDF e modulo di impaginazione confrontati byte per byte con la 3.6.19: nessuna modifica. Generati una scheda Word e un PDF con cinque fotografie elaborate, due restauri, due manutenzioni, diagnosi conservata dopo la rimozione della priorità, azione preventiva storicizzata e intervento eseguito.
+Controllati il footer e la sua resa su tutte le 42 pagine effettive, con estrazione dei contenuti, verifica delle coordinate e controllo visivo dei dettagli a fondo pagina:
 
-- Sei pagine per ciascun formato; controllate visivamente tutte le 12 pagine, comprese le due pagine fotografiche con distribuzione 4 + 1 e intestazione ripetuta.
-- Confermati mappa e loghi, tabelle native del Word, ID a 12 pt, titoli dello storico manutentivo una sola volta per categoria, riquadro delle note, didascalie multilinea e date di risoluzione in grassetto.
-- La priorità eliminata non compare nei documenti, mentre diagnosi, azione preventiva e intervento rimangono presenti. Nessun campo modulo PDF trasparente. Tutte le parti XML del DOCX sono valide; le immagini elaborate sono entro 2.000.000 byte ciascuna.
-- Le esportazioni non modificano lo stato della scheda. La resa Word è stata controllata con LibreOffice, non con Microsoft Word per Mac.
+- Logo, s.c.ar.l., indirizzo, dati fiscali, e-mail e PEC presenti una sola volta per pagina.
+- Recapiti su una sola riga; s.c.ar.l. a 11 pt e color oro, recapiti e contatori a 7,5 pt, come nella proposta approvata.
+- Logo di 113,5 × 34,9 pt; margine sinistro e posizione costanti in tutte le pagine di ciascun formato.
+- Campi PAGE e NUMPAGES aggiornati correttamente, comprese le pagine con numerazione a due cifre.
+- Nessuna sovrapposizione con testi, immagini o riquadri delle note.
+- Nessun footer Word nascosto dalla proprietà Prima pagina diversa; relazioni delle immagini e riferimenti di sezione validi.
 
-## Download e distribuzione
+Tutti gli XML e le relazioni interne dei DOCX sono stati verificati. Rendering Word eseguito con LibreOffice; la verifica nativa in Microsoft Word per Mac resta da confermare.
 
-Superate le combinazioni JSON, PDF + JSON, DOCX + JSON e DOCX + PDF + JSON offline, su desktop e iPhone simulato. Controllati anche i nomi effettivi dei download e dei file dentro lo ZIP. Il JSON rimane obbligatorio; il DOCX non richiede un PDF intermedio. Più formati su iPhone producono un unico ZIP; su desktop restano separati.
+## Salvataggio e distribuzione
 
-Verificati aggiornamento della cache dalla 3.6.19 alla 3.6.20, navigazione offline, isolamento dalle altre app e 20 risorse in cache. L'immagine di filigrana non è più referenziata né distribuita; il relativo elemento e gli stili desktop e mobile sono rimossi. Nessun logo del Sacro Monte aggiunto.
+Superate le combinazioni JSON, PDF + JSON, DOCX + JSON e DOCX + PDF + JSON offline su desktop e iPhone simulato. JSON obbligatorio, più formati raccolti in un unico ZIP su iPhone e download separati su desktop. Il Word nativo non genera un PDF intermedio. Le prove del download usano Happy DOM e IndexedDB; nessun dispositivo iPhone fisico.
 
-Controllati sintassi JavaScript, identificativi HTML, bundle e versione. Archivio con 50 file, mappa e catalogo inclusi, verificato con CRC, `unzip -t`, estrazione e confronto di ogni file con i sorgenti finali. Esclusi documenti e JSON di prova, vecchi template e node_modules.
+Verificato l'aggiornamento della cache dalla 3.6.20 alla 3.6.21: 20 risorse, navigazione e risorse offline, conservazione delle cache di altre app. La filigrana rimane esclusa.
 
-Le prove dell'interfaccia e del download usano Happy DOM e IndexedDB con adattatori per le API del browser. Non è stato disponibile un browser Chromium eseguibile né un iPhone fisico: il comportamento nativo di installazione, fotocamera e download su dispositivo resta da confermare. Nessuna pubblicazione o modifica automatica della repository.
+Archivio finale con 50 file pronti per la radice GitHub, mappa e catalogo inclusi. Controllati sintassi JavaScript, identificativi HTML, riferimenti delle risorse, CRC dello ZIP, unzip -t, estrazione e corrispondenza di ogni file con i sorgenti finali. Esclusi documenti e JSON di prova, node_modules e vecchi template. Nessuna pubblicazione automatica della repository.

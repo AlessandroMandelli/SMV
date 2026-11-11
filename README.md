@@ -1,15 +1,19 @@
-# Schede Restauro 3.6.20
+# Schede Restauro 3.6.21
 
 PWA per il Sacro Monte di Varese, utilizzabile offline su desktop e telefono. Esporta PDF, Word modificabile e JSON. Lo ZIP contiene il sito già compilato, pronto per GitHub Pages senza npm o un server applicativo.
 
 ## Novità della revisione
 
+- Il footer completo compare su **tutte le pagine del Word e del PDF**, comprese seconda pagina, fotografie e continuazioni delle tabelle e degli interventi.
+- Nel Word, logo Cròmo, scritta **s.c.ar.l.** color oro, recapiti su una sola riga e numerazione a destra riprendono la proposta grafica approvata. Il footer usa tabelle e tabulazioni native di Word; i numeri di pagina rimangono campi automatici.
+- Le intestazioni superiori mantengono il comportamento già previsto per ciascuna sezione. La modifica riguarda il footer e conserva i contenuti della 3.6.20.
+
+## Correzioni già incluse nella 3.6.20
+
 - I nomi automatici iniziano con l'oggetto, seguito da ID, `scheda_ispezione_periodica` e data di apertura o aggiornamento, senza ora. Esempio di struttura: `Acquedotto_ID_02.12_2026_scheda_ispezione_periodica_2026-11-09.json`. L'ID effettivo è quello della scheda; l'esempio non cambia gli ID del catalogo. La stessa base è usata per DOCX, PDF, JSON e ZIP. Il nome rimane personalizzabile; riprendere la bozza non aggiorna la data del nome.
 - Le fotografie appena scattate o caricate vengono conservate entro **2 MB ciascuna (2.000.000 byte)**. Se necessario vengono compresse in JPEG e ridimensionate; JPEG e PNG già compatibili e sotto il limite mantengono i byte originali, salvo la normalizzazione dell'orientamento EXIF. Il file originale sul dispositivo rimane intatto. Le fotografie già presenti nei JSON importati non vengono ricompresse automaticamente.
 - **Rimuovi priorità** elimina soltanto il riquadro della priorità: conserva la riga diagnostica, il livello di rischio, le azioni preventive e gli interventi eseguiti. La priorità rimossa non viene ricreata dopo salvataggio, importazione o un nuovo sopralluogo. La cancellazione esplicita della riga diagnostica conserva invece il comportamento precedente e rimuove le voci collegate.
 - Rimossa la filigrana della home su desktop e mobile, senza aggiungere il logo del Sacro Monte. L'immagine inutilizzata non è inclusa nel sito né nella cache.
-
-La base è la 3.6.19. I generatori Word e PDF e il modulo generale di impaginazione sono invariati.
 
 ## Correzioni già incluse nella 3.6.19
 
@@ -39,7 +43,7 @@ Conservati i checkbox separati di Grotta e VI Cappella, le altre coordinate, il 
 
 ## Pubblicazione
 
-Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Se presente nella vecchia versione, elimina anche `assets/home-landscape.png`, che non è più utilizzato. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.20 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
+Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Se presente nella vecchia versione, elimina anche `assets/home-landscape.png`, che non è più utilizzato. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.21 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
 
 ## Home e compilazione
 
@@ -85,7 +89,7 @@ Le finestre in sovraimpressione si chiudono con la × oppure con un clic o tocco
 
 ## Documenti
 
-Il PDF mantiene la propria impaginazione. Le tabelle contengono soltanto righe effettivamente compilate, senza riempimenti vuoti; non vengono creati campi di modulo trasparenti. I loghi e le intestazioni principali compaiono una volta per sezione, con intestazione dell'atlante ripetuta sulle pagine fotografiche.
+Il PDF mantiene la propria impaginazione. Le tabelle contengono soltanto righe effettivamente compilate, senza riempimenti vuoti; non vengono creati campi di modulo trasparenti. I loghi delle intestazioni superiori e le intestazioni principali compaiono una volta per sezione, con intestazione dell'atlante ripetuta sulle pagine fotografiche. Il footer completo compare invece su tutte le pagine, con posizione costante e numerazione a destra.
 
 Il Word usa tabelle native e immagini in linea: mappa e titoli non dipendono da caselle sovrapposte. Le note hanno un riquadro a fondo pagina, i ruoli sono incolonnati e Stato rimane nella colonna accanto. Gli elenchi usano la numerazione Word; non c'è un pallino davanti a Tecnico manutentore. I testi usano tabulazioni invece di sequenze di spazi per l'allineamento.
 

@@ -1,6 +1,6 @@
-/* Schede Restauro 3.6.20 — generato dai sorgenti modulari in js/. */
+/* Schede Restauro 3.6.21 — generato dai sorgenti modulari in js/. */
 (() => {
-  // js/road.js
+  // recovered-smv/js/road.js
   var ROAD_SIZE = { width: 553, height: 949 };
   var ROAD_POINTS = [[246, 860], [256, 827], [270, 783], [285, 737], [295, 704], [294, 686], [293, 679], [308, 683], [330, 690], [352, 697], [365, 698], [368, 686], [366, 669], [360, 648], [352, 634], [341, 626], [324, 619], [307, 616], [292, 623], [280, 636], [271, 644], [255, 646], [235, 646], [211, 646], [202, 644], [198, 639], [198, 626], [201, 599], [201, 574], [200, 548], [208, 520], [205, 490], [204, 466], [210, 449], [204, 422], [196, 396], [193, 379], [194, 369], [199, 364], [208, 363], [218, 369], [224, 383], [231, 406], [240, 433], [255, 458], [270, 476], [277, 484], [292, 483], [302, 476], [306, 463], [306, 445], [306, 419], [294, 399], [298, 377], [296, 355], [284, 330], [273, 309], [254, 287], [235, 268], [226, 249], [225, 229], [221, 205], [219, 181], [217, 156], [215, 137], [212, 123], [226, 121], [236, 115]];
   var ROAD_SVG_POINTS = ROAD_POINTS.map((point) => point.join(",")).join(" ");
@@ -10,7 +10,7 @@
     return kind && kind !== "road" ? assets2.filter((asset2) => asset2.kind === kind && Number.isFinite(asset2.x) && Number.isFinite(asset2.y)) : [];
   }
 
-  // js/sections.js
+  // recovered-smv/js/sections.js
   var EDITOR_LAYOUT_VERSION = 36;
   var SECTION_DEFINITIONS = Object.freeze([
     { key: "context", label: "Identificazione e dati del bene" },
@@ -28,7 +28,7 @@
     return Math.max(0, Math.min(SECTIONS.length - 1, migrated));
   }
 
-  // js/model.js
+  // recovered-smv/js/model.js
   var APP_ID = "schede-restauro";
   var SCHEMA_VERSION = 2;
   var COMMON = Object.freeze({
@@ -545,7 +545,7 @@
     return clone ? structuredClone(data) : data;
   }
 
-  // js/surveys.js
+  // recovered-smv/js/surveys.js
   function surveyEntries(state2) {
     return [
       ...(state2.surveys || []).filter((v) => v.id !== state2.survey.id),
@@ -734,7 +734,7 @@
     return entries;
   }
 
-  // js/storage.js
+  // recovered-smv/js/storage.js
   var DB_NAME = "SchedeRestauroV3";
   var DRAFT_KEY = "current-structured-v1";
   var database;
@@ -802,7 +802,7 @@
     return s.delete(DRAFT_KEY);
   });
 
-  // js/catalog.js
+  // recovered-smv/js/catalog.js
   var ASSETS = [
     {
       "id": "c01",
@@ -1275,7 +1275,7 @@
     }
   ];
 
-  // js/legacy.js
+  // recovered-smv/js/legacy.js
   async function migrateLegacy(legacy, assets2) {
     if ((legacy == null ? void 0 : legacy.version) !== 3 || !legacy.values || !legacy.meta)
       throw Error("Formato della bozza precedente non riconosciuto.");
@@ -1416,11 +1416,11 @@
     return applyFixed(out, assets2, { initialize: false });
   }
 
-  // js/config.js
-  var VERSION = "3.6.20";
+  // recovered-smv/js/config.js
+  var VERSION = "3.6.21";
   var PWA_URL = "https://alessandromandelli.github.io/SMV/";
 
-  // js/pdf-layout.js
+  // recovered-smv/js/pdf-layout.js
   var PAGE = Object.freeze({
     width: 792,
     height: 612,
@@ -1454,7 +1454,6 @@
       this.tableCounter = 0;
       this.activeTable = null;
       this.tables = {};
-      this.brandedPages = /* @__PURE__ */ new Set();
       this.glyphWidths = /* @__PURE__ */ new Map();
       this.photoImages = /* @__PURE__ */ new Map();
       this.characters = new Map(
@@ -1727,8 +1726,6 @@
           };
         }
       }
-      if (!continuation && ["first", "immediate", "preventive"].includes(kind))
-        this.brandedPages.add(page);
       const y = !continuation && ["immediate", "preventive"].includes(kind) ? this.header(page, kind, meta) : PAGE.margin;
       return { page, y };
     }
@@ -1736,17 +1733,15 @@
       const pages = this.pdf.getPages();
       const footer = "Via Matteotti 8, 21030 Castello Cabiaglio (VA) \u2013 C.F./P.IVA 02507710396 \u2013 info@cromorestauri.com \u2013 PEC \u2013 cromorestauri@sicurezzapostale.it";
       pages.forEach((page, i) => {
-        if (this.brandedPages.has(page)) {
-          this.image(page, this.images.footer, PAGE.margin, 563, 113.5, 34.9);
-          this.text(page, "s.c.ar.l.", PAGE.margin + 120, 583, {
-            size: 11,
-            color: "#d8a30a"
-          });
-          let size = 7.5;
-          while (this.width(footer, size) > BODY_WIDTH - 166 && size > 5.5)
-            size -= 0.25;
-          this.text(page, footer, PAGE.margin + 166, 586, { size });
-        }
+        this.image(page, this.images.footer, PAGE.margin, 563, 113.5, 34.9);
+        this.text(page, "s.c.ar.l.", PAGE.margin + 120, 583, {
+          size: 11,
+          color: "#d8a30a"
+        });
+        let size = 7.5;
+        while (this.width(footer, size) > BODY_WIDTH - 166 && size > 5.5)
+          size -= 0.25;
+        this.text(page, footer, PAGE.margin + 166, 586, { size });
         const count = `${i + 1}/${pages.length}`;
         this.text(
           page,
@@ -1971,7 +1966,7 @@
     }
   };
 
-  // js/pdf.js
+  // recovered-smv/js/pdf.js
   var files = /* @__PURE__ */ new Map();
   async function resource(path) {
     if (!files.has(path))
@@ -2629,7 +2624,7 @@
     return layout ? { layout: documentLayout, pdf: blob } : blob;
   }
 
-  // js/zip.js
+  // recovered-smv/js/zip.js
   var loading;
   async function zipLibrary() {
     if (window.JSZip) return window.JSZip;
@@ -2649,7 +2644,7 @@
     return loading;
   }
 
-  // js/docx.js
+  // recovered-smv/js/docx.js
   var WIDTH = 14688;
   var XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
   var NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
@@ -2664,10 +2659,11 @@
     ).join("");
     return `<w:r><w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}" w:eastAsia="${font}"/><w:sz w:val="${size}"/><w:szCs w:val="${size}"/><w:color w:val="${color}"/>${bold ? "<w:b/>" : ""}</w:rPr>${text}</w:r>`;
   }
-  function para(content2 = "", { keep = false, keepLines = false, after = 90, before = 0, align = "left", shade, bullet = -1, style, separator = false, line, indent = 0 } = {}) {
+  function para(content2 = "", { keep = false, keepLines = false, after = 90, before = 0, align = "left", shade, bullet = -1, style, separator = false, line, indent = 0, tabs = [] } = {}) {
     const imageHeight = content2.match(/<wp:extent[^>]*cy="(\d+)"/);
     const spacing = imageHeight ? `w:line="${Math.ceil(Number(imageHeight[1]) / 635 + 40)}" w:lineRule="atLeast"` : line ? `w:line="${Math.round(line * 20)}" w:lineRule="atLeast"` : 'w:line="228" w:lineRule="auto"';
-    return `<w:p><w:pPr>${style ? `<w:pStyle w:val="${style}"/>` : ""}${keep ? "<w:keepNext/>" : ""}${keepLines ? "<w:keepLines/>" : ""}${indent ? `<w:ind w:left="${indent}"/>` : ""}<w:widowControl/><w:spacing w:before="${before}" w:after="${after}" ${spacing}/><w:jc w:val="${align}"/>${separator ? '<w:pBdr><w:bottom w:val="single" w:sz="12" w:space="0" w:color="FFFFFF"/></w:pBdr>' : ""}${shade ? `<w:shd w:fill="${shade}"/>` : ""}${bullet >= 0 ? `<w:numPr><w:ilvl w:val="${bullet}"/><w:numId w:val="1"/></w:numPr>` : ""}</w:pPr>${content2}</w:p>`;
+    const stops = tabs.length ? `<w:tabs>${tabs.map((tab) => `<w:tab w:val="${tab.align}" w:pos="${tab.position}"/>`).join("")}</w:tabs>` : "";
+    return `<w:p><w:pPr>${style ? `<w:pStyle w:val="${style}"/>` : ""}${keep ? "<w:keepNext/>" : ""}${keepLines ? "<w:keepLines/>" : ""}${indent ? `<w:ind w:left="${indent}"/>` : ""}${stops}<w:widowControl/><w:spacing w:before="${before}" w:after="${after}" ${spacing}/><w:jc w:val="${align}"/>${separator ? '<w:pBdr><w:bottom w:val="single" w:sz="12" w:space="0" w:color="FFFFFF"/></w:pBdr>' : ""}${shade ? `<w:shd w:fill="${shade}"/>` : ""}${bullet >= 0 ? `<w:numPr><w:ilvl w:val="${bullet}"/><w:numId w:val="1"/></w:numPr>` : ""}</w:pPr>${content2}</w:p>`;
   }
   var blank = () => para("", { after: 0 });
   var pageBreak = () => '<w:p><w:pPr><w:pageBreakBefore/><w:keepNext/><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr></w:p>';
@@ -2695,7 +2691,8 @@
         const span = cell.span || 1, width = widths.slice(column, column + span).reduce((a, b) => a + b, 0);
         column += span;
         const fill = cell.shade || shade || (headers && index === 0 ? "B9B9B9" : stripe ? index % 2 === 0 ? "F4F7F6" : "FFFFFF" : "");
-        return `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/>${span > 1 ? `<w:gridSpan w:val="${span}"/>` : ""}<w:vAlign w:val="${cell.center ? "center" : "top"}"/>${fill ? `<w:shd w:fill="${fill}"/>` : ""}</w:tcPr>${cell.content || blank()}${((_a = cell.content) == null ? void 0 : _a.endsWith("</w:tbl>")) ? '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="2" w:lineRule="exact"/></w:pPr></w:p>' : ""}</w:tc>`;
+        const bottomMargin = cell.paddingBottom === void 0 ? "" : `<w:tcMar><w:bottom w:w="${cell.paddingBottom}" w:type="dxa"/></w:tcMar>`;
+        return `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/>${span > 1 ? `<w:gridSpan w:val="${span}"/>` : ""}${bottomMargin}<w:vAlign w:val="${cell.verticalAlign || (cell.center ? "center" : "top")}"/>${fill ? `<w:shd w:fill="${fill}"/>` : ""}</w:tcPr>${cell.content || blank()}${((_a = cell.content) == null ? void 0 : _a.endsWith("</w:tbl>")) ? '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="2" w:lineRule="exact"/></w:pPr></w:p>' : ""}</w:tc>`;
       }).join("");
       return `<w:tr><w:trPr>${keepRows ? "<w:cantSplit/>" : ""}${headers && index === 0 ? "<w:tblHeader/>" : ""}${minHeight ? `<w:trHeight w:val="${minHeight}" w:hRule="atLeast"/>` : ""}</w:trPr>${cells}</w:tr>`;
     }).join("");
@@ -2863,7 +2860,7 @@
       for (let index = 0; index < cells.length; index += 2) rows.push(cells.slice(index, index + 2));
       body += table(rows, [WIDTH / 2, WIDTH / 2], { border: false, headers: true, stripe: false, padding: 90 });
     }
-    const sectionProperties = () => `<w:sectPr><w:footerReference w:type="default" r:id="footerDefault"/><w:footerReference w:type="first" r:id="footerFirst"/><w:type w:val="nextPage"/><w:pgSz w:w="15840" w:h="12240" w:orient="landscape"/><w:pgMar w:top="576" w:right="576" w:bottom="1120" w:left="576" w:header="180" w:footer="140"/><w:titlePg/></w:sectPr>`;
+    const sectionProperties = () => `<w:sectPr><w:footerReference w:type="default" r:id="footerDefault"/><w:type w:val="nextPage"/><w:pgSz w:w="15840" w:h="12240" w:orient="landscape"/><w:pgMar w:top="576" w:right="576" w:bottom="1120" w:left="576" w:header="180" w:footer="179"/></w:sectPr>`;
     const sectionBreak = () => `<w:p><w:pPr>${sectionProperties()}</w:pPr></w:p>`;
     body += sectionBreak() + heading("REGISTRO INTERVENTI DI MANUTENZIONE IMMEDIATA", state2.immediate.date) + band("INTERVENTI ESEGUITI");
     for (const row of maintenanceEntries(state2)) {
@@ -2897,26 +2894,36 @@
       }
     }
     body += note(state2.preventive.notes, 1600) + sectionProperties();
-    const number = para('<w:fldSimple w:instr="PAGE">' + run("1", { size: 15 }) + "</w:fldSimple>" + run("/", { size: 15 }) + '<w:fldSimple w:instr="NUMPAGES">' + run("1", { size: 15 }) + "</w:fldSimple>", { align: "right", after: 0 });
-    const footer = table([[para(image(footerLogo, 105, 32.3, "Cr\xF2mo"), { after: 0 }), para(run("s.c.ar.l. \u2013 Via Matteotti 8, 21030 Castello Cabiaglio (VA) \u2013 C.F./P.IVA 02507710396\ninfo@cromorestauri.com \u2013 PEC \u2013 cromorestauri@sicurezzapostale.it", { size: 15 }), { after: 0 })]], [2350, WIDTH - 2350], { border: false, padding: 0 }) + number;
+    const number = '<w:fldSimple w:instr="PAGE">' + run("1", { size: 15 }) + "</w:fldSimple>" + run("/", { size: 15 }) + '<w:fldSimple w:instr="NUMPAGES">' + run("1", { size: 15 }) + "</w:fldSimple>";
+    const contacts = "Via Matteotti 8, 21030 Castello Cabiaglio (VA) \u2013 C.F./P.IVA 02507710396 \u2013 info@cromorestauri.com \u2013 PEC \u2013 cromorestauri@sicurezzapostale.it";
+    const footerLine = para(run("s.c.ar.l.", { size: 22, color: "D8A30A" }) + run("	" + contacts + "	", { size: 15 }) + number, {
+      style: "Footer",
+      after: 0,
+      line: 13.2,
+      tabs: [{ align: "left", position: 920 }, { align: "right", position: WIDTH - 2400 }]
+    });
+    const footer = table([[
+      { content: para(image(footerLogo, 113.5, 34.9, "Cr\xF2mo"), { style: "Footer", after: 0 }), verticalAlign: "bottom" },
+      { content: footerLine, verticalAlign: "bottom", paddingBottom: 157 }
+    ]], [2400, WIDTH - 2400], { border: false, padding: 0 });
     const relXml = (entries) => XML + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + entries.join("") + "</Relationships>";
     zip.file("word/document.xml", XML + `<w:document ${NS}><w:body>${body}</w:body></w:document>`);
-    zip.file("word/styles.xml", XML + `<w:styles ${NS}><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="19"/><w:color w:val="1E3232"/><w:lang w:val="it-IT"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="90" w:line="228" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:rPr><w:b/><w:sz w:val="26"/><w:color w:val="005B60"/></w:rPr></w:style></w:styles>`);
+    const footerStyle = '<w:style w:type="paragraph" w:styleId="Footer"><w:name w:val="footer"/><w:basedOn w:val="Normal"/><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="15"/><w:szCs w:val="15"/></w:rPr></w:style>';
+    zip.file("word/styles.xml", XML + `<w:styles ${NS}><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="19"/><w:color w:val="1E3232"/><w:lang w:val="it-IT"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="90" w:line="228" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:rPr><w:b/><w:sz w:val="26"/><w:color w:val="005B60"/></w:rPr></w:style>${footerStyle}</w:styles>`);
     zip.file("word/numbering.xml", XML + `<w:numbering ${NS}><w:abstractNum w:abstractNumId="0"><w:multiLevelType w:val="multilevel"/>${[0, 1].map((level) => `<w:lvl w:ilvl="${level}"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val="${level ? "\u25CB" : "\u2022"}"/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="${(level + 1) * 500}"/></w:tabs><w:ind w:left="${(level + 1) * 500}" w:hanging="240"/></w:pPr></w:lvl>`).join("")}</w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num></w:numbering>`);
     zip.file("word/settings.xml", XML + `<w:settings ${NS}><w:updateFields w:val="true"/><w:compat><w:compatSetting w:name="compatibilityMode" w:uri="http://schemas.microsoft.com/office/word" w:val="15"/></w:compat></w:settings>`);
-    zip.file("word/footerDefault.xml", XML + `<w:ftr ${NS}>${number}</w:ftr>`);
-    zip.file("word/footerFirst.xml", XML + `<w:ftr ${NS}>${footer}</w:ftr>`);
-    zip.file("word/_rels/footerFirst.xml.rels", relXml(rels.filter((rel) => rel.includes('Id="' + footerLogo + '"'))));
+    zip.file("word/footerDefault.xml", XML + `<w:ftr ${NS}>${footer}</w:ftr>`);
+    zip.file("word/_rels/footerDefault.xml.rels", relXml(rels.filter((rel) => rel.includes('Id="' + footerLogo + '"'))));
     const type = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/";
-    zip.file("word/_rels/document.xml.rels", relXml([...rels, ...["styles", "numbering", "settings"].map((name) => `<Relationship Id="${name}" Type="${type + name}" Target="${name}.xml"/>`), ...["First", "Default"].map((name) => `<Relationship Id="footer${name}" Type="${type}footer" Target="footer${name}.xml"/>`)]));
+    zip.file("word/_rels/document.xml.rels", relXml([...rels, ...["styles", "numbering", "settings"].map((name) => `<Relationship Id="${name}" Type="${type + name}" Target="${name}.xml"/>`), `<Relationship Id="footerDefault" Type="${type}footer" Target="footerDefault.xml"/>`]));
     zip.file("_rels/.rels", relXml([`<Relationship Id="document" Type="${type}officeDocument" Target="word/document.xml"/>`, '<Relationship Id="core" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>']));
     zip.file("docProps/core.xml", XML + '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>' + esc(baseName(state2, assets2)) + "</dc:title><dc:creator>" + esc(COMMON.company) + "</dc:creator><dc:description>Schede Restauro " + VERSION + "</dc:description></cp:coreProperties>");
-    const overrides = { "word/document.xml": "document.main", "word/styles.xml": "styles", "word/numbering.xml": "numbering", "word/settings.xml": "settings", "word/footerFirst.xml": "footer", "word/footerDefault.xml": "footer" };
+    const overrides = { "word/document.xml": "document.main", "word/styles.xml": "styles", "word/numbering.xml": "numbering", "word/settings.xml": "settings", "word/footerDefault.xml": "footer" };
     zip.file("[Content_Types].xml", XML + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="jpg" ContentType="image/jpeg"/>' + Object.entries(overrides).map(([path, value]) => `<Override PartName="/${path}" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.${value}+xml"/>`).join("") + '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>');
     return new Blob([await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 6 } })], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
   }
 
-  // js/documents.js
+  // recovered-smv/js/documents.js
   async function buildExportFiles(state2, assets2, formats) {
     const files2 = /* @__PURE__ */ new Map();
     if (formats.includes("pdf")) {
@@ -2930,7 +2937,7 @@
     return formats.map((extension) => ({ extension, blob: files2.get(extension) }));
   }
 
-  // js/history-view.js
+  // recovered-smv/js/history-view.js
   var escape = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
   var content = (value) => escape(value || "\u2014");
   var labels = {
@@ -3033,7 +3040,7 @@
     return visits.map((visit, index) => `<details class="visit-history"><summary>Sopralluogo del ${content(displayDate(visit.date))}</summary><div class="historic-page">${historyPage(visit.data, section, images, visits.slice(0, index))}</div></details>`).join("");
   }
 
-  // js/photos.js
+  // recovered-smv/js/photos.js
   var MAX_PHOTO_BYTES = 2e6;
   var MAX_COMPRESSED_SIDE = 2400;
   var JPEG_QUALITIES = [0.9, 0.8, 0.7, 0.6];
@@ -3130,7 +3137,7 @@
     }
   }
 
-  // js/dialogs.js
+  // recovered-smv/js/dialogs.js
   function initDialogs(canClose = () => true) {
     const close = (dialog) => {
       if ((dialog == null ? void 0 : dialog.open) && canClose(dialog)) dialog.close();
@@ -3162,7 +3169,7 @@
     }
   }
 
-  // js/corrections.js
+  // recovered-smv/js/corrections.js
   var dataVersions = (state2) => [state2, ...state2.surveys.map((visit) => visit.data)];
   var at = (data, keys) => keys.reduce((value, key) => value == null ? void 0 : value[key], data);
   function fieldTargets(state2, keys, correction) {
@@ -3308,7 +3315,7 @@
     return true;
   }
 
-  // js/export.js
+  // recovered-smv/js/export.js
   function isAppleMobile(nav = navigator) {
     return /iPhone|iPad|iPod/.test(nav.userAgent) || nav.platform === "MacIntel" && nav.maxTouchPoints > 1;
   }
@@ -3397,7 +3404,7 @@
     }
   };
 
-  // js/home-title.js
+  // recovered-smv/js/home-title.js
   function initHomeTitle() {
     const branding = document.querySelector(".home-branding");
     const title = document.getElementById("homeTitle");
@@ -3423,7 +3430,7 @@
     }
   }
 
-  // js/app.js
+  // recovered-smv/js/app.js
   var $ = (id) => document.getElementById(id);
   var exportFiles = new ExportFiles($("exportReady"), notify);
   var unlockedPages = /* @__PURE__ */ new Set();
