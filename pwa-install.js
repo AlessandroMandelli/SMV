@@ -27,10 +27,7 @@
       const button = document.getElementById(id);
       if (button) { button.hidden = installed; button.disabled = prompting; }
     }
-    for (const id of ["installSeparator", "homeInstallSeparator"]) {
-      const separator = document.getElementById(id);
-      if (separator) separator.hidden = installed;
-    }
+    // Il separatore rimane: precede anche Cerca aggiornamenti, sempre visibile.
   }
   async function checkInstalled() {
     if (typeof navigator.getInstalledRelatedApps === "function") {

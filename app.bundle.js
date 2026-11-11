@@ -1,6 +1,6 @@
-/* Schede Restauro 3.6.21 — generato dai sorgenti modulari in js/. */
+/* Schede Restauro 3.6.23 — generato dai sorgenti modulari in js/. */
 (() => {
-  // recovered-smv/js/road.js
+  // js/road.js
   var ROAD_SIZE = { width: 553, height: 949 };
   var ROAD_POINTS = [[246, 860], [256, 827], [270, 783], [285, 737], [295, 704], [294, 686], [293, 679], [308, 683], [330, 690], [352, 697], [365, 698], [368, 686], [366, 669], [360, 648], [352, 634], [341, 626], [324, 619], [307, 616], [292, 623], [280, 636], [271, 644], [255, 646], [235, 646], [211, 646], [202, 644], [198, 639], [198, 626], [201, 599], [201, 574], [200, 548], [208, 520], [205, 490], [204, 466], [210, 449], [204, 422], [196, 396], [193, 379], [194, 369], [199, 364], [208, 363], [218, 369], [224, 383], [231, 406], [240, 433], [255, 458], [270, 476], [277, 484], [292, 483], [302, 476], [306, 463], [306, 445], [306, 419], [294, 399], [298, 377], [296, 355], [284, 330], [273, 309], [254, 287], [235, 268], [226, 249], [225, 229], [221, 205], [219, 181], [217, 156], [215, 137], [212, 123], [226, 121], [236, 115]];
   var ROAD_SVG_POINTS = ROAD_POINTS.map((point) => point.join(",")).join(" ");
@@ -10,7 +10,7 @@
     return kind && kind !== "road" ? assets2.filter((asset2) => asset2.kind === kind && Number.isFinite(asset2.x) && Number.isFinite(asset2.y)) : [];
   }
 
-  // recovered-smv/js/sections.js
+  // js/sections.js
   var EDITOR_LAYOUT_VERSION = 36;
   var SECTION_DEFINITIONS = Object.freeze([
     { key: "context", label: "Identificazione e dati del bene" },
@@ -28,7 +28,7 @@
     return Math.max(0, Math.min(SECTIONS.length - 1, migrated));
   }
 
-  // recovered-smv/js/model.js
+  // js/model.js
   var APP_ID = "schede-restauro";
   var SCHEMA_VERSION = 2;
   var COMMON = Object.freeze({
@@ -545,7 +545,7 @@
     return clone ? structuredClone(data) : data;
   }
 
-  // recovered-smv/js/surveys.js
+  // js/surveys.js
   function surveyEntries(state2) {
     return [
       ...(state2.surveys || []).filter((v) => v.id !== state2.survey.id),
@@ -734,7 +734,7 @@
     return entries;
   }
 
-  // recovered-smv/js/storage.js
+  // js/storage.js
   var DB_NAME = "SchedeRestauroV3";
   var DRAFT_KEY = "current-structured-v1";
   var database;
@@ -802,7 +802,7 @@
     return s.delete(DRAFT_KEY);
   });
 
-  // recovered-smv/js/catalog.js
+  // js/catalog.js
   var ASSETS = [
     {
       "id": "c01",
@@ -1275,7 +1275,7 @@
     }
   ];
 
-  // recovered-smv/js/legacy.js
+  // js/legacy.js
   async function migrateLegacy(legacy, assets2) {
     if ((legacy == null ? void 0 : legacy.version) !== 3 || !legacy.values || !legacy.meta)
       throw Error("Formato della bozza precedente non riconosciuto.");
@@ -1416,11 +1416,11 @@
     return applyFixed(out, assets2, { initialize: false });
   }
 
-  // recovered-smv/js/config.js
-  var VERSION = "3.6.21";
+  // js/config.js
+  var VERSION = "3.6.23";
   var PWA_URL = "https://alessandromandelli.github.io/SMV/";
 
-  // recovered-smv/js/pdf-layout.js
+  // js/pdf-layout.js
   var PAGE = Object.freeze({
     width: 792,
     height: 612,
@@ -1966,7 +1966,7 @@
     }
   };
 
-  // recovered-smv/js/pdf.js
+  // js/pdf.js
   var files = /* @__PURE__ */ new Map();
   async function resource(path) {
     if (!files.has(path))
@@ -2624,7 +2624,7 @@
     return layout ? { layout: documentLayout, pdf: blob } : blob;
   }
 
-  // recovered-smv/js/zip.js
+  // js/zip.js
   var loading;
   async function zipLibrary() {
     if (window.JSZip) return window.JSZip;
@@ -2644,7 +2644,7 @@
     return loading;
   }
 
-  // recovered-smv/js/docx.js
+  // js/docx.js
   var WIDTH = 14688;
   var XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
   var NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
@@ -2653,15 +2653,15 @@
   var any = (row, keys) => keys.some((key) => filled(row[key]));
   var actionFilled = (action) => Object.entries(action).some(([key, value]) => key !== "id" && filled(value));
   var riskColor2 = (risk) => ({ ALTO: "FF0000", MEDIO: "AA8000", BASSO: "138138" })[risk] || "1E3232";
-  function run(value, { bold = false, size = 19, color = "1E3232", font = "Arial" } = {}) {
+  function run(value, { bold = false, size = 19, color = "1E3232", font = "Arial", position } = {}) {
     const text = String(value ?? "").normalize("NFC").replace(/\r\n?/g, "\n").replace(/ {2,}/g, "	").split(/(\n|\t)/).map(
       (part) => part === "\n" ? "<w:br/>" : part === "	" ? "<w:tab/>" : `<w:t xml:space="preserve">${esc(part)}</w:t>`
     ).join("");
-    return `<w:r><w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}" w:eastAsia="${font}"/><w:sz w:val="${size}"/><w:szCs w:val="${size}"/><w:color w:val="${color}"/>${bold ? "<w:b/>" : ""}</w:rPr>${text}</w:r>`;
+    return `<w:r><w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}" w:eastAsia="${font}"/><w:sz w:val="${size}"/><w:szCs w:val="${size}"/><w:color w:val="${color}"/>${bold ? "<w:b/>" : ""}${position === void 0 ? "" : `<w:position w:val="${position}"/>`}</w:rPr>${text}</w:r>`;
   }
-  function para(content2 = "", { keep = false, keepLines = false, after = 90, before = 0, align = "left", shade, bullet = -1, style, separator = false, line, indent = 0, tabs = [] } = {}) {
+  function para(content2 = "", { keep = false, keepLines = false, after = 90, before = 0, align = "left", shade, bullet = -1, style, separator = false, line, exactLine = false, indent = 0, tabs = [] } = {}) {
     const imageHeight = content2.match(/<wp:extent[^>]*cy="(\d+)"/);
-    const spacing = imageHeight ? `w:line="${Math.ceil(Number(imageHeight[1]) / 635 + 40)}" w:lineRule="atLeast"` : line ? `w:line="${Math.round(line * 20)}" w:lineRule="atLeast"` : 'w:line="228" w:lineRule="auto"';
+    const spacing = imageHeight ? `w:line="${Math.ceil(Number(imageHeight[1]) / 635 + 40)}" w:lineRule="atLeast"` : line ? `w:line="${Math.round(line * 20)}" w:lineRule="${exactLine ? "exact" : "atLeast"}"` : 'w:line="228" w:lineRule="auto"';
     const stops = tabs.length ? `<w:tabs>${tabs.map((tab) => `<w:tab w:val="${tab.align}" w:pos="${tab.position}"/>`).join("")}</w:tabs>` : "";
     return `<w:p><w:pPr>${style ? `<w:pStyle w:val="${style}"/>` : ""}${keep ? "<w:keepNext/>" : ""}${keepLines ? "<w:keepLines/>" : ""}${indent ? `<w:ind w:left="${indent}"/>` : ""}${stops}<w:widowControl/><w:spacing w:before="${before}" w:after="${after}" ${spacing}/><w:jc w:val="${align}"/>${separator ? '<w:pBdr><w:bottom w:val="single" w:sz="12" w:space="0" w:color="FFFFFF"/></w:pBdr>' : ""}${shade ? `<w:shd w:fill="${shade}"/>` : ""}${bullet >= 0 ? `<w:numPr><w:ilvl w:val="${bullet}"/><w:numId w:val="1"/></w:numPr>` : ""}</w:pPr>${content2}</w:p>`;
   }
@@ -2896,10 +2896,11 @@
     body += note(state2.preventive.notes, 1600) + sectionProperties();
     const number = '<w:fldSimple w:instr="PAGE">' + run("1", { size: 15 }) + "</w:fldSimple>" + run("/", { size: 15 }) + '<w:fldSimple w:instr="NUMPAGES">' + run("1", { size: 15 }) + "</w:fldSimple>";
     const contacts = "Via Matteotti 8, 21030 Castello Cabiaglio (VA) \u2013 C.F./P.IVA 02507710396 \u2013 info@cromorestauri.com \u2013 PEC \u2013 cromorestauri@sicurezzapostale.it";
-    const footerLine = para(run("s.c.ar.l.", { size: 22, color: "D8A30A" }) + run("	" + contacts + "	", { size: 15 }) + number, {
+    const footerLine = para(run("s.c.ar.l.", { size: 22, color: "D8A30A", position: -4 }) + run("	" + contacts + "	", { size: 15, position: -4 }) + number, {
       style: "Footer",
       after: 0,
       line: 13.2,
+      exactLine: true,
       tabs: [{ align: "left", position: 920 }, { align: "right", position: WIDTH - 2400 }]
     });
     const footer = table([[
@@ -2923,7 +2924,7 @@
     return new Blob([await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 6 } })], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
   }
 
-  // recovered-smv/js/documents.js
+  // js/documents.js
   async function buildExportFiles(state2, assets2, formats) {
     const files2 = /* @__PURE__ */ new Map();
     if (formats.includes("pdf")) {
@@ -2937,7 +2938,7 @@
     return formats.map((extension) => ({ extension, blob: files2.get(extension) }));
   }
 
-  // recovered-smv/js/history-view.js
+  // js/history-view.js
   var escape = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
   var content = (value) => escape(value || "\u2014");
   var labels = {
@@ -3040,7 +3041,7 @@
     return visits.map((visit, index) => `<details class="visit-history"><summary>Sopralluogo del ${content(displayDate(visit.date))}</summary><div class="historic-page">${historyPage(visit.data, section, images, visits.slice(0, index))}</div></details>`).join("");
   }
 
-  // recovered-smv/js/photos.js
+  // js/photos.js
   var MAX_PHOTO_BYTES = 2e6;
   var MAX_COMPRESSED_SIDE = 2400;
   var JPEG_QUALITIES = [0.9, 0.8, 0.7, 0.6];
@@ -3137,7 +3138,7 @@
     }
   }
 
-  // recovered-smv/js/dialogs.js
+  // js/dialogs.js
   function initDialogs(canClose = () => true) {
     const close = (dialog) => {
       if ((dialog == null ? void 0 : dialog.open) && canClose(dialog)) dialog.close();
@@ -3169,7 +3170,7 @@
     }
   }
 
-  // recovered-smv/js/corrections.js
+  // js/corrections.js
   var dataVersions = (state2) => [state2, ...state2.surveys.map((visit) => visit.data)];
   var at = (data, keys) => keys.reduce((value, key) => value == null ? void 0 : value[key], data);
   function fieldTargets(state2, keys, correction) {
@@ -3315,7 +3316,7 @@
     return true;
   }
 
-  // recovered-smv/js/export.js
+  // js/export.js
   function isAppleMobile(nav = navigator) {
     return /iPhone|iPad|iPod/.test(nav.userAgent) || nav.platform === "MacIntel" && nav.maxTouchPoints > 1;
   }
@@ -3367,7 +3368,7 @@
       if (!files2.length) return false;
       const generation = this.generation;
       const apple = isAppleMobile();
-      const archive = apple && files2.length > 1 ? await makeArchive(files2, name) : null;
+      const archive = files2.length > 1 ? await makeArchive(files2, name) : null;
       if (generation !== this.generation) return false;
       if (archive) {
         this.link(this.zipLink, archive, `${name}.zip`);
@@ -3404,7 +3405,7 @@
     }
   };
 
-  // recovered-smv/js/home-title.js
+  // js/home-title.js
   function initHomeTitle() {
     const branding = document.querySelector(".home-branding");
     const title = document.getElementById("homeTitle");
@@ -3430,9 +3431,130 @@
     }
   }
 
-  // recovered-smv/js/app.js
+  // js/updates.js
+  var TIMEOUT = 45e3;
+  var TIMEOUT_MESSAGE = "Il controllo sta impiegando troppo tempo. Riprova tra poco.";
+  var returnKey = () => "schede-restauro:ritorno-aggiornamento:" + new URL("./", location.href).href;
+  function within(promise, milliseconds) {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(Error(TIMEOUT_MESSAGE)), milliseconds);
+      Promise.resolve(promise).then(resolve, reject).finally(() => clearTimeout(timer));
+    });
+  }
+  function activated(worker, milliseconds) {
+    return new Promise((resolve, reject) => {
+      const finish = (error) => {
+        clearTimeout(timer);
+        worker.removeEventListener("statechange", check);
+        if (error) reject(error);
+        else resolve();
+      };
+      const check = () => {
+        if (worker.state === "activated") finish();
+        else if (worker.state === "redundant")
+          finish(Error("Aggiornamento non completato. La scheda resta aperta; riprova tra poco."));
+      };
+      const timer = setTimeout(() => finish(Error(TIMEOUT_MESSAGE)), milliseconds);
+      worker.addEventListener("statechange", check);
+      check();
+    });
+  }
+  function controlling(worker, milliseconds) {
+    const service = navigator.serviceWorker;
+    return new Promise((resolve, reject) => {
+      const finish = (error) => {
+        clearTimeout(timer);
+        service.removeEventListener("controllerchange", check);
+        if (error) reject(error);
+        else resolve();
+      };
+      const check = () => {
+        if (service.controller === worker) finish();
+      };
+      const timer = setTimeout(() => finish(Error(TIMEOUT_MESSAGE)), milliseconds);
+      service.addEventListener("controllerchange", check);
+      check();
+    });
+  }
+  function workerVersion(worker, milliseconds) {
+    return new Promise((resolve, reject) => {
+      const channel = new MessageChannel();
+      const finish = (error, version) => {
+        clearTimeout(timer);
+        channel.port1.close();
+        channel.port2.close();
+        if (error) reject(error);
+        else resolve(version);
+      };
+      const timer = setTimeout(() => finish(Error("Non \xE8 stato possibile verificare la versione. Riprova tra poco.")), milliseconds);
+      channel.port1.onmessage = (event) => {
+        var _a, _b;
+        const version = (_a = event.data) == null ? void 0 : _a.version;
+        if (((_b = event.data) == null ? void 0 : _b.type) !== "APP_VERSION" || typeof version !== "string" || !/^\d+\.\d+(?:\.\d+)?$/.test(version))
+          finish(Error("Risposta di aggiornamento non valida. Riprova tra poco."));
+        else finish(null, version.replace(/\.0$/, ""));
+      };
+      try {
+        worker.postMessage({ type: "GET_APP_VERSION" }, [channel.port2]);
+      } catch (error) {
+        finish(error);
+      }
+    });
+  }
+  async function checkForUpdates(onProgress = () => {
+  }, timeout = TIMEOUT) {
+    if (!/^https?:$/.test(location.protocol))
+      throw Error("Per cercare gli aggiornamenti apri l\u2019app dal suo indirizzo online.");
+    if (navigator.onLine === false)
+      throw Error("Connessione assente. Riprova quando sei online.");
+    if (!("serviceWorker" in navigator) || !isSecureContext)
+      throw Error("La ricerca degli aggiornamenti non \xE8 disponibile in questo browser.");
+    const deadline = Date.now() + timeout;
+    const remaining = () => Math.max(0, deadline - Date.now());
+    const registration = await within(navigator.serviceWorker.register("./sw.js", {
+      scope: "./",
+      updateViaCache: "none"
+    }), remaining());
+    let candidate = registration.installing || registration.waiting;
+    const found = () => {
+      candidate = registration.installing || registration.waiting || candidate;
+      if (candidate) onProgress("Aggiornamento in corso\u2026");
+    };
+    registration.addEventListener("updatefound", found);
+    try {
+      found();
+      await within(registration.update(), remaining());
+      found();
+      const worker = candidate || registration.active;
+      if (!worker) throw Error("Aggiornamento non disponibile. Riprova tra poco.");
+      await activated(worker, remaining());
+      await controlling(worker, remaining());
+      const version = await workerVersion(worker, Math.min(4e3, remaining()));
+      return { version, available: version !== VERSION };
+    } finally {
+      registration.removeEventListener("updatefound", found);
+    }
+  }
+  function rememberUpdateView(view, version) {
+    sessionStorage.setItem(returnKey(), JSON.stringify({ view, version, time: Date.now() }));
+  }
+  function takeUpdateView() {
+    try {
+      const key = returnKey(), raw = sessionStorage.getItem(key);
+      sessionStorage.removeItem(key);
+      if (!raw) return null;
+      const saved = JSON.parse(raw);
+      if (saved.version !== VERSION || !["home", "editor"].includes(saved.view) || !Number.isFinite(saved.time) || Math.abs(Date.now() - saved.time) > 6e5) return null;
+      return saved.view;
+    } catch {
+      return null;
+    }
+  }
+
+  // js/app.js
   var $ = (id) => document.getElementById(id);
   var exportFiles = new ExportFiles($("exportReady"), notify);
+  var updateView = takeUpdateView();
   var unlockedPages = /* @__PURE__ */ new Set();
   var escape2 = (value) => String(value ?? "").replace(
     /[&<>"']/g,
@@ -3519,11 +3641,13 @@
         await saveDraft(copy);
         savedRevision = version;
         if (version === revision) $("saveStatus").textContent = "Bozza salvata";
+        return true;
       } catch {
         $("saveStatus").textContent = "Bozza non salvata";
         notify(
           "Salvataggio locale non riuscito. Mantieni aperta la scheda e salvala prima di uscire."
         );
+        return false;
       }
     });
     return saveChain;
@@ -3705,7 +3829,7 @@
   };
   function setBusy(value) {
     busy = value;
-    for (const id of ["next", "previous", "filename", "newButton", "importButton", "resetButton", "pageLockButton", "surveyHistoryButton"])
+    for (const id of ["next", "previous", "filename", "newButton", "importButton", "resetButton", "pageLockButton", "surveyHistoryButton", "homeUpdateButton", "updateButton"])
       $(id).disabled = value;
     $("resumeButton").disabled = value || !draftAvailable;
     for (const button of $("sectionContent").querySelectorAll('[data-action="camera"], [data-action="photos"]'))
@@ -3899,6 +4023,54 @@
   }
   $("infoButton").onclick = openInfo;
   $("homeInfoButton").onclick = openInfo;
+  var updateButtons = [$("homeUpdateButton"), $("updateButton")];
+  async function searchForUpdates() {
+    if (busy) return;
+    $("options").open = $("homeOptions").open = false;
+    const view = $("editor").hidden ? "home" : "editor";
+    const controls = [...$("sectionContent").querySelectorAll("button, input, select, textarea")].map((element) => ({ element, disabled: element.disabled }));
+    const progress = (message) => {
+      for (const button of updateButtons) button.textContent = message;
+      notify(message);
+    };
+    let reloading = false;
+    setBusy(true);
+    for (const { element } of controls) element.disabled = true;
+    for (const button of updateButtons) button.setAttribute("aria-busy", "true");
+    try {
+      progress("Ricerca in corso\u2026");
+      if (state && !await persist())
+        throw Error("Bozza non salvata. Salva la scheda prima di applicare un aggiornamento.");
+      const update = await checkForUpdates(progress);
+      if (!update.available) {
+        notify("L\u2019app \xE8 gi\xE0 aggiornata alla V." + VERSION + ".");
+        return;
+      }
+      progress("Aggiornamento in corso\u2026");
+      if (state && !await persist())
+        throw Error("Bozza non salvata. L\u2019aggiornamento non \xE8 stato applicato; la scheda resta aperta.");
+      try {
+        rememberUpdateView(view, update.version);
+      } catch {
+        throw Error("Non \xE8 possibile preparare la riapertura della scheda. Riprova senza chiudere l\u2019app.");
+      }
+      location.reload();
+      reloading = true;
+    } catch (error) {
+      const networkError = ["TypeError", "NetworkError", "SecurityError", "InvalidStateError"].includes(error.name);
+      notify(networkError ? navigator.onLine === false ? "Connessione assente. Riprova quando sei online." : "Impossibile cercare gli aggiornamenti. Controlla la connessione e riprova." : error.message || "Impossibile cercare gli aggiornamenti. Riprova tra poco.");
+    } finally {
+      if (!reloading) {
+        setBusy(false);
+        for (const { element, disabled } of controls) element.disabled = disabled;
+        for (const button of updateButtons) {
+          button.textContent = "Cerca aggiornamenti";
+          button.removeAttribute("aria-busy");
+        }
+      }
+    }
+  }
+  for (const button of updateButtons) button.onclick = searchForUpdates;
   $("newButton").onclick = () => {
     $("assetSelect").replaceChildren();
     for (const button of $("newDialog").querySelectorAll("[data-kind]")) button.setAttribute("aria-pressed", "false");
@@ -4176,6 +4348,7 @@
     $("importButton").disabled = false;
     window.RestauroAppReady = true;
     const startRevision = revision;
+    let storageFailed = false;
     try {
       await openStorage();
       storageReady = true;
@@ -4192,7 +4365,12 @@
         $("resumeButton").disabled = false;
       } else if (state && revision > savedRevision) persist();
     } catch (error) {
+      storageFailed = true;
       notify("Bozza locale non disponibile: " + error.message);
+    }
+    if (updateView && !storageFailed) {
+      if (updateView === "editor" && state) show("editor");
+      notify("App aggiornata alla V." + VERSION + ".");
     }
   }
   init().catch((error) => showMessage("Avvio non riuscito", error.message));

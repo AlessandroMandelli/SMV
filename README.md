@@ -1,8 +1,21 @@
-# Schede Restauro 3.6.21
+# Schede Restauro 3.6.23
 
 PWA per il Sacro Monte di Varese, utilizzabile offline su desktop e telefono. Esporta PDF, Word modificabile e JSON. Lo ZIP contiene il sito già compilato, pronto per GitHub Pages senza npm o un server applicativo.
 
 ## Novità della revisione
+
+- **Cerca aggiornamenti** è presente in Opzioni sia nella home sia nella compilazione, dopo il separatore e prima di Installa app. Rimane visibile anche quando l'app è già installata; in questo caso il separatore resta presente.
+- Il comando salva la bozza, controlla la pubblicazione online, attende che tutti i file siano pronti e che il nuovo aggiornamento controlli la pagina. Poi ricarica l'app e riprende la stessa scheda nella stessa sezione; dalla home ritorna alla home. Fotografie, storico, date e nome personalizzato rimangono conservati.
+- Durante la ricerca compaiono **Ricerca in corso…** e, quando necessario, **Aggiornamento in corso…**. Se la versione è già attuale viene mostrato **L'app è già aggiornata**. In caso di connessione assente, download incompleto o salvataggio locale fallito, la scheda resta aperta e si può riprovare. Il controllo ha un limite di attesa per evitare che i pulsanti restino occupati indefinitamente.
+- Rimane il controllo automatico al caricamento dell'app; la compilazione non viene ricaricata automaticamente durante il lavoro. Il comando manuale applica anche un aggiornamento già scaricato mentre la finestra mostrava ancora la versione precedente.
+
+## Correzioni già incluse nella 3.6.22
+
+- Nel footer Word, **s.c.ar.l.** e i recapiti sono abbassati al filo inferiore della scritta Cròmo. Il logo conserva posizione e dimensioni; rimangono la riga unica, le tabulazioni e la numerazione automatica. Il footer PDF è invariato.
+- **Salva scheda** scarica il solo JSON direttamente. Se vengono scelti due o tre formati, scarica un unico ZIP su tutti i dispositivi, desktop compreso. Il JSON rimane obbligatorio.
+- L'intera interfaccia segue automaticamente la modalità chiara o scura del dispositivo/browser, anche quando la preferenza cambia ad app aperta. Sono adattati home, campi, controlli nativi, tabelle, menu, finestre, storico e stati risolti. Mappa e fotografie mantengono i colori originali; Word e PDF conservano il fondo bianco e i propri stili.
+
+## Correzioni già incluse nella 3.6.21
 
 - Il footer completo compare su **tutte le pagine del Word e del PDF**, comprese seconda pagina, fotografie e continuazioni delle tabelle e degli interventi.
 - Nel Word, logo Cròmo, scritta **s.c.ar.l.** color oro, recapiti su una sola riga e numerazione a destra riprendono la proposta grafica approvata. Il footer usa tabelle e tabulazioni native di Word; i numeri di pagina rimangono campi automatici.
@@ -43,7 +56,9 @@ Conservati i checkbox separati di Grotta e VI Cappella, le altre coordinate, il 
 
 ## Pubblicazione
 
-Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Se presente nella vecchia versione, elimina anche `assets/home-landscape.png`, che non è più utilizzato. Attendi il completamento di GitHub Pages e riapri l'app. La cache 3.6.21 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
+Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Se presente nella vecchia versione, elimina anche `assets/home-landscape.png`, che non è più utilizzato. Attendi il completamento di GitHub Pages. La cache 3.6.23 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
+
+Per il primo passaggio dalla 3.6.22, che non contiene il nuovo pulsante, ricarica l'app con connessione, attendi il controllo iniziale e ricaricala di nuovo se mostra ancora la versione precedente. Dalla 3.6.23 in poi puoi usare Cerca aggiornamenti. La ricerca riguarda il percorso da cui hai aperto l'app, anche se la repository ha un nome diverso da SMV.
 
 ## Home e compilazione
 
@@ -54,6 +69,8 @@ Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository,
 Storico manutentivo e stato conservativo hanno schermate distinte. I titoli superiori duplicati e i campi ID/data/oggetto delle sezioni finali non occupano spazio nella compilazione; le corrispondenti intestazioni rimangono nei documenti. Tra nome file e Opzioni si trovano il lucchetto e l'icona cronologia. La cronologia mostra soltanto le versioni precedenti della pagina corrente.
 
 Salva scheda registra lo stato corrente. Non sono necessari pulsanti separati Nuovo sopralluogo o Registra aggiornamento nell'editor. La bozza locale si salva durante la compilazione. L'Info conserva il collegamento SMV approvato; i percorsi tecnici sono relativi e funzionano anche sotto SMV_V5. Installa app scompare quando l'installazione viene rilevata.
+
+Cerca aggiornamenti conserva i dati in IndexedDB e usa soltanto una breve indicazione nella sessione della finestra per riaprire la home o la compilazione dopo la ricarica. Non avvia un nuovo sopralluogo, non aggiunge campi al JSON e non aggiorna le date della scheda. L'indicazione viene consumata una sola volta e scade dopo dieci minuti.
 
 ## Blocchi e correzioni definitive
 
@@ -83,7 +100,7 @@ Il limite di 2 MB riguarda il peso binario di ogni nuova immagine, non il peso c
 
 Quando contiene fotografie, l'atlante inizia su una nuova pagina, contiene fino a quattro fotografie per pagina e ripete l'intestazione sulle continuazioni, sia nel PDF sia nel Word. Se è vuoto, viene stampato soltanto il titolo dopo la sezione 5, sulla stessa pagina quando lo spazio lo consente. Didascalie particolarmente lunghe possono richiedere altre pagine. Le didascalie delle visite chiuse sono conservate separatamente dall'immagine; correggerle a lucchetto aperto aggiorna anche le copie precedenti della stessa fotografia.
 
-Salva scheda include sempre il JSON e permette di aggiungere DOCX e PDF. Il JSON non può essere deselezionato. Su iPhone il solo JSON viene scaricato direttamente; più formati sono raccolti in un unico ZIP. Su desktop vengono scaricati separatamente. Il JSON conserva i dati e lo storico necessari per il sopralluogo successivo.
+Salva scheda include sempre il JSON e permette di aggiungere DOCX e PDF. Il JSON non può essere deselezionato. Su tutti i dispositivi, il solo JSON viene scaricato direttamente; due o tre formati sono raccolti in un unico ZIP. Il JSON conserva i dati e lo storico necessari per il sopralluogo successivo.
 
 Le finestre in sovraimpressione si chiudono con la × oppure con un clic o tocco esterno. Durante importazioni e salvataggi in corso resta la protezione contro la chiusura accidentale.
 
@@ -100,5 +117,7 @@ Il Word rimane modificabile e scorre con il contenuto: numero di pagine e interr
 I sorgenti leggibili sono in `js/`; per ricompilarli eseguire `npm ci` e `npm run build`. Il sito distribuito funziona senza questi comandi. `assets/beni.json` contiene l'anagrafica, i valori iniziali `fixed`, i campi in grassetto `boldFields` e il campo `fileLabel` per la parte del nome relativa a ciascun bene, `assets/map.jpg` la planimetria e `js/road.js` il tracciato sovrapposto del Viale. Il catalogo contiene le nuove coordinate delle cappelle, delle grotte, degli archi e delle fontane. Non viene utilizzato un vecchio template PDF.
 
 `js/corrections.js` applica le correzioni definitive, `js/surveys.js` gestisce sopralluoghi e collegamenti, `js/pdf.js` e `js/docx.js` generano i documenti. Le note scritte manualmente restano testi autonomi: eventuali riferimenti da correggere vanno modificati nel relativo campo.
+
+`js/updates.js`, già incluso nel bundle, gestisce la ricerca manuale, l'attesa dell'aggiornamento completo e il ritorno alla pagina precedente. Il service worker restituisce la propria versione su richiesta, così una pagina ancora aperta con il vecchio codice riconosce anche una cache già aggiornata. Non vengono cancellati i dati locali per forzare l'aggiornamento.
 
 I nuovi JSON mantengono lo schema 2 e importano gli schemi 1 e 2. Lo ZIP del sito non contiene JSON o documenti di prova, vecchi template o `node_modules`. Non comprende integrazioni Nextcloud o applicazioni native.

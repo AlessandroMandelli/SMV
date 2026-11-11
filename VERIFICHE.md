@@ -1,39 +1,29 @@
-# Verifiche della revisione 3.6.21
+# Verifiche della revisione 3.6.23
 
-Base: versione 3.6.20 recuperata dalla repository SMV al commit `8f955fe58597f2b51fd0327ca799e8240630a5c8`. Ricostruito l'archivio con i 50 file e verificata la corrispondenza esatta con l'ultima consegna: 2.704.473 byte, SHA-256 `eb4664423b5e9ac7d3bf8a3dc282a4186b69b49faf82c74229bbc26358b43d1d`.
+Base: archivio dell'ultima consegna 3.6.22, 2.706.391 byte, SHA-256 `6bdebbe19db608eb566936c734da1f6a692c5b6c48a00c81be1f918643575169`. Verificati CRC e corrispondenza dei 50 file con la copia di lavoro prima delle modifiche.
 
-## Modifica localizzata
+## Modifiche
 
-- Footer completo su ogni pagina del Word e del PDF, comprese le continuazioni.
-- Word con logo originale, scritta s.c.ar.l. color oro, recapiti su una riga e numerazione automatica a destra. Tabella e tabulazioni native; nessuna casella di testo sovrapposta.
-- Un solo footer Word predefinito, referenziato da tutte le sezioni; rimossa la distinzione tra footer della prima pagina e delle successive.
-- Posizione del footer PDF e dimensioni dei suoi elementi conservate; rimosso il limite alle sole pagine iniziali delle sezioni.
-- Modificati soltanto i due moduli interessati, i metadati di versione, il bundle, la cache e la documentazione. Catalogo, mappa, fotografie, nomenclatura, diagnostica, priorità, storico e collegamenti sono identici alla 3.6.20.
+- Cerca aggiornamenti nelle opzioni della home e della compilazione, sotto il separatore e prima di Installa app. Il comando e il separatore restano visibili anche con l'app già installata.
+- Controllo manuale della pubblicazione con aggiornamento del service worker, attesa del download completo, dell'attivazione e del passaggio di controllo della pagina.
+- Risposta del service worker con la propria versione: riconosciuto anche il caso di cache già aggiornata con pagina ancora aperta sulla vecchia versione.
+- Conferma del salvataggio della bozza prima della ricerca e prima della ricarica. Durante l'operazione i campi restano protetti; in caso di errore si ripristinano i blocchi originali.
+- Ritorno alla home o alla stessa sezione della scheda tramite un'indicazione temporanea della sessione, senza aggiungere dati al JSON o iniziare un nuovo sopralluogo.
 
-## Documenti e continuazioni
+## Verifiche automatiche
 
-Generati due casi con gli stessi dati sia con i generatori 3.6.20 sia con quelli aggiornati:
+Superate 45 prove:
 
-1. Scheda essenziale con data generale vuota e note a fondo pagina: quattro pagine Word e quattro pagine PDF.
-2. Scheda con due sopralluoghi, testo manutentivo lungo, otto diagnosi, priorità rimossa conservando il degrado, quattro risoluzioni, azioni preventive storicizzate, cinque fotografie e note: 15 pagine Word e 19 pagine PDF.
+- **15 sul controllo aggiornamenti:** versione attuale, pagina vecchia e cache nuova, attesa delle diverse fasi, installazione già in corso, download fallito, errore di rete con nuovo tentativo, assenza di connessione, file locale e browser non supportato, timeout e rimozione dei listener, risposte non valide, ripristino della vista e isolamento fra percorsi della PWA.
+- **8 sull'interfaccia e sulla bozza:** posizione e testo dei menu, home già aggiornata, home offline, ritorno alla home dopo un aggiornamento, ripresa della compilazione nella stessa sezione, conservazione di fotografie/date/storico/nome personalizzato, blocco del doppio clic e ripristino dei campi dopo un errore, salvataggio locale fallito senza ricarica. Un secondo caricamento del bundle simula la nuova versione e usa lo stesso IndexedDB e la stessa sessione: la scheda ripresa coincide con quella salvata.
+- **10 sull'installazione:** browser normale, tutto schermo, finestra installata, overlay, modalità iOS simulata, applicazioni correlate, evento di installazione, storage di sessione non disponibile e listener precedenti. Cerca aggiornamenti e i separatori rimangono visibili mentre Installa app scompare nei casi previsti.
+- **2 sulla cache:** venti risorse complete e navigazione offline, risposta con la versione, pulizia della sola cache precedente; un download interrotto conserva la cache funzionante e permette un tentativo successivo completo.
+- **10 sull'esportazione:** cinque combinazioni su desktop simulato e cinque su iPhone simulato, con risorse offline. JSON obbligatorio, JSON singolo diretto e ZIP per più formati; verificati contenuti e nomi dei file. Nessun PDF intermedio per generare il DOCX.
 
-Per entrambi i casi, il corpo XML del Word coincide con la 3.6.20 dopo l'esclusione delle sole proprietà del footer; operazioni e coordinate del corpo PDF e struttura delle tabelle coincidono integralmente. Le esportazioni non modificano i dati della scheda.
+I controlli della pagina usano Happy DOM e IndexedDB simulato; eventi e messaggi del service worker sono simulati. Non è stata eseguita una prova nativa in browser grafico o su iPhone fisico. La verifica precedente del footer Word resta valida: generatori Word/PDF e asset sono identici per byte alla 3.6.22, come gli stili dell'interfaccia. Non sono state apportate modifiche all'impaginazione dei documenti.
 
-Controllati il footer e la sua resa su tutte le 42 pagine effettive, con estrazione dei contenuti, verifica delle coordinate e controllo visivo dei dettagli a fondo pagina:
+## Distribuzione
 
-- Logo, s.c.ar.l., indirizzo, dati fiscali, e-mail e PEC presenti una sola volta per pagina.
-- Recapiti su una sola riga; s.c.ar.l. a 11 pt e color oro, recapiti e contatori a 7,5 pt, come nella proposta approvata.
-- Logo di 113,5 × 34,9 pt; margine sinistro e posizione costanti in tutte le pagine di ciascun formato.
-- Campi PAGE e NUMPAGES aggiornati correttamente, comprese le pagine con numerazione a due cifre.
-- Nessuna sovrapposizione con testi, immagini o riquadri delle note.
-- Nessun footer Word nascosto dalla proprietà Prima pagina diversa; relazioni delle immagini e riferimenti di sezione validi.
+Versione coerente fra package, configurazione, bundle, riferimenti HTML e cache. Un solo nuovo modulo sorgente, già incluso nel bundle: 51 file nello ZIP e 20 risorse nella cache. Conservati catalogo, mappa, tracciato, fotografie, dati dei beni e logica dei sopralluoghi.
 
-Tutti gli XML e le relazioni interne dei DOCX sono stati verificati. Rendering Word eseguito con LibreOffice; la verifica nativa in Microsoft Word per Mac resta da confermare.
-
-## Salvataggio e distribuzione
-
-Superate le combinazioni JSON, PDF + JSON, DOCX + JSON e DOCX + PDF + JSON offline su desktop e iPhone simulato. JSON obbligatorio, più formati raccolti in un unico ZIP su iPhone e download separati su desktop. Il Word nativo non genera un PDF intermedio. Le prove del download usano Happy DOM e IndexedDB; nessun dispositivo iPhone fisico.
-
-Verificato l'aggiornamento della cache dalla 3.6.20 alla 3.6.21: 20 risorse, navigazione e risorse offline, conservazione delle cache di altre app. La filigrana rimane esclusa.
-
-Archivio finale con 50 file pronti per la radice GitHub, mappa e catalogo inclusi. Controllati sintassi JavaScript, identificativi HTML, riferimenti delle risorse, CRC dello ZIP, unzip -t, estrazione e corrispondenza di ogni file con i sorgenti finali. Esclusi documenti e JSON di prova, node_modules e vecchi template. Nessuna pubblicazione automatica della repository.
+Controllati sintassi JavaScript, identificativi HTML, riferimenti dei pulsanti e delle risorse, CRC dello ZIP, `unzip -t`, estrazione e corrispondenza dei file con i sorgenti finali. Esclusi documenti e JSON di prova, node_modules, vecchi template e filigrane. Nessuna modifica o pubblicazione della repository GitHub.
