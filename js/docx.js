@@ -5,7 +5,7 @@ import {
 import {
   surveyEntries, allPhotos, preventiveGroups, maintenanceEntries,
 } from "./surveys.js";
-import { ROAD_POINTS, ROAD_SIZE, mapAssets } from "./road.js";
+import { ROAD_POINTS, ROAD_SIZE, DOCUMENT_MAP_WIDTH, mapAssets } from "./road.js";
 import { zipLibrary } from "./zip.js";
 import { VERSION } from "./config.js";
 
@@ -150,7 +150,8 @@ export async function makeDocx(state, assets) {
   left += band("2. SOGGETTO E DATI TECNICO-DIMENSIONALI") + label("Soggetto:", g.subject, { always: true });
   left += label("Dimensioni:", `H: ${measureText(g.height)}\t\tL: ${measureText(g.width)}\t\tP: ${measureText(g.depth)}`, { always: true });
   left += label("Materie e Tecniche:", g.materials, { always: true });
-  const right = table([[para(run("LOCALIZZAZIONE BENE", { bold: true, size: 22, color: "005B60" }), { align: "center", after: 120 }) + para(image(map, 254.15, 254.15 * ROAD_SIZE.height / ROAD_SIZE.width, "Planimetria del bene selezionato"), { align: "center", after: 0 })]], [6688], { borderColor: "005B60", shade: "F8FAF9", padding: 80, minHeight: 10000 });
+  // Titolo e bordo superiore restano fermi: la mappa cresce ai lati e in basso.
+  const right = table([[para(run("LOCALIZZAZIONE BENE", { bold: true, size: 22, color: "005B60" }), { align: "center", after: 120 }) + para(image(map, DOCUMENT_MAP_WIDTH, DOCUMENT_MAP_WIDTH * ROAD_SIZE.height / ROAD_SIZE.width, "Planimetria del bene selezionato"), { align: "center", after: 0 })]], [6688], { borderColor: "005B60", shade: "F8FAF9", padding: 80, minHeight: 10000 });
   let body = table([[left, "", right]], [7424, 576, 6688], { border: false, padding: 0, keepRows: false });
   body += pageBreak() + band("3. STORICO MANUTENTIVO");
   for (const [key, title] of [["restorations", "Interventi di RESTAURO precedenti"], ["maintenance", "Interventi di MANUTENZIONE precedenti"]]) {

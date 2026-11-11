@@ -1,6 +1,6 @@
 import { surveyEntries, preventiveGroups, maintenanceEntries, allPhotos } from "./surveys.js";
 import { VERSION } from "./config.js";
-import { ROAD_SIZE, ROAD_POINTS, mapAssets } from "./road.js";
+import { ROAD_SIZE, ROAD_POINTS, DOCUMENT_MAP_WIDTH, mapAssets } from "./road.js";
 import {
   COMMON,
   METHODS,
@@ -212,10 +212,10 @@ function identification(report, state, assets) {
     { size: 11, bold: true, color: COLORS.green },
   );
   const map = {
-    x: frame.x + (frame.width - 254.15) / 2,
+    x: frame.x + (frame.width - DOCUMENT_MAP_WIDTH) / 2,
     top: PAGE.margin + 24.45,
-    width: 254.15,
-    height: 254.15 * ROAD_SIZE.height / ROAD_SIZE.width,
+    width: DOCUMENT_MAP_WIDTH,
+    height: DOCUMENT_MAP_WIDTH * ROAD_SIZE.height / ROAD_SIZE.width,
   };
   report.image(page, report.images.map, map.x, map.top, map.width, map.height);
   if (state.assetId === "strada")
@@ -233,15 +233,16 @@ function identification(report, state, assets) {
         opacity: 0.9,
       });
     }
+  const markerSize = 17.4 * map.width / ROAD_SIZE.width;
   mapAssets(assets, state.assetId)
     .forEach((asset) =>
       report.checkbox(
         page,
-        map.x + (asset.x / 100) * map.width - 4,
-        map.top + (asset.y / 100) * map.height - 4,
+        map.x + (asset.x / 100) * map.width - markerSize / 2,
+        map.top + (asset.y / 100) * map.height - markerSize / 2,
         "",
         asset.id === state.assetId,
-        { size: 8 },
+        { size: markerSize },
       ),
     );
 }
