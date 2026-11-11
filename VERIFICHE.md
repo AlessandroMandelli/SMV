@@ -1,38 +1,34 @@
-# Verifiche della revisione 3.6.24
+# Verifiche della revisione 3.6.25
 
-Base: archivio dell'ultima consegna 3.6.23, 2.712.189 byte, SHA-256 `4305d91002fbea2f90eabafaf80cd0b19c14dc10e81e2210f19e76503ccd98a5`. Verificati CRC e corrispondenza esatta dei 51 file prima della modifica.
+Base 3.6.24 recuperata dalla repository pubblicata dopo il ripristino dell'ambiente di lavoro. Ricostruito l'archivio dell'ultima consegna e verificata la corrispondenza esatta: 51 file, 2.712.401 byte, SHA-256 `fffda6b56b0a39ddafacca17c7fbe632be7869faf2df08afc4f695a8048b6da6`.
 
-## Correzione localizzata
+## Correzione
 
-Allineate al filo inferiore della scritta Cròmo le linee di base di s.c.ar.l. e dell'intera riga dei dati aziendali nel footer PDF. La posizione si ricava dal bordo inferiore del logo e dalla dimensione effettiva del font, senza spostare logo, numerazione o corpo della pagina. Generatore Word e stili dell'app invariati.
+Prima pagina PDF riportata al margine superiore di 28,8 pt del Word. Riposizionati titolo, loghi, primo blocco dei metadati e localizzazione; i contenuti della prima colonna seguono l'intestazione. Mappa, checkbox e tracciato del Viale condividono il nuovo riferimento verticale. Non cambiano larghezze, font, dimensioni delle immagini, contenuti o footer.
 
-## PDF
+## Confronto con il Word
 
-Generati con lo stesso stato sia il PDF della 3.6.23 sia quello aggiornato, confrontando tutte le operazioni di disegno e le tabelle:
+Generati PDF e Word dagli stessi dati di una scheda con sopralluoghi e cinque fotografie. Rendering Word con LibreOffice e PDF con Poppler, confrontando prima pagina e coordinate estratte:
 
-- Scheda essenziale dell'Acquedotto, data iniziale vuota e riquadri note: quattro pagine.
-- Scheda con due sopralluoghi, storico manutentivo lungo, otto diagnosi, quattro risoluzioni, priorità rimossa conservando il degrado, azioni preventive storicizzate e cinque fotografie: diciannove pagine.
+- Titolo della scheda: differenza verticale di circa 0,36 pt.
+- Titolo Localizzazione bene: differenza di circa 0,05 pt.
+- Inizio dell'ID: differenza inferiore a 0,01 pt.
+- Immagini dei due loghi e della mappa: coordinate superiori coincidenti.
 
-In tutti i casi le sole differenze di impaginazione sono le coordinate verticali delle due scritte del footer. Contenuti, righe, tabelle, interruzioni di pagina, loghi e numerazione coincidono integralmente con la 3.6.23. I dati della scheda non vengono modificati dall'esportazione.
+Corpo, immagini, stili, relazioni e footer del DOCX sono identici per byte alla 3.6.24; cambia soltanto il metadato della versione. Il Word di riferimento non è stato modificato. Non è stata effettuata una nuova prova nativa in Word per Mac.
 
-Renderizzati con Poppler e controllati visivamente tutti i 23 footer, oltre a una pagina completa con note. Verificati anche i PDF tramite estrazione delle coordinate:
+## PDF e contenuti lunghi
 
-- Linea di base di entrambe le scritte a 597,9 pt dal bordo superiore, coincidente entro 0,02 pt con il bordo inferiore del logo.
-- Logo invariato a 28,8 pt da sinistra e 563 pt dall'alto, dimensioni 113,5 x 34,9 pt.
-- Sigla societaria a 11 pt e recapiti a 7,5 pt, come nella versione precedente; riga dei recapiti completa e senza tagli.
-- Tutti i testi entro la pagina, separati dal contenuto e dai riquadri note. Numerazione corretta anche con pagine a due cifre.
-- Nessun campo di modulo trasparente.
+Cinque schede di prova, per 36 pagine complessive: Acquedotto essenziale con note, scheda con storico lungo e quindici pagine, scheda di confronto Word/PDF, Viale con tracciato rosso e scheda con ID multilinea, diciotto righe di autore e ventiquattro di materie e tecniche.
 
-## Word e salvataggio
+Nei quattro casi ordinari il confronto con la 3.6.24 conferma che cambiano soltanto coordinate verticali della prima pagina; tutte le pagine successive e le tabelle sono identiche. Nella prova con testo lungo sono conservate tutte le righe e le continuazioni. Le esportazioni non modificano i dati della scheda.
 
-Confrontate tutte le parti del DOCX con la 3.6.23, usando una scheda con sopralluoghi e fotografie: corpo, footer, immagini, stili e relazioni identici per byte. Cambia soltanto il metadato della versione dell'app. Dati originali invariati.
+Controllate visivamente le prime pagine e tutte le cinque pagine del caso con testi lunghi. Verificati su tutti i PDF footer, numerazione e assenza di campi di modulo trasparenti. Conservato l'allineamento del footer PDF introdotto nella 3.6.24. Nessun testo oltre il margine inferiore del contenuto o sovrapposto al footer.
 
-Superate cinque combinazioni di esportazione su desktop simulato e cinque su iPhone simulato: JSON obbligatorio, JSON singolo diretto, ZIP per più formati, contenuti e nomi verificati. Le risorse sono disponibili anche offline; il Word nativo non crea PDF intermedi.
+## Salvataggio e distribuzione
 
-Verificata la cache 3.6.24 con venti risorse, risposta con la versione per Cerca aggiornamenti, navigazione offline e pulizia della sola cache precedente. Un download interrotto conserva la cache funzionante e permette un tentativo successivo completo. Le prove di browser e iPhone sono simulate; non è stata eseguita una prova su dispositivo fisico.
+Superate cinque combinazioni di esportazione su desktop simulato e cinque su iPhone simulato: JSON obbligatorio, JSON singolo, ZIP per più formati, nomi e contenuti corretti e funzionamento offline. Il DOCX nativo non crea un PDF intermedio.
 
-## Archivio
+Cache 3.6.25 con venti risorse, controllo della versione per Cerca aggiornamenti, navigazione e risorse offline, rimozione della sola cache precedente. Interfaccia, tema, salvataggio della bozza, aggiornamenti e logica dei sopralluoghi conservati. Prove del browser e di iPhone simulate in Happy DOM; nessun iPhone fisico.
 
-Versione coerente fra package, configurazione, bundle, HTML e service worker. Modificato soltanto il modulo del layout PDF, oltre ai metadati di versione, ai file generati e alla documentazione. Interfaccia, tema, ricerca aggiornamenti, catalogo, mappa e logica dei sopralluoghi conservati.
-
-ZIP con 51 file pronti per la radice GitHub. Controllati sintassi JavaScript, riferimenti HTML e risorse, CRC, unzip -t, estrazione e corrispondenza dei file con i sorgenti finali. Esclusi PDF, DOCX e JSON di prova, node_modules, vecchi template e filigrane. Nessuna pubblicazione automatica della repository.
+ZIP finale con 51 file pronti per GitHub. Verificati sintassi JavaScript, riferimenti HTML, file della cache, CRC, unzip -t, estrazione e corrispondenza dei file con i sorgenti finali. Esclusi documenti e JSON di prova, vecchi template, filigrane e node_modules. Nessuna modifica della repository remota.
