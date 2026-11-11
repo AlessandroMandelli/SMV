@@ -33,9 +33,11 @@ import { SECTION_DEFINITIONS } from "./sections.js";
 import { VERSION, PWA_URL } from "./config.js";
 import { ExportFiles } from "./export.js";
 import { initHomeTitle } from "./home-title.js";
+import { checkForUpdates, rememberUpdateView, takeUpdateView } from "./updates.js";
 
 const $ = (id) => document.getElementById(id);
 const exportFiles = new ExportFiles($("exportReady"), notify);
+const updateView = takeUpdateView();
 // Permessi temporanei per pagina: non fanno parte della bozza né del JSON.
 const unlockedPages = new Set();
 const escape = (value) =>
@@ -132,11 +134,13 @@ function persist() {
         await storage.saveDraft(copy);
         savedRevision = version;
         if (version === revision) $("saveStatus").textContent = "Bozza salvata";
+        return true;
       } catch {
         $("saveStatus").textContent = "Bozza non salvata";
         notify(
           "Salvataggio locale non riuscito. Mantieni aperta la scheda e salvala prima di uscire.",
         );
+        return false;
       }
     });
   return saveChain;
@@ -341,7 +345,7 @@ const sectionRenderers = {
 };
 function setBusy(value) {
   busy = value;
-  for (const id of ["next", "previous", "filename", "newButton", "importButton", "resetButton", "pageLockButton", "surveyHistoryButton"])
+  for (const id of ["next", "previous", "filename", "newButton", "importButton", "resetButton", "pageLockButton", "surveyHistoryButton", "homeUpdateButton", "updateButton"])
     $(id).disabled = value;
   $("resumeButton").disabled = value || !draftAvailable;
   for (const button of $("sectionContent").querySelectorAll('[data-action="camera"], [data-action="photos"]'))
@@ -561,6 +565,58 @@ function openInfo() {
 }
 $("infoButton").onclick = openInfo;
 $("homeInfoButton").onclick = openInfo;
+const updateButtons = [$("homeUpdateButton"), $("updateButton")];
+async function searchForUpdates() {
+  if (busy) return;
+  $("options").open = $("homeOptions").open = false;
+  const view = $("editor").hidden ? "home" : "editor";
+  const controls = [...$("sectionContent").querySelectorAll("button, input, select, textarea")]
+    .map(element => ({ element, disabled: element.disabled }));
+  const progress = message => {
+    for (const button of updateButtons) button.textContent = message;
+    notify(message);
+  };
+  let reloading = false;
+  setBusy(true);
+  for (const { element } of controls) element.disabled = true;
+  for (const button of updateButtons) button.setAttribute("aria-busy", "true");
+  try {
+    progress("Ricerca in corso…");
+    if (state && !await persist())
+      throw Error("Bozza non salvata. Salva la scheda prima di applicare un aggiornamento.");
+    const update = await checkForUpdates(progress);
+    if (!update.available) {
+      notify("L’app è già aggiornata alla V." + VERSION + ".");
+      return;
+    }
+    progress("Aggiornamento in corso…");
+    // Ricontrolla il salvataggio prima di abbandonare la finestra corrente.
+    if (state && !await persist())
+      throw Error("Bozza non salvata. L’aggiornamento non è stato applicato; la scheda resta aperta.");
+    try { rememberUpdateView(view, update.version); }
+    catch { throw Error("Non è possibile preparare la riapertura della scheda. Riprova senza chiudere l’app."); }
+    location.reload();
+    reloading = true;
+  } catch (error) {
+    const networkError = ["TypeError", "NetworkError", "SecurityError", "InvalidStateError"].includes(error.name);
+    notify(networkError
+      ? navigator.onLine === false ? "Connessione assente. Riprova quando sei online."
+        : "Impossibile cercare gli aggiornamenti. Controlla la connessione e riprova."
+      : error.message || "Impossibile cercare gli aggiornamenti. Riprova tra poco.");
+  } finally {
+    // Durante la navigazione mantieni i campi fermi: nessuna modifica può
+    // arrivare fra l'ultimo salvataggio e la chiusura della vecchia pagina.
+    if (!reloading) {
+      setBusy(false);
+      for (const { element, disabled } of controls) element.disabled = disabled;
+      for (const button of updateButtons) {
+        button.textContent = "Cerca aggiornamenti";
+        button.removeAttribute("aria-busy");
+      }
+    }
+  }
+}
+for (const button of updateButtons) button.onclick = searchForUpdates;
 $("newButton").onclick = () => {
   $("assetSelect").replaceChildren();
   for (const button of $("newDialog").querySelectorAll("[data-kind]")) button.setAttribute("aria-pressed", "false");
@@ -825,6 +881,7 @@ async function init() {
   window.RestauroAppReady = true;
   // La home è utilizzabile subito. L'apertura della bozza non blocca i pulsanti.
   const startRevision = revision;
+  let storageFailed = false;
   try {
     await storage.openStorage();
     storageReady = true;
@@ -841,7 +898,12 @@ async function init() {
       $("resumeButton").disabled = false;
     } else if (state && revision > savedRevision) persist();
   } catch (error) {
+    storageFailed = true;
     notify("Bozza locale non disponibile: " + error.message);
+  }
+  if (updateView && !storageFailed) {
+    if (updateView === "editor" && state) show("editor");
+    notify("App aggiornata alla V." + VERSION + ".");
   }
 }
 init().catch((error) => showMessage("Avvio non riuscito", error.message));

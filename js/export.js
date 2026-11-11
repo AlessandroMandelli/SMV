@@ -15,7 +15,7 @@ async function makeArchive(files, name) {
     { type: "application/zip" });
 }
 
-/** Prepara tutti i file prima di avviare i download; un solo ZIP su iPhone. */
+/** Un solo download: file singolo oppure ZIP dei formati selezionati. */
 export class ExportFiles {
   constructor(root, notify) {
     this.root = root;
@@ -54,7 +54,7 @@ export class ExportFiles {
     if (!files.length) return false;
     const generation = this.generation;
     const apple = isAppleMobile();
-    const archive = apple && files.length > 1 ? await makeArchive(files, name) : null;
+    const archive = files.length > 1 ? await makeArchive(files, name) : null;
     if (generation !== this.generation) return false;
     if (archive) {
       this.link(this.zipLink, archive, `${name}.zip`);

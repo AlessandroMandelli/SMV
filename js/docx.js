@@ -20,15 +20,15 @@ const any = (row, keys) => keys.some(key => filled(row[key]));
 const actionFilled = action => Object.entries(action).some(([key, value]) => key !== "id" && filled(value));
 const riskColor = risk => ({ ALTO: "FF0000", MEDIO: "AA8000", BASSO: "138138" })[risk] || "1E3232";
 
-function run(value, { bold = false, size = 19, color = "1E3232", font = "Arial" } = {}) {
+function run(value, { bold = false, size = 19, color = "1E3232", font = "Arial", position } = {}) {
   const text = String(value ?? "").normalize("NFC").replace(/\r\n?/g, "\n").replace(/ {2,}/g, "\t").split(/(\n|\t)/).map(part =>
     part === "\n" ? "<w:br/>" : part === "\t" ? "<w:tab/>" : `<w:t xml:space="preserve">${esc(part)}</w:t>`,
   ).join("");
-  return `<w:r><w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}" w:eastAsia="${font}"/><w:sz w:val="${size}"/><w:szCs w:val="${size}"/><w:color w:val="${color}"/>${bold ? "<w:b/>" : ""}</w:rPr>${text}</w:r>`;
+  return `<w:r><w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}" w:eastAsia="${font}"/><w:sz w:val="${size}"/><w:szCs w:val="${size}"/><w:color w:val="${color}"/>${bold ? "<w:b/>" : ""}${position === undefined ? "" : `<w:position w:val="${position}"/>`}</w:rPr>${text}</w:r>`;
 }
-function para(content = "", { keep = false, keepLines = false, after = 90, before = 0, align = "left", shade, bullet = -1, style, separator = false, line, indent = 0, tabs = [] } = {}) {
+function para(content = "", { keep = false, keepLines = false, after = 90, before = 0, align = "left", shade, bullet = -1, style, separator = false, line, exactLine = false, indent = 0, tabs = [] } = {}) {
   const imageHeight = content.match(/<wp:extent[^>]*cy="(\d+)"/);
-  const spacing = imageHeight ? `w:line="${Math.ceil(Number(imageHeight[1]) / 635 + 40)}" w:lineRule="atLeast"` : line ? `w:line="${Math.round(line * 20)}" w:lineRule="atLeast"` : 'w:line="228" w:lineRule="auto"';
+  const spacing = imageHeight ? `w:line="${Math.ceil(Number(imageHeight[1]) / 635 + 40)}" w:lineRule="atLeast"` : line ? `w:line="${Math.round(line * 20)}" w:lineRule="${exactLine ? "exact" : "atLeast"}"` : 'w:line="228" w:lineRule="auto"';
   const stops = tabs.length ? `<w:tabs>${tabs.map(tab => `<w:tab w:val="${tab.align}" w:pos="${tab.position}"/>`).join("")}</w:tabs>` : "";
   return `<w:p><w:pPr>${style ? `<w:pStyle w:val="${style}"/>` : ""}${keep ? "<w:keepNext/>" : ""}${keepLines ? "<w:keepLines/>" : ""}${indent ? `<w:ind w:left="${indent}"/>` : ""}${stops}<w:widowControl/><w:spacing w:before="${before}" w:after="${after}" ${spacing}/><w:jc w:val="${align}"/>${separator ? '<w:pBdr><w:bottom w:val="single" w:sz="12" w:space="0" w:color="FFFFFF"/></w:pBdr>' : ""}${shade ? `<w:shd w:fill="${shade}"/>` : ""}${bullet >= 0 ? `<w:numPr><w:ilvl w:val="${bullet}"/><w:numId w:val="1"/></w:numPr>` : ""}</w:pPr>${content}</w:p>`;
 }
@@ -239,8 +239,10 @@ export async function makeDocx(state, assets) {
   // recapiti e numerazione sulla stessa riga, senza spazi di allineamento.
   const number = '<w:fldSimple w:instr="PAGE">' + run("1", { size: 15 }) + '</w:fldSimple>' + run("/", { size: 15 }) + '<w:fldSimple w:instr="NUMPAGES">' + run("1", { size: 15 }) + '</w:fldSimple>';
   const contacts = "Via Matteotti 8, 21030 Castello Cabiaglio (VA) – C.F./P.IVA 02507710396 – info@cromorestauri.com – PEC – cromorestauri@sicurezzapostale.it";
-  const footerLine = para(run("s.c.ar.l.", { size: 22, color: "D8A30A" }) + run("\t" + contacts + "\t", { size: 15 }) + number, {
-    style: "Footer", after: 0, line: 13.2,
+  // Abbassa soltanto le scritte di 2 pt. L'interlinea esatta impedisce che
+  // l'offset allarghi la riga, lasciando il logo nella posizione originale.
+  const footerLine = para(run("s.c.ar.l.", { size: 22, color: "D8A30A", position: -4 }) + run("\t" + contacts + "\t", { size: 15, position: -4 }) + number, {
+    style: "Footer", after: 0, line: 13.2, exactLine: true,
     tabs: [{ align: "left", position: 920 }, { align: "right", position: WIDTH - 2400 }],
   });
   const footer = table([[
