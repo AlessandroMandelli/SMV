@@ -42,7 +42,6 @@ export class PdfReport {
     this.tableCounter = 0;
     this.activeTable = null;
     this.tables = {};
-    this.brandedPages = new Set();
     this.glyphWidths = new Map();
     this.photoImages = new Map();
     this.characters = new Map(
@@ -332,9 +331,6 @@ export class PdfReport {
         page[method] = options => { this.record(page, { type: method, ...options }); return draw(options); };
       }
     }
-    // Marchi e dati fissi appartengono solo all'apertura dei tre documenti.
-    if (!continuation && ["first", "immediate", "preventive"].includes(kind))
-      this.brandedPages.add(page);
     const y =
       !continuation && ["immediate", "preventive"].includes(kind)
         ? this.header(page, kind, meta)
@@ -346,17 +342,15 @@ export class PdfReport {
     const footer =
       "Via Matteotti 8, 21030 Castello Cabiaglio (VA) – C.F./P.IVA 02507710396 – info@cromorestauri.com – PEC – cromorestauri@sicurezzapostale.it";
     pages.forEach((page, i) => {
-      if (this.brandedPages.has(page)) {
-        this.image(page, this.images.footer, PAGE.margin, 563, 113.5, 34.9);
-        this.text(page, "s.c.ar.l.", PAGE.margin + 120, 583, {
-          size: 11,
-          color: "#d8a30a",
-        });
-        let size = 7.5;
-        while (this.width(footer, size) > BODY_WIDTH - 166 && size > 5.5)
-          size -= 0.25;
-        this.text(page, footer, PAGE.margin + 166, 586, { size });
-      }
+      this.image(page, this.images.footer, PAGE.margin, 563, 113.5, 34.9);
+      this.text(page, "s.c.ar.l.", PAGE.margin + 120, 583, {
+        size: 11,
+        color: "#d8a30a",
+      });
+      let size = 7.5;
+      while (this.width(footer, size) > BODY_WIDTH - 166 && size > 5.5)
+        size -= 0.25;
+      this.text(page, footer, PAGE.margin + 166, 586, { size });
       const count = `${i + 1}/${pages.length}`;
       this.text(
         page,

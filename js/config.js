@@ -1,3 +1,3 @@
 /** Generato da tools/build.mjs. */
-export const VERSION = "3.6.20";
+export const VERSION = "3.6.21";
 export const PWA_URL = "https://alessandromandelli.github.io/SMV/";

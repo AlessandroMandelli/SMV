@@ -26,10 +26,11 @@ function run(value, { bold = false, size = 19, color = "1E3232", font = "Arial" 
   ).join("");
   return `<w:r><w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}" w:eastAsia="${font}"/><w:sz w:val="${size}"/><w:szCs w:val="${size}"/><w:color w:val="${color}"/>${bold ? "<w:b/>" : ""}</w:rPr>${text}</w:r>`;
 }
-function para(content = "", { keep = false, keepLines = false, after = 90, before = 0, align = "left", shade, bullet = -1, style, separator = false, line, indent = 0 } = {}) {
+function para(content = "", { keep = false, keepLines = false, after = 90, before = 0, align = "left", shade, bullet = -1, style, separator = false, line, indent = 0, tabs = [] } = {}) {
   const imageHeight = content.match(/<wp:extent[^>]*cy="(\d+)"/);
   const spacing = imageHeight ? `w:line="${Math.ceil(Number(imageHeight[1]) / 635 + 40)}" w:lineRule="atLeast"` : line ? `w:line="${Math.round(line * 20)}" w:lineRule="atLeast"` : 'w:line="228" w:lineRule="auto"';
-  return `<w:p><w:pPr>${style ? `<w:pStyle w:val="${style}"/>` : ""}${keep ? "<w:keepNext/>" : ""}${keepLines ? "<w:keepLines/>" : ""}${indent ? `<w:ind w:left="${indent}"/>` : ""}<w:widowControl/><w:spacing w:before="${before}" w:after="${after}" ${spacing}/><w:jc w:val="${align}"/>${separator ? '<w:pBdr><w:bottom w:val="single" w:sz="12" w:space="0" w:color="FFFFFF"/></w:pBdr>' : ""}${shade ? `<w:shd w:fill="${shade}"/>` : ""}${bullet >= 0 ? `<w:numPr><w:ilvl w:val="${bullet}"/><w:numId w:val="1"/></w:numPr>` : ""}</w:pPr>${content}</w:p>`;
+  const stops = tabs.length ? `<w:tabs>${tabs.map(tab => `<w:tab w:val="${tab.align}" w:pos="${tab.position}"/>`).join("")}</w:tabs>` : "";
+  return `<w:p><w:pPr>${style ? `<w:pStyle w:val="${style}"/>` : ""}${keep ? "<w:keepNext/>" : ""}${keepLines ? "<w:keepLines/>" : ""}${indent ? `<w:ind w:left="${indent}"/>` : ""}${stops}<w:widowControl/><w:spacing w:before="${before}" w:after="${after}" ${spacing}/><w:jc w:val="${align}"/>${separator ? '<w:pBdr><w:bottom w:val="single" w:sz="12" w:space="0" w:color="FFFFFF"/></w:pBdr>' : ""}${shade ? `<w:shd w:fill="${shade}"/>` : ""}${bullet >= 0 ? `<w:numPr><w:ilvl w:val="${bullet}"/><w:numId w:val="1"/></w:numPr>` : ""}</w:pPr>${content}</w:p>`;
 }
 const blank = () => para("", { after: 0 });
 const pageBreak = () => '<w:p><w:pPr><w:pageBreakBefore/><w:keepNext/><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr></w:p>';
@@ -56,7 +57,8 @@ function table(rows, widths, { border = true, headers = false, stripe = headers,
       const span = cell.span || 1, width = widths.slice(column, column + span).reduce((a, b) => a + b, 0);
       column += span;
       const fill = cell.shade || shade || (headers && index === 0 ? "B9B9B9" : stripe ? index % 2 === 0 ? "F4F7F6" : "FFFFFF" : "");
-      return `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/>${span > 1 ? `<w:gridSpan w:val="${span}"/>` : ""}<w:vAlign w:val="${cell.center ? "center" : "top"}"/>${fill ? `<w:shd w:fill="${fill}"/>` : ""}</w:tcPr>${cell.content || blank()}${cell.content?.endsWith("</w:tbl>") ? '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="2" w:lineRule="exact"/></w:pPr></w:p>' : ""}</w:tc>`;
+      const bottomMargin = cell.paddingBottom === undefined ? "" : `<w:tcMar><w:bottom w:w="${cell.paddingBottom}" w:type="dxa"/></w:tcMar>`;
+      return `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/>${span > 1 ? `<w:gridSpan w:val="${span}"/>` : ""}${bottomMargin}<w:vAlign w:val="${cell.verticalAlign || (cell.center ? "center" : "top")}"/>${fill ? `<w:shd w:fill="${fill}"/>` : ""}</w:tcPr>${cell.content || blank()}${cell.content?.endsWith("</w:tbl>") ? '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="2" w:lineRule="exact"/></w:pPr></w:p>' : ""}</w:tc>`;
     }).join("");
     return `<w:tr><w:trPr>${keepRows ? "<w:cantSplit/>" : ""}${headers && index === 0 ? "<w:tblHeader/>" : ""}${minHeight ? `<w:trHeight w:val="${minHeight}" w:hRule="atLeast"/>` : ""}</w:trPr>${cells}</w:tr>`;
   }).join("");
@@ -201,7 +203,7 @@ export async function makeDocx(state, assets) {
     for (let index = 0; index < cells.length; index += 2) rows.push(cells.slice(index, index + 2));
     body += table(rows, [WIDTH / 2, WIDTH / 2], { border: false, headers: true, stripe: false, padding: 90 });
   }
-  const sectionProperties = () => `<w:sectPr><w:footerReference w:type="default" r:id="footerDefault"/><w:footerReference w:type="first" r:id="footerFirst"/><w:type w:val="nextPage"/><w:pgSz w:w="15840" w:h="12240" w:orient="landscape"/><w:pgMar w:top="576" w:right="576" w:bottom="1120" w:left="576" w:header="180" w:footer="140"/><w:titlePg/></w:sectPr>`;
+  const sectionProperties = () => `<w:sectPr><w:footerReference w:type="default" r:id="footerDefault"/><w:type w:val="nextPage"/><w:pgSz w:w="15840" w:h="12240" w:orient="landscape"/><w:pgMar w:top="576" w:right="576" w:bottom="1120" w:left="576" w:header="180" w:footer="179"/></w:sectPr>`;
   const sectionBreak = () => `<w:p><w:pPr>${sectionProperties()}</w:pPr></w:p>`;
   body += sectionBreak() + heading("REGISTRO INTERVENTI DI MANUTENZIONE IMMEDIATA", state.immediate.date) + band("INTERVENTI ESEGUITI");
   for (const row of maintenanceEntries(state)) {
@@ -233,21 +235,31 @@ export async function makeDocx(state, assets) {
     }
   }
   body += note(state.preventive.notes, 1600) + sectionProperties();
-  const number = para('<w:fldSimple w:instr="PAGE">' + run("1", { size: 15 }) + '</w:fldSimple>' + run("/", { size: 15 }) + '<w:fldSimple w:instr="NUMPAGES">' + run("1", { size: 15 }) + '</w:fldSimple>', { align: "right", after: 0 });
-  const footer = table([[para(image(footerLogo, 105, 32.3, "Cròmo"), { after: 0 }), para(run("s.c.ar.l. – Via Matteotti 8, 21030 Castello Cabiaglio (VA) – C.F./P.IVA 02507710396\ninfo@cromorestauri.com – PEC – cromorestauri@sicurezzapostale.it", { size: 15 }), { after: 0 })]], [2350, WIDTH - 2350], { border: false, padding: 0 }) + number;
+  // Un unico footer nativo per tutte le pagine. Le tabulazioni mantengono
+  // recapiti e numerazione sulla stessa riga, senza spazi di allineamento.
+  const number = '<w:fldSimple w:instr="PAGE">' + run("1", { size: 15 }) + '</w:fldSimple>' + run("/", { size: 15 }) + '<w:fldSimple w:instr="NUMPAGES">' + run("1", { size: 15 }) + '</w:fldSimple>';
+  const contacts = "Via Matteotti 8, 21030 Castello Cabiaglio (VA) – C.F./P.IVA 02507710396 – info@cromorestauri.com – PEC – cromorestauri@sicurezzapostale.it";
+  const footerLine = para(run("s.c.ar.l.", { size: 22, color: "D8A30A" }) + run("\t" + contacts + "\t", { size: 15 }) + number, {
+    style: "Footer", after: 0, line: 13.2,
+    tabs: [{ align: "left", position: 920 }, { align: "right", position: WIDTH - 2400 }],
+  });
+  const footer = table([[
+    { content: para(image(footerLogo, 113.5, 34.9, "Cròmo"), { style: "Footer", after: 0 }), verticalAlign: "bottom" },
+    { content: footerLine, verticalAlign: "bottom", paddingBottom: 157 },
+  ]], [2400, WIDTH - 2400], { border: false, padding: 0 });
   const relXml = entries => XML + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + entries.join("") + '</Relationships>';
   zip.file("word/document.xml", XML + `<w:document ${NS}><w:body>${body}</w:body></w:document>`);
-  zip.file("word/styles.xml", XML + `<w:styles ${NS}><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="19"/><w:color w:val="1E3232"/><w:lang w:val="it-IT"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="90" w:line="228" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:rPr><w:b/><w:sz w:val="26"/><w:color w:val="005B60"/></w:rPr></w:style></w:styles>`);
+  const footerStyle = '<w:style w:type="paragraph" w:styleId="Footer"><w:name w:val="footer"/><w:basedOn w:val="Normal"/><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="15"/><w:szCs w:val="15"/></w:rPr></w:style>';
+  zip.file("word/styles.xml", XML + `<w:styles ${NS}><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="19"/><w:color w:val="1E3232"/><w:lang w:val="it-IT"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="90" w:line="228" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:rPr><w:b/><w:sz w:val="26"/><w:color w:val="005B60"/></w:rPr></w:style>${footerStyle}</w:styles>`);
   zip.file("word/numbering.xml", XML + `<w:numbering ${NS}><w:abstractNum w:abstractNumId="0"><w:multiLevelType w:val="multilevel"/>${[0, 1].map(level => `<w:lvl w:ilvl="${level}"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val="${level ? "○" : "•"}"/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="${(level + 1) * 500}"/></w:tabs><w:ind w:left="${(level + 1) * 500}" w:hanging="240"/></w:pPr></w:lvl>`).join("")}</w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num></w:numbering>`);
   zip.file("word/settings.xml", XML + `<w:settings ${NS}><w:updateFields w:val="true"/><w:compat><w:compatSetting w:name="compatibilityMode" w:uri="http://schemas.microsoft.com/office/word" w:val="15"/></w:compat></w:settings>`);
-  zip.file("word/footerDefault.xml", XML + `<w:ftr ${NS}>${number}</w:ftr>`);
-  zip.file("word/footerFirst.xml", XML + `<w:ftr ${NS}>${footer}</w:ftr>`);
-  zip.file("word/_rels/footerFirst.xml.rels", relXml(rels.filter(rel => rel.includes('Id="' + footerLogo + '"'))));
+  zip.file("word/footerDefault.xml", XML + `<w:ftr ${NS}>${footer}</w:ftr>`);
+  zip.file("word/_rels/footerDefault.xml.rels", relXml(rels.filter(rel => rel.includes('Id="' + footerLogo + '"'))));
   const type = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/";
-  zip.file("word/_rels/document.xml.rels", relXml([...rels, ...["styles", "numbering", "settings"].map(name => `<Relationship Id="${name}" Type="${type + name}" Target="${name}.xml"/>`), ...['First', 'Default'].map(name => `<Relationship Id="footer${name}" Type="${type}footer" Target="footer${name}.xml"/>`)]));
+  zip.file("word/_rels/document.xml.rels", relXml([...rels, ...["styles", "numbering", "settings"].map(name => `<Relationship Id="${name}" Type="${type + name}" Target="${name}.xml"/>`), `<Relationship Id="footerDefault" Type="${type}footer" Target="footerDefault.xml"/>`]));
   zip.file("_rels/.rels", relXml([`<Relationship Id="document" Type="${type}officeDocument" Target="word/document.xml"/>`, '<Relationship Id="core" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>']));
   zip.file("docProps/core.xml", XML + '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>' + esc(baseName(state, assets)) + '</dc:title><dc:creator>' + esc(COMMON.company) + '</dc:creator><dc:description>Schede Restauro ' + VERSION + '</dc:description></cp:coreProperties>');
-  const overrides = { 'word/document.xml': 'document.main', 'word/styles.xml': 'styles', 'word/numbering.xml': 'numbering', 'word/settings.xml': 'settings', 'word/footerFirst.xml': 'footer', 'word/footerDefault.xml': 'footer' };
+  const overrides = { 'word/document.xml': 'document.main', 'word/styles.xml': 'styles', 'word/numbering.xml': 'numbering', 'word/settings.xml': 'settings', 'word/footerDefault.xml': 'footer' };
   zip.file("[Content_Types].xml", XML + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="jpg" ContentType="image/jpeg"/>' + Object.entries(overrides).map(([path, value]) => `<Override PartName="/${path}" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.${value}+xml"/>`).join("") + '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>');
   return new Blob([await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 6 } })], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
 }
