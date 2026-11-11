@@ -339,18 +339,22 @@ export class PdfReport {
   }
   finish() {
     const pages = this.pdf.getPages();
+    const logoTop = 563, logoHeight = 34.9;
+    // La linea di base delle scritte coincide con il filo inferiore di Cròmo.
+    // Usa lo stesso rapporto della primitiva text(), anche se il font si riduce.
+    const footerTextTop = size => logoTop + logoHeight - size * 0.905;
     const footer =
       "Via Matteotti 8, 21030 Castello Cabiaglio (VA) – C.F./P.IVA 02507710396 – info@cromorestauri.com – PEC – cromorestauri@sicurezzapostale.it";
     pages.forEach((page, i) => {
-      this.image(page, this.images.footer, PAGE.margin, 563, 113.5, 34.9);
-      this.text(page, "s.c.ar.l.", PAGE.margin + 120, 583, {
+      this.image(page, this.images.footer, PAGE.margin, logoTop, 113.5, logoHeight);
+      this.text(page, "s.c.ar.l.", PAGE.margin + 120, footerTextTop(11), {
         size: 11,
         color: "#d8a30a",
       });
       let size = 7.5;
       while (this.width(footer, size) > BODY_WIDTH - 166 && size > 5.5)
         size -= 0.25;
-      this.text(page, footer, PAGE.margin + 166, 586, { size });
+      this.text(page, footer, PAGE.margin + 166, footerTextTop(size), { size });
       const count = `${i + 1}/${pages.length}`;
       this.text(
         page,
