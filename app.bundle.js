@@ -1,7 +1,8 @@
-/* Schede Restauro 3.6.25 — generato dai sorgenti modulari in js/. */
+/* Schede Restauro 3.6.26 — generato dai sorgenti modulari in js/. */
 (() => {
   // js/road.js
   var ROAD_SIZE = { width: 553, height: 949 };
+  var DOCUMENT_MAP_WIDTH = 286;
   var ROAD_POINTS = [[246, 860], [256, 827], [270, 783], [285, 737], [295, 704], [294, 686], [293, 679], [308, 683], [330, 690], [352, 697], [365, 698], [368, 686], [366, 669], [360, 648], [352, 634], [341, 626], [324, 619], [307, 616], [292, 623], [280, 636], [271, 644], [255, 646], [235, 646], [211, 646], [202, 644], [198, 639], [198, 626], [201, 599], [201, 574], [200, 548], [208, 520], [205, 490], [204, 466], [210, 449], [204, 422], [196, 396], [193, 379], [194, 369], [199, 364], [208, 363], [218, 369], [224, 383], [231, 406], [240, 433], [255, 458], [270, 476], [277, 484], [292, 483], [302, 476], [306, 463], [306, 445], [306, 419], [294, 399], [298, 377], [296, 355], [284, 330], [273, 309], [254, 287], [235, 268], [226, 249], [225, 229], [221, 205], [219, 181], [217, 156], [215, 137], [212, 123], [226, 121], [236, 115]];
   var ROAD_SVG_POINTS = ROAD_POINTS.map((point) => point.join(",")).join(" ");
   function mapAssets(assets2, assetId) {
@@ -1417,7 +1418,7 @@
   }
 
   // js/config.js
-  var VERSION = "3.6.25";
+  var VERSION = "3.6.26";
   var PWA_URL = "https://alessandromandelli.github.io/SMV/";
 
   // js/pdf-layout.js
@@ -2141,10 +2142,10 @@
       { size: 11, bold: true, color: COLORS.green }
     );
     const map = {
-      x: frame.x + (frame.width - 254.15) / 2,
+      x: frame.x + (frame.width - DOCUMENT_MAP_WIDTH) / 2,
       top: PAGE.margin + 24.45,
-      width: 254.15,
-      height: 254.15 * ROAD_SIZE.height / ROAD_SIZE.width
+      width: DOCUMENT_MAP_WIDTH,
+      height: DOCUMENT_MAP_WIDTH * ROAD_SIZE.height / ROAD_SIZE.width
     };
     report.image(page, report.images.map, map.x, map.top, map.width, map.height);
     if (state2.assetId === "strada")
@@ -2162,14 +2163,15 @@
           opacity: 0.9
         });
       }
+    const markerSize = 17.4 * map.width / ROAD_SIZE.width;
     mapAssets(assets2, state2.assetId).forEach(
       (asset2) => report.checkbox(
         page,
-        map.x + asset2.x / 100 * map.width - 4,
-        map.top + asset2.y / 100 * map.height - 4,
+        map.x + asset2.x / 100 * map.width - markerSize / 2,
+        map.top + asset2.y / 100 * map.height - markerSize / 2,
         "",
         asset2.id === state2.assetId,
-        { size: 8 }
+        { size: markerSize }
       )
     );
   }
@@ -2814,7 +2816,7 @@
     left += band("2. SOGGETTO E DATI TECNICO-DIMENSIONALI") + label("Soggetto:", g.subject, { always: true });
     left += label("Dimensioni:", `H: ${measureText(g.height)}		L: ${measureText(g.width)}		P: ${measureText(g.depth)}`, { always: true });
     left += label("Materie e Tecniche:", g.materials, { always: true });
-    const right = table([[para(run("LOCALIZZAZIONE BENE", { bold: true, size: 22, color: "005B60" }), { align: "center", after: 120 }) + para(image(map, 254.15, 254.15 * ROAD_SIZE.height / ROAD_SIZE.width, "Planimetria del bene selezionato"), { align: "center", after: 0 })]], [6688], { borderColor: "005B60", shade: "F8FAF9", padding: 80, minHeight: 1e4 });
+    const right = table([[para(run("LOCALIZZAZIONE BENE", { bold: true, size: 22, color: "005B60" }), { align: "center", after: 120 }) + para(image(map, DOCUMENT_MAP_WIDTH, DOCUMENT_MAP_WIDTH * ROAD_SIZE.height / ROAD_SIZE.width, "Planimetria del bene selezionato"), { align: "center", after: 0 })]], [6688], { borderColor: "005B60", shade: "F8FAF9", padding: 80, minHeight: 1e4 });
     let body = table([[left, "", right]], [7424, 576, 6688], { border: false, padding: 0, keepRows: false });
     body += pageBreak() + band("3. STORICO MANUTENTIVO");
     for (const [key, title] of [["restorations", "Interventi di RESTAURO precedenti"], ["maintenance", "Interventi di MANUTENZIONE precedenti"]]) {
