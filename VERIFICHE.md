@@ -1,29 +1,38 @@
-# Verifiche della revisione 3.6.23
+# Verifiche della revisione 3.6.24
 
-Base: archivio dell'ultima consegna 3.6.22, 2.706.391 byte, SHA-256 `6bdebbe19db608eb566936c734da1f6a692c5b6c48a00c81be1f918643575169`. Verificati CRC e corrispondenza dei 50 file con la copia di lavoro prima delle modifiche.
+Base: archivio dell'ultima consegna 3.6.23, 2.712.189 byte, SHA-256 `4305d91002fbea2f90eabafaf80cd0b19c14dc10e81e2210f19e76503ccd98a5`. Verificati CRC e corrispondenza esatta dei 51 file prima della modifica.
 
-## Modifiche
+## Correzione localizzata
 
-- Cerca aggiornamenti nelle opzioni della home e della compilazione, sotto il separatore e prima di Installa app. Il comando e il separatore restano visibili anche con l'app già installata.
-- Controllo manuale della pubblicazione con aggiornamento del service worker, attesa del download completo, dell'attivazione e del passaggio di controllo della pagina.
-- Risposta del service worker con la propria versione: riconosciuto anche il caso di cache già aggiornata con pagina ancora aperta sulla vecchia versione.
-- Conferma del salvataggio della bozza prima della ricerca e prima della ricarica. Durante l'operazione i campi restano protetti; in caso di errore si ripristinano i blocchi originali.
-- Ritorno alla home o alla stessa sezione della scheda tramite un'indicazione temporanea della sessione, senza aggiungere dati al JSON o iniziare un nuovo sopralluogo.
+Allineate al filo inferiore della scritta Cròmo le linee di base di s.c.ar.l. e dell'intera riga dei dati aziendali nel footer PDF. La posizione si ricava dal bordo inferiore del logo e dalla dimensione effettiva del font, senza spostare logo, numerazione o corpo della pagina. Generatore Word e stili dell'app invariati.
 
-## Verifiche automatiche
+## PDF
 
-Superate 45 prove:
+Generati con lo stesso stato sia il PDF della 3.6.23 sia quello aggiornato, confrontando tutte le operazioni di disegno e le tabelle:
 
-- **15 sul controllo aggiornamenti:** versione attuale, pagina vecchia e cache nuova, attesa delle diverse fasi, installazione già in corso, download fallito, errore di rete con nuovo tentativo, assenza di connessione, file locale e browser non supportato, timeout e rimozione dei listener, risposte non valide, ripristino della vista e isolamento fra percorsi della PWA.
-- **8 sull'interfaccia e sulla bozza:** posizione e testo dei menu, home già aggiornata, home offline, ritorno alla home dopo un aggiornamento, ripresa della compilazione nella stessa sezione, conservazione di fotografie/date/storico/nome personalizzato, blocco del doppio clic e ripristino dei campi dopo un errore, salvataggio locale fallito senza ricarica. Un secondo caricamento del bundle simula la nuova versione e usa lo stesso IndexedDB e la stessa sessione: la scheda ripresa coincide con quella salvata.
-- **10 sull'installazione:** browser normale, tutto schermo, finestra installata, overlay, modalità iOS simulata, applicazioni correlate, evento di installazione, storage di sessione non disponibile e listener precedenti. Cerca aggiornamenti e i separatori rimangono visibili mentre Installa app scompare nei casi previsti.
-- **2 sulla cache:** venti risorse complete e navigazione offline, risposta con la versione, pulizia della sola cache precedente; un download interrotto conserva la cache funzionante e permette un tentativo successivo completo.
-- **10 sull'esportazione:** cinque combinazioni su desktop simulato e cinque su iPhone simulato, con risorse offline. JSON obbligatorio, JSON singolo diretto e ZIP per più formati; verificati contenuti e nomi dei file. Nessun PDF intermedio per generare il DOCX.
+- Scheda essenziale dell'Acquedotto, data iniziale vuota e riquadri note: quattro pagine.
+- Scheda con due sopralluoghi, storico manutentivo lungo, otto diagnosi, quattro risoluzioni, priorità rimossa conservando il degrado, azioni preventive storicizzate e cinque fotografie: diciannove pagine.
 
-I controlli della pagina usano Happy DOM e IndexedDB simulato; eventi e messaggi del service worker sono simulati. Non è stata eseguita una prova nativa in browser grafico o su iPhone fisico. La verifica precedente del footer Word resta valida: generatori Word/PDF e asset sono identici per byte alla 3.6.22, come gli stili dell'interfaccia. Non sono state apportate modifiche all'impaginazione dei documenti.
+In tutti i casi le sole differenze di impaginazione sono le coordinate verticali delle due scritte del footer. Contenuti, righe, tabelle, interruzioni di pagina, loghi e numerazione coincidono integralmente con la 3.6.23. I dati della scheda non vengono modificati dall'esportazione.
 
-## Distribuzione
+Renderizzati con Poppler e controllati visivamente tutti i 23 footer, oltre a una pagina completa con note. Verificati anche i PDF tramite estrazione delle coordinate:
 
-Versione coerente fra package, configurazione, bundle, riferimenti HTML e cache. Un solo nuovo modulo sorgente, già incluso nel bundle: 51 file nello ZIP e 20 risorse nella cache. Conservati catalogo, mappa, tracciato, fotografie, dati dei beni e logica dei sopralluoghi.
+- Linea di base di entrambe le scritte a 597,9 pt dal bordo superiore, coincidente entro 0,02 pt con il bordo inferiore del logo.
+- Logo invariato a 28,8 pt da sinistra e 563 pt dall'alto, dimensioni 113,5 x 34,9 pt.
+- Sigla societaria a 11 pt e recapiti a 7,5 pt, come nella versione precedente; riga dei recapiti completa e senza tagli.
+- Tutti i testi entro la pagina, separati dal contenuto e dai riquadri note. Numerazione corretta anche con pagine a due cifre.
+- Nessun campo di modulo trasparente.
 
-Controllati sintassi JavaScript, identificativi HTML, riferimenti dei pulsanti e delle risorse, CRC dello ZIP, `unzip -t`, estrazione e corrispondenza dei file con i sorgenti finali. Esclusi documenti e JSON di prova, node_modules, vecchi template e filigrane. Nessuna modifica o pubblicazione della repository GitHub.
+## Word e salvataggio
+
+Confrontate tutte le parti del DOCX con la 3.6.23, usando una scheda con sopralluoghi e fotografie: corpo, footer, immagini, stili e relazioni identici per byte. Cambia soltanto il metadato della versione dell'app. Dati originali invariati.
+
+Superate cinque combinazioni di esportazione su desktop simulato e cinque su iPhone simulato: JSON obbligatorio, JSON singolo diretto, ZIP per più formati, contenuti e nomi verificati. Le risorse sono disponibili anche offline; il Word nativo non crea PDF intermedi.
+
+Verificata la cache 3.6.24 con venti risorse, risposta con la versione per Cerca aggiornamenti, navigazione offline e pulizia della sola cache precedente. Un download interrotto conserva la cache funzionante e permette un tentativo successivo completo. Le prove di browser e iPhone sono simulate; non è stata eseguita una prova su dispositivo fisico.
+
+## Archivio
+
+Versione coerente fra package, configurazione, bundle, HTML e service worker. Modificato soltanto il modulo del layout PDF, oltre ai metadati di versione, ai file generati e alla documentazione. Interfaccia, tema, ricerca aggiornamenti, catalogo, mappa e logica dei sopralluoghi conservati.
+
+ZIP con 51 file pronti per la radice GitHub. Controllati sintassi JavaScript, riferimenti HTML e risorse, CRC, unzip -t, estrazione e corrispondenza dei file con i sorgenti finali. Esclusi PDF, DOCX e JSON di prova, node_modules, vecchi template e filigrane. Nessuna pubblicazione automatica della repository.

@@ -1,8 +1,13 @@
-# Schede Restauro 3.6.23
+# Schede Restauro 3.6.24
 
 PWA per il Sacro Monte di Varese, utilizzabile offline su desktop e telefono. Esporta PDF, Word modificabile e JSON. Lo ZIP contiene il sito già compilato, pronto per GitHub Pages senza npm o un server applicativo.
 
 ## Novità della revisione
+
+- Nel footer di tutte le pagine PDF, **s.c.ar.l.** e l'intera riga dei dati aziendali sono allineati al filo inferiore della scritta Cròmo. Posizione e dimensioni del logo, font e numerazione sono conservati.
+- Il corpo del PDF e l'impaginazione Word rimangono identici alla 3.6.23. La correzione riguarda soltanto la posizione verticale delle due scritte del footer PDF.
+
+## Correzioni già incluse nella 3.6.23
 
 - **Cerca aggiornamenti** è presente in Opzioni sia nella home sia nella compilazione, dopo il separatore e prima di Installa app. Rimane visibile anche quando l'app è già installata; in questo caso il separatore resta presente.
 - Il comando salva la bozza, controlla la pubblicazione online, attende che tutti i file siano pronti e che il nuovo aggiornamento controlli la pagina. Poi ricarica l'app e riprende la stessa scheda nella stessa sezione; dalla home ritorna alla home. Fotografie, storico, date e nome personalizzato rimangono conservati.
@@ -56,7 +61,7 @@ Conservati i checkbox separati di Grotta e VI Cappella, le altre coordinate, il 
 
 ## Pubblicazione
 
-Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Se presente nella vecchia versione, elimina anche `assets/home-landscape.png`, che non è più utilizzato. Attendi il completamento di GitHub Pages. La cache 3.6.23 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
+Estrai lo ZIP e carica tutti i file e le cartelle nella radice della repository, sostituendo quelli della versione precedente. `index.html`, `styles.css`, `app.bundle.js`, `sw.js` e `manifest.webmanifest` devono trovarsi accanto alle cartelle `assets`, `js`, `vendor` e `tools`. Non caricare lo ZIP senza estrarlo. Se presente nella vecchia versione, elimina anche `assets/home-landscape.png`, che non è più utilizzato. Attendi il completamento di GitHub Pages. La cache 3.6.24 sostituisce quella precedente senza cancellare la bozza; una scheda in compilazione non viene ricaricata forzatamente.
 
 Per il primo passaggio dalla 3.6.22, che non contiene il nuovo pulsante, ricarica l'app con connessione, attendi il controllo iniziale e ricaricala di nuovo se mostra ancora la versione precedente. Dalla 3.6.23 in poi puoi usare Cerca aggiornamenti. La ricerca riguarda il percorso da cui hai aperto l'app, anche se la repository ha un nome diverso da SMV.
 
