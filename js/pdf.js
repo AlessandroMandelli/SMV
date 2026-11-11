@@ -90,14 +90,17 @@ function identification(report, state, assets) {
   const left = PAGE.margin,
     columnWidth = 371.2,
     textX = left + 92;
-  report.image(page, report.images.anniversary, left, 55.1, 70.6, 15);
-  report.image(page, report.images.logo, left, 84.55, 70.6, 108.5);
-  report.text(page, "SCHEDA DI ISPEZIONE PERIODICA", textX, 48.2, {
+  // Partenza della prima pagina come nel Word: margine di 28,8 pt,
+  // loghi in linea e titolo sul bordo superiore della composizione.
+  const logoTop = PAGE.margin + 25.95;
+  report.image(page, report.images.anniversary, left, PAGE.margin + 1.95, 70.6, 15);
+  report.image(page, report.images.logo, left, logoTop, 70.6, 108.5);
+  report.text(page, "SCHEDA DI ISPEZIONE PERIODICA", textX, PAGE.margin, {
     size: 13,
     bold: true,
     color: COLORS.green,
   });
-  let headerY = 86.6;
+  let headerY = PAGE.margin + 26.6;
   for (const [label, value] of [
     ["ID Scheda:", state.general.id],
     ["Data:", displayDate(state.general.date)],
@@ -119,7 +122,7 @@ function identification(report, state, assets) {
     });
     headerY += height;
   }
-  headerY = Math.max(144.6, headerY + 14);
+  headerY = Math.max(PAGE.margin + 66.2, headerY + 8);
   report.text(page, "Operatore: " + COMMON.operator, textX, headerY, {
     bold: true,
   });
@@ -134,7 +137,7 @@ function identification(report, state, assets) {
     report.text(page, info, textX, headerY, { size: 8 });
     headerY += 11.2;
   }
-  const top = Math.max(225.5, headerY + 20);
+  const top = Math.max(logoTop + 108.5 + 16, headerY + 20);
   report.band(page, "1. IDENTIFICAZIONE DEL BENE", top, left, columnWidth);
   const flow = new Flow(
     report,
@@ -165,7 +168,7 @@ function identification(report, state, assets) {
   flow.y += 17.4;
   flow.paragraph("Complesso:", state.general.complex, { showEmpty: true });
   flow.paragraph("Ente Proprietario:", state.general.owner, { showEmpty: true });
-  flow.y = Math.max(flow.firstColumn ? 376 : flow.y + 8, flow.y + 12);
+  flow.y = Math.max(flow.firstColumn ? top + 150.5 : flow.y + 8, flow.y + 12);
   flow.section("2. SOGGETTO E DATI TECNICO-DIMENSIONALI", 18);
   flow.paragraph("Soggetto:", state.general.subject, {
     showEmpty: true,
@@ -205,12 +208,12 @@ function identification(report, state, assets) {
     page,
     mapTitle,
     frame.x + (frame.width - report.width(mapTitle, 11, true)) / 2,
-    39.6,
+    PAGE.margin + 4.2,
     { size: 11, bold: true, color: COLORS.green },
   );
   const map = {
     x: frame.x + (frame.width - 254.15) / 2,
-    top: 63.2,
+    top: PAGE.margin + 24.45,
     width: 254.15,
     height: 254.15 * ROAD_SIZE.height / ROAD_SIZE.width,
   };
